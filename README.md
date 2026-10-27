@@ -22,15 +22,18 @@ olduğundan katsayıları merkezlenmiş (işaretli) tutarak paketleme genişliğ
 
 ## Durum
 
+**Başvuru son tarihi: 4 Ocak 2027, 17.30** · hedef yükleme: 2 Ocak 2027
+
 | Aşama | Konu | Tarih | Durum |
 |---|---|---|---|
-| 0 | Repo, plan, dokümanlar, ön ölçüm | 26 Eki – 1 Kas 2026 | ✅ iskelet hazır, danışman toplantısı bekliyor |
-| 1 | Literatür + teori (ispat) | 2 – 15 Kas | ⏳ |
-| 2 | Referans ML-KEM (NTT) + NIST test vektörleri | 16 – 29 Kas | ⏳ |
-| 3 | Kronecker motorları + ML-KEM entegrasyonu | 30 Kas – 13 Ara | ⏳ |
-| 4 | Deneyler (H2–H4) | 14 Ara – 3 Oca | ⏳ |
-| 5 | PQC-Drop prototipi | 4 – 17 Oca 2027 | ⏳ |
-| 6 | Rapor, poster, sunum | 18 – 31 Oca | ⏳ |
+| 0 | Repo, plan, dokümanlar, ön ölçüm | 26 Eki – 2 Kas 2026 | 🟡 iskelet + CI hazır, danışman toplantısı bekliyor |
+| 1 | Literatür + teori (ispat) | 3 – 15 Kas | ⏳ |
+| 2 | Referans ML-KEM (NTT) + NIST test vektörleri | 3 – 22 Kas | ⏳ |
+| 3 | Kronecker motorları + ML-KEM entegrasyonu | 23 Kas – 4 Ara | ⏳ |
+| 4 | Deneyler (H2–H4) | 5 – 18 Ara | ⏳ |
+| 5a | PQC-Drop asgari prototip (CLI) | 12 – 20 Ara | ⏳ |
+| 6 | Rapor | 16 – 31 Ara | ⏳ |
+| 5b | GUI, poster, sunum (başvuru sonrası) | Ocak – sergi | ⏳ |
 
 Ayrıntı: [docs/01-calisma-plani.md](docs/01-calisma-plani.md)
 
