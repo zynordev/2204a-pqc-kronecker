@@ -67,7 +67,34 @@ Açık noktalar (Aşama 1):
 - [ ] Kuyruk bölgesinde normal yaklaşımın doğruluğu (Berry–Esseen) — lise düzeyinde "yaklaşık" demek yeterli mi?
 - [ ] Modül toplamı (Σ_j a_ij·s_j, k terimli) için sınırlar: n·A·η·k.
 
-## Negasiklik kısayol (Aşama 3 varyantı)
-X = 2^ℓ'de X^n + 1 = 2^(nℓ) + 1. Bu yüzden a·s mod (X^n+1) polinomu, P_a·P_s mod (2^(nℓ)+1) tamsayısının
-dengeli gösterimidir — **eğer** indirgenmiş katsayılar |c_k − c_{k+n}| < 2^(ℓ−1) koşulunu sağlıyorsa.
-İndirgenmiş katsayı en fazla n terimin toplamı olduğundan aynı sınır (n·A·η) geçerlidir. İspat Aşama 1'de yazılacak.
+## Önerme 2 (negasiklik kısayol) — `negasiklik_mod` varyantları
+X = 2^ℓ'de X^n + 1 = 2^(nℓ) + 1 =: M. P_a·P_s ≡ Σ_{k<n} d_k·2^(kℓ) (mod M), d_k = c_k − c_{k+n}
+(çünkü 2^(nℓ) ≡ −1). d_k tam olarak n terimin toplamıdır (i + j ≡ k mod n olan her i için bir terim),
+yani |d_k| ≤ n·A·η. Bu sınır < 2^(ℓ−1) ise Σ d_k·2^(kℓ) değeri (−M/2, M/2) aralığındadır; dolayısıyla
+P_a·P_s mod M'nin merkezlenmiş temsilcisi tam olarak budur ve Lemma 1 ile d_k'ler okunur. Gereken ℓ,
+Teorem 1 ile **aynıdır**; kazanç: açılacak dilim sayısı 2n−1 yerine n.
+Keskinlik: s ≡ η, a_i = +A (i ≤ k₀), −A (i > k₀) seçilirse d_{k₀} = n·A·η olur
+(`tests/test_kronecker.py::_en_kotu_negasiklik`). [ölçüldü: l=22 doğru, l=21 bozuk]
+
+*Taslak ispat — Aşama 1'de B elle kontrol edecek: "tam olarak n terim" ve aralık argümanı.*
+
+## Sonuç 1 (modül toplamı) — `modul_toplami` varyantları
+ML-KEM'de çarpımlar hep iç çarpım olarak gelir: Σ_{j<k} a_j·s_j. Terimler tamsayı olarak toplanıp
+**bir kez** açılırsa her katsayı k·n·A·η ile sınırlıdır (üçgen eşitsizliği). Gereken ℓ:
+
+| Parametre | k | η₁ | k·n·A·η | ℓ_min |
+|---|---|---|---|---|
+| ML-KEM-512 | 2 | 3 | 2 555 904 | 23 |
+| ML-KEM-768 | 3 | 2 | 2 555 904 | 23 |
+| ML-KEM-1024 | 4 | 2 | 3 407 872 | 23 |
+
+[hesaplandı; `tests/test_kronecker.py::test_gerekli_l_tablosu`] → **ℓ = 24 (3 bayt) üç parametre setinin
+tamamına yeter.** Bayt hizalı olduğu için hızlı bayt dönüşümüyle açılabilir. Aynı hile işaretsiz 32 bitte
+mümkün değildir: 2·256·3328² ≥ 2^32.
+
+## Lemma 2 (bayt ile açma) — `bayt` varyantları
+Dilimler d_k ∈ [−2^(ℓ−1), 2^(ℓ−1)) ise C' = C + 2^(ℓ−1)·Σ_k 2^(kℓ) = Σ_k (d_k + 2^(ℓ−1))·2^(kℓ) ve her
+(d_k + 2^(ℓ−1)) ∈ [0, 2^ℓ). Yani C' negatif olmayan, "borçsuz" bir taban-2^ℓ sayısıdır; ℓ 8'in katıysa
+dilimleri doğrudan baytlardan okunur, sonra 2^(ℓ−1) çıkarılır. Paketleme de doğrusal olduğundan
+paket(f) = paket(f + c) − c·paket(1) ile negatif olmayan sayılar üzerinden yapılır.
+Dilim koşulu bozulursa (dar ℓ) bayt dönüşümü sessizce yanlış sonuç vermek yerine hata fırlatır.

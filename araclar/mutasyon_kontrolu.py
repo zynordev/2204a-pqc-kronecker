@@ -33,6 +33,11 @@ MUTASYONLAR = [
         "return True",
         "dk özet kontrolü yok",
     ),
+    ("src/pqc/kronecker.py", "(c[i] - c[i + N]) % Q", "(c[i] + c[i + N]) % Q", "Kronecker: X^n = −1 yerine +1"),
+    ("src/pqc/kronecker.py", "sapma = (1 << (l - 1)) if isaretli else 0", "sapma = 0",
+     "Kronecker: bayt açmada işaret sapması unutuldu"),
+    ("src/pqc/teori.py", "return terim * n * a_max * b_max", "return n * a_max * b_max",
+     "Teori: modül toplamında sınır k ile çarpılmıyor"),
 ]
 
 
