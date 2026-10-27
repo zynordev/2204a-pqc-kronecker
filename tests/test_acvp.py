@@ -6,10 +6,15 @@ import pathlib
 
 import pytest
 
-from pqc import mlkem
+from pqc import kpke, mlkem
+from pqc.kpke_kronecker import KroneckerPKE
+from pqc.kronecker import VARYANTLAR
 from pqc.parametreler import PARAMETRELER
 
 _KLASOR = pathlib.Path(__file__).parent / "vektorler"
+
+# H1: aynı resmî vektörler hem standardın yolu (NTT) hem her Kronecker varyantı ile geçmeli.
+MOTORLAR = [pytest.param(kpke, id="ntt")] + [pytest.param(KroneckerPKE(v), id=v.ad) for v in VARYANTLAR]
 
 
 def _vakalar(dosya: str, fonksiyon: str | None = None) -> list:
@@ -32,23 +37,26 @@ def _b(hex_metin: str) -> bytes:
 
 
 @pytest.mark.parametrize("p,vaka", _vakalar("ML-KEM-keyGen-FIPS203"))
-def test_keygen(p, vaka):
-    ek, dk = mlkem.keygen_internal(_b(vaka["d"]), _b(vaka["z"]), p)
+@pytest.mark.parametrize("pke", MOTORLAR)
+def test_keygen(p, vaka, pke):
+    ek, dk = mlkem.keygen_internal(_b(vaka["d"]), _b(vaka["z"]), p, pke)
     assert ek == _b(vaka["ek"])
     assert dk == _b(vaka["dk"])
 
 
 @pytest.mark.parametrize("p,vaka", _vakalar("ML-KEM-encapDecap-FIPS203", "encapsulation"))
-def test_encaps(p, vaka):
-    K, c = mlkem.encaps_internal(_b(vaka["ek"]), _b(vaka["m"]), p)
+@pytest.mark.parametrize("pke", MOTORLAR)
+def test_encaps(p, vaka, pke):
+    K, c = mlkem.encaps_internal(_b(vaka["ek"]), _b(vaka["m"]), p, pke)
     assert c == _b(vaka["c"])
     assert K == _b(vaka["k"])
 
 
 @pytest.mark.parametrize("p,vaka", _vakalar("ML-KEM-encapDecap-FIPS203", "decapsulation"))
-def test_decaps(p, vaka):
+@pytest.mark.parametrize("pke", MOTORLAR)
+def test_decaps(p, vaka, pke):
     # "modified ciphertext" vakaları örtük reddetmeyi (K̄ = J(z‖c)) sınar.
-    assert mlkem.decaps_internal(_b(vaka["dk"]), _b(vaka["c"]), p) == _b(vaka["k"])
+    assert mlkem.decaps_internal(_b(vaka["dk"]), _b(vaka["c"]), p, pke) == _b(vaka["k"])
 
 
 @pytest.mark.parametrize("p,vaka", _vakalar("ML-KEM-encapDecap-FIPS203", "encapsulationKeyCheck"))

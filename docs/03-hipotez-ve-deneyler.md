@@ -10,9 +10,9 @@
 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
-| E1.1 | ACVP keyGen / encaps / decaps vektörleri, 3 parametre seti | %100 eşleşme | NTT ile 225/225 [ölçüldü, 2026-10-27]; Kronecker ile Aşama 3 |
-| E1.2 | 10.000 rastgele (a, s) çifti: her Kronecker varyantı vs schoolbook | 0 hata | — |
-| E1.3 | Kenar durumlar: tüm katsayılar ±1664, s tamamen ±η, sıfır polinom | 0 hata | — |
+| E1.1 | ACVP keyGen / encaps / decaps vektörleri, 3 parametre seti | %100 eşleşme | NTT ve 8 Kronecker varyantının her biri ile 225/225 [ölçüldü, 2026-10-27, `tests/test_acvp.py`] |
+| E1.2 | 10.000 rastgele (a, s) çifti: her Kronecker varyantı vs schoolbook | 0 hata | 8 varyant × 10.000: 0 hata [ölçüldü, `experiments/01-dogruluk`] |
+| E1.3 | Kenar durumlar: tüm katsayılar ±1664, s tamamen ±η, sıfır polinom, negasiklik en kötü girdi | 0 hata | 8 varyant, 0 hata [ölçüldü, `tests/test_kronecker.py`] |
 
 ## H2 — Teori deneyle örtüşür (ana kanıt)
 **İddia:** [04 — Teori](04-teori.md)'deki Lemma 1'in verdiği ℓ_min her girdi için yeterlidir ve keskindir;

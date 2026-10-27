@@ -58,10 +58,12 @@ Her aşamanın bir **çıkış kriteri** var. Kriter sağlanmadan sonraki aşama
 - **Çıkış:** tüm resmî test vektörleri geçiyor; CI yeşil.
 
 ### Aşama 3 — Kronecker motorları (23 Kas – 4 Ara)
-- [ ] Varyantlar: işaretsiz 32 bit · işaretli 22 bit · ofset hileli · mod 2^(nℓ)+1 negasiklik ·
-      modül toplamını paketli alanda yapan
-- [ ] Her varyant ML-KEM'e takılabilir (çarpım fonksiyonu parametre)
-- [ ] Her varyant: schoolbook'a karşı 10.000 rastgele + kenar durum testi; ML-KEM test vektörleri hâlâ geçiyor
+- [x] Varyantlar (8): işaretsiz 32 bit (döngü/bayt) · işaretli 22 bit · bayt hizalı 24 bit (ofset hilesi) ·
+      mod 2^(nℓ)+1 negasiklik · modül toplamını paketli alanda yapan ([kronecker.py](../src/pqc/kronecker.py))
+- [x] Her varyant ML-KEM'e takılabilir (`KroneckerPKE`, ADR 0003)
+- [x] Kenar durum testleri; ML-KEM test vektörleri 8 varyantla geçiyor
+- [x] 10.000 rastgele örnek (E1.2): 8 varyant, 0 hata ([sonuç](../experiments/01-dogruluk/sonuc.md))
+- [ ] Halil'in kod okuma notu ([rehber](kod-okuma/asama-3.md))
 - **Çıkış:** H1 doğrulandı.
 
 ### Aşama 4 — Deneyler (5 – 18 Ara)
