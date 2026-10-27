@@ -1,6 +1,6 @@
 # 01 — Çalışma Planı
 
-*Son güncelleme: 2026-10-27. **Başvuru son tarihi: 4 Ocak 2027, 17.30** (şartname, Halil doğruladı).
+*Son güncelleme: 2026-10-27 (Aşama 2 kodu). **Başvuru son tarihi: 4 Ocak 2027, 17.30** (şartname, Halil doğruladı).
 Hedef yükleme tarihi: **2 Ocak 2027** — son güne bırakılmaz.*
 
 ## Ekip ve rol dağılımı
@@ -51,9 +51,10 @@ Her aşamanın bir **çıkış kriteri** var. Kriter sağlanmadan sonraki aşama
 - **Çıkış:** iki öğrenci de ispatı tahtada anlatıyor; 02 tablosunda ✘ kalmadı; kategori yazıldı.
 
 ### Aşama 2 — Referans ML-KEM (3 – 22 Kas) · Öğrenci A
-- [ ] Saf Python ML-KEM-512/768/1024: SHAKE, CBD, NTT, K-PKE, KEM (FIPS 203 algoritma numaralarıyla)
-- [ ] NIST ACVP test vektörleri ile test (keyGen, encaps, decaps)
-- [ ] Okul yöntemi (schoolbook) negasiklik çarpım = altın standart
+- [x] Saf Python ML-KEM-512/768/1024: SHAKE, CBD, NTT, K-PKE, KEM (FIPS 203 algoritma numaralarıyla)
+- [x] NIST ACVP test vektörleri ile test (keyGen, encaps, decaps)
+- [x] Okul yöntemi (schoolbook) negasiklik çarpım = altın standart
+- [ ] Halil'in kod okuma notu ([rehber](kod-okuma/asama-2.md))
 - **Çıkış:** tüm resmî test vektörleri geçiyor; CI yeşil.
 
 ### Aşama 3 — Kronecker motorları (23 Kas – 4 Ara)

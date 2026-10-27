@@ -1,7 +1,7 @@
 """docs/04-teori.md'deki sınırların kod karşılığı."""
 
-N = 256
-Q = 3329
+from pqc.parametreler import Q
+
 A = (Q - 1) // 2  # merkezlenmiş katsayının en büyük mutlak değeri: 1664
 
 

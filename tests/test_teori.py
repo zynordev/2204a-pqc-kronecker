@@ -1,6 +1,7 @@
 """docs/04-teori.md Teorem 1 tablosunun sayısal kontrolü."""
 
-from pqc.teori import A, N, Q, katsayi_siniri, l_min_isaretli, l_min_isaretsiz
+from pqc.parametreler import N, Q
+from pqc.teori import A, katsayi_siniri, l_min_isaretli, l_min_isaretsiz
 
 
 def test_tablo_eta3():

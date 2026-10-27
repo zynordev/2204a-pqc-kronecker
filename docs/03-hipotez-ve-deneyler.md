@@ -10,7 +10,7 @@
 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
-| E1.1 | ACVP keyGen / encaps / decaps vektörleri, 3 parametre seti | %100 eşleşme | — |
+| E1.1 | ACVP keyGen / encaps / decaps vektörleri, 3 parametre seti | %100 eşleşme | NTT ile 225/225 [ölçüldü, 2026-10-27]; Kronecker ile Aşama 3 |
 | E1.2 | 10.000 rastgele (a, s) çifti: her Kronecker varyantı vs schoolbook | 0 hata | — |
 | E1.3 | Kenar durumlar: tüm katsayılar ±1664, s tamamen ±η, sıfır polinom | 0 hata | — |
 
