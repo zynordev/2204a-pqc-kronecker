@@ -1,6 +1,6 @@
 # 00 — Proje Özeti
 
-*Son güncelleme: 2026-10-26 (Aşama 0). İlk taslak metnin yerini alır; abartılı iddialar çıkarıldı.*
+*Son güncelleme: 2026-10-27 (çıkış gözlemi eklendi). İlk taslak metnin yerini alır; abartılı iddialar çıkarıldı.*
 
 ## Tek cümle
 ML-KEM'deki polinom çarpımını merkezlenmiş Kronecker ikamesiyle yapmak için gereken paketleme genişliğini
@@ -12,6 +12,13 @@ ve yöntemi çalışan bir kuantum korumalı dosya aktarım prototipinde kullan�
 Danışman uyarısı: rapor anlatılmaz, **pazarlanır**. Her bölüm şu zinciri izler:
 **problem → neden önemli → iddiamız → kanıtımız → çalışan ürün.**
 
+0. **Çıkış noktası: kendi gözlemimiz.** 23² = ? sorusunu (2x + 3)² = 4x² + 12x + 9 açılımı ve sağdan sola
+   elde ile çözdük (9 → 9; 12 → 2, elde 1; 4 + 1 → 5 ⇒ 529). Sonra şunu sorduk: *taban ne kadar büyük olursa
+   elde hiç gerekmez ve katsayılar doğrudan okunur?* (2 basamaklı karede: taban ≥ 163.) Bu soruyu
+   genelleştirince, polinomları büyük tamsayıya çevirip çarpan **Kronecker ikamesine** (1882) ulaştık:
+   gözlemimiz onun taban-10'daki, ters yönlü halidir. Bunu literatürde sonradan öğrendik.
+   Kriptografide aynı soru şudur: ML-KEM'de eldesiz okuma için taban 2^ℓ'de ℓ ne olmalı?
+   Ayrıntı: [04 §0](04-teori.md).
 1. **Problem.** RSA ve eliptik eğri tabanlı anahtar değişimi, Shor algoritması ile kuantum bilgisayarda polinom
    zamanda kırılabilir. Bugün kaydedilen trafik yarın çözülebilir ("harvest now, decrypt later").
 2. **Çözümün standardı.** NIST, 13 Ağustos 2024'te FIPS 203 (ML-KEM) standardını yayımladı. Güvenliği
@@ -37,6 +44,7 @@ Endüstride TLS 1.3 hibrit anahtar değişimi de aynı mantıkla çalışır.
 
 | Söylüyoruz | Söylemiyoruz |
 |---|---|
+| Kendi gözlemimizden (23² ve elde) yola çıktık; Kronecker ikamesinin özel hali olduğunu sonradan öğrendik | Bu çarpma yöntemini ilk biz bulduk |
 | NIST standardını temel aldık | Yeni bir şifreleme algoritması bulduk |
 | Literatürdeki işaretli Kronecker yöntemini ML-KEM için analiz ettik | Merkezlenmiş Kronecker'i ilk biz önerdik |
 | Sınırı ispatladık ve deneyle doğruladık | Her koşulda daha hızlı |

@@ -27,7 +27,7 @@ olduğundan katsayıları merkezlenmiş (işaretli) tutarak paketleme genişliğ
 | Aşama | Konu | Tarih | Durum |
 |---|---|---|---|
 | 0 | Repo, plan, dokümanlar, ön ölçüm | 26 Eki – 2 Kas 2026 | 🟡 iskelet + CI hazır, danışman toplantısı bekliyor |
-| 1 | Literatür + teori (ispat) | 3 – 15 Kas | ⏳ |
+| 1 | Literatür + teori (ispat) | 3 – 15 Kas | 🟡 çıkış gözlemi (23²) + Lemma 1 / Teorem 1 ispatları yazıldı (`asama-1`), B'nin kontrolü ve künye doğrulama bekliyor |
 | 2 | Referans ML-KEM (NTT) + NIST test vektörleri | 3 – 22 Kas | 🟡 kod + 225/225 NIST testi geçti (`asama-2` dalı), kod okuma bekliyor |
 | 3 | Kronecker motorları + ML-KEM entegrasyonu | 23 Kas – 4 Ara | 🟡 8 varyant, her biri 225/225 NIST testi (`asama-3` dalı), kod okuma bekliyor |
 | 4 | Deneyler (H2–H4) | 5 – 18 Ara | ⏳ |

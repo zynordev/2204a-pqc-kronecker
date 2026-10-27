@@ -38,6 +38,7 @@ MUTASYONLAR = [
      "Kronecker: bayt açmada işaret sapması unutuldu"),
     ("src/pqc/teori.py", "return terim * n * a_max * b_max", "return n * a_max * b_max",
      "Teori: modül toplamında sınır k ile çarpılmıyor"),
+    ("src/pqc/taban.py", "divmod(c + elde, taban)", "divmod(c, taban)", "Çıkış gözlemi: elde sola eklenmiyor"),
 ]
 
 

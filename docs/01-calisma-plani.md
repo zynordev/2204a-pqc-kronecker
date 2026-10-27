@@ -45,7 +45,9 @@ Her aşamanın bir **çıkış kriteri** var. Kriter sağlanmadan sonraki aşama
 ### Aşama 1 — Literatür ve teori (3 – 15 Kas) · Öğrenci B
 - [ ] [02](02-literatur.md)'deki her kaynağı bul, oku, künyesini doğrula (✘ → ✔)
 - [ ] FIPS 203'ün ilgili bölümlerini oku: parametreler, CBD, NTT, K-PKE
-- [ ] Taşma lemmasının ispatını elle yaz ([04](04-teori.md)), keskinlik örneğini elle hesapla
+- [x] Çıkış gözlemi (23², elde) teoriye bağlandı ([04 §0](04-teori.md), `src/pqc/taban.py`)
+- [x] Lemma 1, Teorem 1, Önerme 1 kesin ifade + ispat yazıldı (Claude)
+- [ ] B ispatları elle kontrol etti, keskinlik örneğini elle hesapladı
 - [ ] Olasılık modelini (normal yaklaşım) kur
 - [ ] Kategori kararı (Matematik / Bilgisayar)
 - **Çıkış:** iki öğrenci de ispatı tahtada anlatıyor; 02 tablosunda ✘ kalmadı; kategori yazıldı.
