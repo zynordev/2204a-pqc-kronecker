@@ -119,8 +119,14 @@ def e33_deneyi():
     a_m = [merkezle(rng.randrange(Q)) for _ in range(N)]
     s_m = [rng.randint(-3, 3) for _ in range(N)]
 
-    varyant_adlari = ["isaretsiz32-dongu", "isaretsiz32-bayt", "isaretli22-dongu",
-                      "isaretli24-bayt", "isaretli22-negmod", "isaretli24-bayt-negmod"]
+    varyant_adlari = [
+        "isaretsiz32-dongu",
+        "isaretsiz32-bayt",
+        "isaretli22-dongu",
+        "isaretli24-bayt",
+        "isaretli22-negmod",
+        "isaretli24-bayt-negmod",
+    ]
     sonuclar = []
 
     for vad in varyant_adlari:
@@ -169,7 +175,9 @@ def e34_deneyi(tekrar: int = 100):
     for p in parametreler:
         for motor_ad, pke in motorlar:
             # Keygen
-            med_kg, iqr_kg = olc_medyan_iqr(lambda p=p, pke=pke: mlkem.keygen(p, pke=pke), tekrar=tekrar, isinma=5)
+            med_kg, iqr_kg = olc_medyan_iqr(
+                lambda p=p, pke=pke: mlkem.keygen(p, pke=pke), tekrar=tekrar, isinma=5
+            )
             # Encaps
             ek, dk = mlkem.keygen(p, pke=pke)
             med_enc, iqr_enc = olc_medyan_iqr(
@@ -203,7 +211,10 @@ def main():
         yaz.writerows(res_31)
     base_8192 = res_31[0][2]
     val_5632 = res_31[2][2]
-    print(f"E3.1 tamamlandı: 8192b = {base_8192:.2f} µs, 5632b = {val_5632:.2f} µs (Hızlanma: {base_8192 / val_5632:.2f}x)", flush=True)
+    print(
+        f"E3.1 tamamlandı: 8192b = {base_8192:.2f} µs, 5632b = {val_5632:.2f} µs (Hızlanma: {base_8192 / val_5632:.2f}x)",
+        flush=True,
+    )
 
     print("E3.2: Tek polinom çarpım süreleri ölçülüyor...", flush=True)
     res_32 = e32_deneyi()
@@ -228,8 +239,18 @@ def main():
     with open(KLASOR / "veri_e34.csv", "w", newline="") as f:
         yaz = csv.writer(f)
         yaz.writerow([baslik])
-        yaz.writerow(["parametre", "motor", "keygen_med_us", "keygen_iqr_us",
-                      "encaps_med_us", "encaps_iqr_us", "decaps_med_us", "decaps_iqr_us"])
+        yaz.writerow(
+            [
+                "parametre",
+                "motor",
+                "keygen_med_us",
+                "keygen_iqr_us",
+                "encaps_med_us",
+                "encaps_iqr_us",
+                "decaps_med_us",
+                "decaps_iqr_us",
+            ]
+        )
         yaz.writerows(res_34)
     print("E3.4 tamamlandı.", flush=True)
 

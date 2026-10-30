@@ -31,6 +31,7 @@ def _birler(l: int, adet: int) -> int:
 
 # --- paketleme ---
 
+
 def paketle_dongu(f: list[int], l: int) -> int:
     """Horner yöntemi: Σ f_i·2^(i·l). Negatif katsayılarla da doğru çalışır."""
     x = 0
@@ -48,6 +49,7 @@ def paketle_bayt(f: list[int], l: int, sapma: int) -> int:
 
 
 # --- açma ---
+
 
 def ac_dongu_isaretli(C: int, l: int, adet: int) -> list[int]:
     """Lemma 1'in ispatındaki algoritma: dilim ≥ 2^(l−1) ise negatif say, çıkar, kaydır."""
@@ -162,7 +164,13 @@ VARYANTLAR = [
     Varyant("isaretli22-negmod", l=22, isaretli=True, negasiklik_mod=True),
     Varyant("isaretli24-bayt-negmod", l=24, isaretli=True, bayt=True, negasiklik_mod=True),
     Varyant("isaretli24-bayt-modul", l=24, isaretli=True, bayt=True, modul_toplami=True),
-    Varyant("isaretli24-bayt-negmod-modul", l=24, isaretli=True, bayt=True, negasiklik_mod=True,
-            modul_toplami=True),
+    Varyant(
+        "isaretli24-bayt-negmod-modul",
+        l=24,
+        isaretli=True,
+        bayt=True,
+        negasiklik_mod=True,
+        modul_toplami=True,
+    ),
 ]
 VARYANT = {v.ad: v for v in VARYANTLAR}

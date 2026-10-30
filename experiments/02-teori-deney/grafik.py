@@ -19,7 +19,13 @@ from pqc.parametreler import N
 from pqc.teori import A, l_min_isaretli, model_hata, model_hata_taban
 
 KLASOR = pathlib.Path(__file__).parent
-DURUMLAR = {"tek-eta3": (1, 3), "tek-eta2": (1, 2), "modul-512": (2, 3), "modul-768": (3, 2), "modul-1024": (4, 2)}
+DURUMLAR = {
+    "tek-eta3": (1, 3),
+    "tek-eta2": (1, 2),
+    "modul-512": (2, 3),
+    "modul-768": (3, 2),
+    "modul-1024": (4, 2),
+}
 OLCULEBILIR = (1e-3, 1 - 1e-3)  # ön kayıt: model bu aralıktayken karşılaştırılır
 
 
@@ -66,19 +72,37 @@ def main() -> None:
             bag, birlesim = model_hata(l, N, eta, k, neg)
             alt, ust = wilson(x, n)
             olculebilir = OLCULEBILIR[0] < bag < OLCULEBILIR[1]
-            ozet.append([seri, l, x, n, x / n, alt, ust, bag, birlesim, int(olculebilir),
-                         int(alt <= bag <= ust)])
+            ozet.append(
+                [seri, l, x, n, x / n, alt, ust, bag, birlesim, int(olculebilir), int(alt <= bag <= ust)]
+            )
     with open(KLASOR / "ozet.csv", "w", newline="") as f:
         yaz = csv.writer(f)
-        yaz.writerow(["seri", "l", "hatali", "toplam", "oran", "wilson_alt", "wilson_ust", "model_bagimsiz",
-                      "model_birlesim", "olculebilir", "model_aralikta"])
+        yaz.writerow(
+            [
+                "seri",
+                "l",
+                "hatali",
+                "toplam",
+                "oran",
+                "wilson_alt",
+                "wilson_ust",
+                "model_bagimsiz",
+                "model_birlesim",
+                "olculebilir",
+                "model_aralikta",
+            ]
+        )
         yaz.writerows(ozet)
     print("E2.3 (tam sayı ℓ; yalnızca 0 < hatalı < toplam veya ölçülebilir satırlar):")
-    print(f"{'seri':16s} {'ℓ':>3s} {'hatalı/toplam':>14s} {'oran':>9s} {'%95 GA':>21s} {'model':>9s} {'birleşim':>9s}")
+    print(
+        f"{'seri':16s} {'ℓ':>3s} {'hatalı/toplam':>14s} {'oran':>9s} {'%95 GA':>21s} {'model':>9s} {'birleşim':>9s}"
+    )
     for s in ozet:
         if 0 < s[2] < s[3] or s[9]:
-            print(f"{s[0]:16s} {s[1]:3d} {s[2]:>6d}/{s[3]:<7d} {s[4]:9.2e} [{s[5]:.2e}, {s[6]:.2e}] "
-                  f"{s[7]:9.2e} {s[8]:9.2e} {'✓' if s[10] else '✗'}")
+            print(
+                f"{s[0]:16s} {s[1]:3d} {s[2]:>6d}/{s[3]:<7d} {s[4]:9.2e} [{s[5]:.2e}, {s[6]:.2e}] "
+                f"{s[7]:9.2e} {s[8]:9.2e} {'✓' if s[10] else '✗'}"
+            )
 
     # --- E2.4: sürekli taban ---
     print("\nE2.4 (sürekli log₂B ızgarası, adım 0,02; model ölçülebilir aralıktayken):")
@@ -101,13 +125,17 @@ def main() -> None:
                 icinde += alt <= bag <= ust
         e24[seri] = noktalar
         log_h = sorted(math.log2(2 * v) for v in h)
-        print(f"{seri:16s} model GA içinde {icinde:3d}/{sayilan:<3d}  log₂(2h*) medyan {log_h[n // 2]:.2f}, "
-              f"en büyük {log_h[-1]:.2f}, ℓ_min {l_min_isaretli(N, A, eta, k)}")
+        print(
+            f"{seri:16s} model GA içinde {icinde:3d}/{sayilan:<3d}  log₂(2h*) medyan {log_h[n // 2]:.2f}, "
+            f"en büyük {log_h[-1]:.2f}, ℓ_min {l_min_isaretli(N, A, eta, k)}"
+        )
 
     # --- grafikler ---
     renk = {"tek-eta3": "C0", "tek-eta2": "C1", "modul-512": "C2", "modul-768": "C4", "modul-1024": "C3"}
-    for dosya, baslik, tur in (("grafik_e24.png", "tam çarpım (2n−1 dilim)", "tam"),
-                               ("grafik_e24_neg.png", "negasiklik mod 2^(nℓ)+1 (n dilim)", "neg")):
+    for dosya, baslik, tur in (
+        ("grafik_e24.png", "tam çarpım (2n−1 dilim)", "tam"),
+        ("grafik_e24_neg.png", "negasiklik mod 2^(nℓ)+1 (n dilim)", "neg"),
+    ):
         fig, ax = plt.subplots(figsize=(8, 5))
         for seri, noktalar in e24.items():
             if not seri.endswith(tur):
@@ -116,9 +144,15 @@ def main() -> None:
             xs = [p[0] for p in noktalar]
             ax.plot(xs, [max(p[4], 1e-7) for p in noktalar], "-", color=renk[ad], lw=1.5, label=f"{ad} model")
             olc = [(p[0], p[1], p[2], p[3]) for p in noktalar[::5] if p[1] > 0]
-            ax.errorbar([o[0] for o in olc], [o[1] for o in olc],
-                        yerr=[[o[1] - o[2] for o in olc], [o[3] - o[1] for o in olc]],
-                        fmt="o", ms=3, color=renk[ad], label=f"{ad} ölçülen (%95 GA)")
+            ax.errorbar(
+                [o[0] for o in olc],
+                [o[1] for o in olc],
+                yerr=[[o[1] - o[2] for o in olc], [o[3] - o[1] for o in olc]],
+                fmt="o",
+                ms=3,
+                color=renk[ad],
+                label=f"{ad} ölçülen (%95 GA)",
+            )
         ax.set_yscale("log")
         ax.set_ylim(1e-5, 1.5)
         ax.set_xlabel("log₂ B  (B = açma tabanı; B = 2^ℓ'de tam sayı)")
@@ -136,7 +170,9 @@ def main() -> None:
         seri = f"{ad}-tam"
         k, eta, _ = seri_parametre(seri)
         log_h = [math.log2(2 * v) for v in hler[seri]]
-        ax.hist(log_h, bins=60, histtype="step", color=renk[ad], label=f"{ad}: rastgele girdide gereken log₂B")
+        ax.hist(
+            log_h, bins=60, histtype="step", color=renk[ad], label=f"{ad}: rastgele girdide gereken log₂B"
+        )
         ax.axvline(l_min_isaretli(N, A, eta, k) - 0.03 * i, color=renk[ad], ls="--", lw=1)
     ax.set_xlabel("log₂ B (gereken açma tabanı); kesikli çizgi: ℓ_min (Teorem 1 / Sonuç 1, en kötü durum)")
     ax.set_ylabel("deneme sayısı")

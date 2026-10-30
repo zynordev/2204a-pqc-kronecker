@@ -24,7 +24,10 @@ KLASOR = pathlib.Path(__file__).parent
 
 def cbd(rng, eta):
     """CBD(η): η yazı-tura farkı (FIPS 203 Alg. 8 ile aynı dağılım, bayt yerine doğrudan)."""
-    return [sum(rng.getrandbits(1) for _ in range(eta)) - sum(rng.getrandbits(1) for _ in range(eta)) for _ in range(N)]
+    return [
+        sum(rng.getrandbits(1) for _ in range(eta)) - sum(rng.getrandbits(1) for _ in range(eta))
+        for _ in range(N)
+    ]
 
 
 def main():
@@ -34,7 +37,9 @@ def main():
     basla = time.time()
     with open(KLASOR / "veri.csv", "w", newline="") as f:
         yaz = csv.writer(f)
-        yaz.writerow([f"# tohum={TOHUM} adet={adet} python={platform.python_version()} makine={platform.machine()}"])
+        yaz.writerow(
+            [f"# tohum={TOHUM} adet={adet} python={platform.python_version()} makine={platform.machine()}"]
+        )
         yaz.writerow(["ornek", "k", "eta"] + [v.ad for v in VARYANTLAR])
         for i in range(adet):
             k, eta = KOMBINASYONLAR[i % len(KOMBINASYONLAR)]
