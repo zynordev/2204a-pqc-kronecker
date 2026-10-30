@@ -25,3 +25,26 @@ def test_l_min_gercekten_en_kucuk():
         l = l_min_isaretli(N, A, eta)
         assert b < 2 ** (l - 1)
         assert b >= 2 ** (l - 2)
+
+
+def test_model2_terim_sayilari():
+    """Her a_i·s_j terimi tam olarak bir dilime düşer: toplam n² (tam ve negasiklik)."""
+    from pqc.teori import terim_sayilari
+
+    assert sum(terim_sayilari(N, False)) == N * N
+    assert sum(terim_sayilari(N, True)) == N * N
+    assert max(terim_sayilari(N, False)) == N
+
+
+def test_model2_monoton_ve_sinirli():
+    from pqc.teori import model_hata
+
+    onceki = 1.0
+    for l in range(14, 23):
+        bag, birlesim = model_hata(l, N, 3)
+        assert 0.0 <= bag <= birlesim <= 1.0
+        assert bag <= onceki
+        onceki = bag
+    # neg her dilimde n terim → aynı l'de daha olası; k·η aynıysa model aynı
+    assert model_hata(17, N, 3, negasiklik=True)[0] > model_hata(17, N, 3)[0]
+    assert model_hata(17, N, 3, terim=2) == model_hata(17, N, 2, terim=3)
