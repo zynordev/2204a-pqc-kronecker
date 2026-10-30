@@ -39,3 +39,6 @@ Madde 1–2'nin L5–L7'de zaten yapılıp yapılmadığı **Aşama 1'in ana sor
 
 ## Okuma notları
 *(Her kaynak için: ne okundu, ana sonuç, bizim için önemli cümle/denklem, sayfa numarası.)*
+Implementing RLWE-based Schemes Using an
+RSA Co-Processor Okuyan Halil Erdem Yanık 2026:
+Başka bir kaynak gostererek Kronecker Substition diye başlamış
