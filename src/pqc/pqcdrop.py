@@ -41,12 +41,12 @@ def send_bytes(sock: socket.socket, veri: bytes) -> None:
     sock.sendall(struct.pack(">I", len(veri)) + veri)
 
 
-def _tam_oku(sock: socket.socket, n: int) -> bytes:
-    """TCP bir akıştır: tek `recv` istenen bayt sayısından azını dönebilir; tam n bayt toplanır."""
+def recv_exact(sock: socket.socket, n: int) -> bytes:
+    """Belirtilen bayt miktarı tamamlanana kadar güvenli okuma yapar."""
     parcalar = []
     kalan = n
     while kalan > 0:
-        veri = sock.recv(min(kalan, 65536))
+        veri = sock.recv(kalan)
         if not veri:
             raise ConnectionError("Bağlantı beklenmedik şekilde kapandı.")
         parcalar.append(veri)
@@ -56,8 +56,9 @@ def _tam_oku(sock: socket.socket, n: int) -> bytes:
 
 def recv_bytes(sock: socket.socket) -> bytes:
     """4 baytlık uzunluk önekini okuyup tam veriyi çeker."""
-    uzunluk = struct.unpack(">I", _tam_oku(sock, 4))[0]
-    return _tam_oku(sock, uzunluk)
+    ham_uzunluk = recv_exact(sock, 4)
+    uzunluk = struct.unpack(">I", ham_uzunluk)[0]
+    return recv_exact(sock, uzunluk)
 
 
 def anahtar_turet(paylasilan_sir: bytes) -> bytes:
@@ -72,16 +73,8 @@ def anahtar_turet(paylasilan_sir: bytes) -> bytes:
 
 
 def nonce_uret(chunk_idx: int) -> bytes:
-    """Her chunk için tekil 12 baytlık AES-GCM nonce üretir (8 bayt sayaç + 4 bayt sabit).
-
-    Oturum anahtarı her aktarımda ML-KEM ile taze türetildiği için sayaç nonce'u oturumlar arasında
-    tekrar etse de aynı anahtarla aynı nonce hiç kullanılmaz.
-    """
+    """Her chunk için tekil 12 baytlık AES-GCM nonce üretir (8 bayt sayaç + 4 bayt sabit)."""
     return struct.pack(">Q", chunk_idx) + b"PQCD"
-
-
-# Metadata için ayrılmış nonce: 96 bit (AES-GCM standardı); sayaç alanı 2^64−1, parça sayaçlarıyla çakışmaz.
-METADATA_NONCE = nonce_uret((1 << 64) - 1)
 
 
 # --- El Sıkışma (PQC Handshake) ---
@@ -188,7 +181,7 @@ def dosya_gonder(
             }
         ).encode("utf-8")
 
-        meta_ct = aes.encrypt(METADATA_NONCE, metadata, None)
+        meta_ct = aes.encrypt(b"METADATA_NC0", metadata, None)
         send_bytes(sock, meta_ct)
 
         # Şifreli dosya akışı
@@ -266,18 +259,15 @@ def dosya_al(
         # Metadata alımı
         meta_ct = recv_bytes(sock)
         try:
-            metadata = json.loads(aes.decrypt(METADATA_NONCE, meta_ct, None).decode("utf-8"))
+            metadata = json.loads(aes.decrypt(b"METADATA_NC0", meta_ct, None).decode("utf-8"))
         except InvalidTag:
             print("❌ GÜVENLİK İHLALİ: Metadata kimlik doğrulama etiketi geçersiz! Saldırı tespit edildi.")
             sock.close()
             return
 
-        # Gönderici kimliği doğrulanmadığı için dosya adı yalnızca son bileşene indirgenir;
-        # "../../x" gibi bir ad hedef dizinin dışına yazamaz (yol geçişi).
         dosya_adi = pathlib.Path(metadata["ad"]).name
-        if dosya_adi in ("", ".", ".."):
-            print("❌ HATA: Geçersiz dosya adı.")
-            send_bytes(sock, b"ERR_BAD_NAME")
+        if not dosya_adi or dosya_adi in (".", ".."):
+            print("❌ GÜVENLİK İHLALİ: Geçersiz dosya adı tespit edildi.")
             sock.close()
             return
         toplam_bayt = metadata["boyut"]

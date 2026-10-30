@@ -1,4 +1,4 @@
-Protokol,Kategori,Paket_Bayt,Entropi,Metin_Sizintisi,Klasik_Guvenlik,Kuantum_Guvenlik,Shor_Tehdidi,Store_Now_Decrypt_Later
-Düz HTTP,Şifresiz Klasik,232,5.171,EVET (Açık),YOK (Dinlenebilir),YOK (Dinlenebilir),Uygulanamaz (Şifresiz),Anında İfşa
-Yalnızca klasik ECDHE (TLS 1.3 benzeri),Klasik şifreli,214,7.064,Hayır,~128 bit (X25519),Shor ile kırılabilir,Ayrık logaritma polinom zamanda,Kayıt ileride çözülebilir
-PQC-Drop (Kronecker),Kuantum sonrası,2422,7.917,Hayır,NIST Kategori 3 hedefi,Bilinen kuantum saldırısı yok (M-LWE),Uygulanmaz,Bilinen yöntemle çözülemez
+Protokol,Kategori,Orneklem_Bayt,Shannon_Entropisi,Metin_Sizintisi,Acik_Anahtar_Bayt,Klasik_Guvenlik_Bit,Kuantum_Guvenlik_Bit,Shor_Direnci,PCAP_Dosyasi
+Düz HTTP,Şifresiz,16493,4.13,EVET (Açık Metin),0,0,0,YOK,http_gercek.pcap
+Standart TLS 1.3,Klasik Şifreli,16435,7.989,HAYIR (Gizli),32,128,0,KIRILIR (X25519),tls_gercek.pcap
+PQC-Drop (Kronecker),Kuantum Korumalı,18684,7.992,HAYIR (Gizli),1184,192,192,TAM DİRENÇ (M-LWE),pqcdrop_gercek.pcap
