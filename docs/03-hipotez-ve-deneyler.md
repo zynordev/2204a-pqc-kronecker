@@ -25,6 +25,47 @@ rastgele girdide hata olasılığını Model 2 tahmin eder.
 | E2.3 | ℓ ∈ {16…22}, rastgele girdi (CBD ile s), her ℓ için N deneme | Model 2 eğrisi | — |
 | E2.4 | E2.3 grafiği: model eğrisi + ölçülen noktalar + %95 güven aralığı | eğri aralıkların içinde | — |
 
+### H2 ön kaydı (2026-10-30, deneyden önce yazıldı; değiştirilmez)
+
+Deney: [experiments/02-teori-deney](../experiments/02-teori-deney/). Seriler: ML-KEM'deki (k, η) çiftleri —
+tek çarpım η = 3 / η = 2 (Teorem 1), modül toplamı k = 2, 3, 4 (Sonuç 1) — × açma türü
+(tam: 2n−1 dilim; neg: mod 2^(nℓ)+1, n dilim, Önerme 2). Rastgele girdi: büyük [0, q) düzgün, küçük CBD(η).
+Model: `pqc.teori.model_hata` (Model 2). Her seri N = 20 000 deneme, tohum 20261030.
+
+**E2.1 / E2.2:** 10 seri × en kötü girdiler (±işaret; neg için k0 = 0 ve n−1): ℓ_min'de hepsi doğru,
+ℓ_min − 1'de hepsi bozuk. ℓ_min = 22 (tek, η=3), 21 (tek, η=2), 23 (modül, üç set).
+
+**E2.3 — tam sayı ℓ'de model tahmini (bağımsızlık yaklaşımı):**
+
+| Seri | ℓ ≤ 16 | ℓ = 17 | ℓ = 18 | ℓ ≥ 19 |
+|---|---|---|---|---|
+| tek-η3 tam / neg | ≈ 1 | 0,031 / 0,12 | 7·10⁻¹¹ / 9·10⁻¹⁰ | < 10⁻⁴⁰ |
+| tek-η2 tam / neg | ≈ 1 (ℓ=16: 0,98 / 1) | 9·10⁻⁴ / 5·10⁻³ | ~10⁻¹⁵ | < 10⁻⁶⁰ |
+| modül-512 tam / neg | ≈ 1 | 0,76 / 0,97 | 3·10⁻⁵ / 2·10⁻⁴ | < 10⁻¹⁹ |
+| modül-768 tam / neg | ≈ 1 | 0,76 / 0,97 | 3·10⁻⁵ / 2·10⁻⁴ | < 10⁻¹⁹ |
+| modül-1024 tam / neg | ≈ 1 | 0,98 / 1,00 | 9·10⁻⁴ / 5·10⁻³ | < 10⁻¹⁵ |
+
+**E2.4 — sürekli taban (log₂B), model tahmini:** hata olasılığı 0,5 ve 0,01 olduğu log₂B:
+
+| Seri | p = 0,5 | p = 0,01 | p = 10⁻⁶ | ℓ_min (en kötü durum) | fark (ℓ_min − p=10⁻⁶) |
+|---|---|---|---|---|---|
+| tek-η3 tam | 16,62 | 17,11 | 17,66 | 22 | 4,3 bit |
+| tek-η2 tam | 16,32 | 16,81 | 17,37 | 21 | 3,6 bit |
+| modül-512 tam | 17,12 | 17,61 | 18,16 | 23 | 4,8 bit |
+| modül-1024 tam | 17,32 | 17,81 | 18,37 | 23 | 4,6 bit |
+| (neg serileri) | +0,13…0,17 | +0,13…0,14 | +0,10 | aynı | |
+
+Önceden yazılan beklentiler:
+1. E2.1/E2.2 tam olarak tutar (ispat). Gerçek açma ile Lemma 1 ölçütü (h* ≤ 2^(ℓ−1)) her denemede aynı sonucu verir.
+2. Ölçülen hata oranı, model değerinin %95 Wilson güven aralığının içinde kalır (ölçülebilir aralıkta,
+   yani 0,001 < p < 0,999).
+3. **Sistematik sapma beklentisi:** terimler sınırlı (|a_i·s_j| ≤ 4992) olduğu için gerçek dağılımın kuyruğu
+   normalden incedir; model kuyrukta (p küçükken) hatayı **biraz fazla** tahmin edebilir. Bağımlılık
+   (aynı a_i birçok dilimde) bağımsızlık formülünü birleşim sınırının altına çeker.
+4. modül-512 ile modül-768 aynı eğriyi verir (k·η = 6 ikisinde de; model yalnızca k·η'ya bağlı).
+5. neg serileri aynı ℓ'de tam serilerinden daha sık bozulur (her dilim n terimli; tamda yalnızca ortadakiler).
+6. Ön ölçümdeki "ℓ = 17'de 291/300 hata" (düzgün s ile) CBD ile tekrarlanmaz: tek-η3-tam ℓ = 17'de ≈ %3.
+
 ## H3 — Performans
 **İddia:** Operand 8192 → 5632 bit küçülünce büyük tamsayı çarpımı Karatsuba'ya göre ≈ (8192/5632)^1.585 ≈ 1,81
 kat hızlanır. Uçtan uca hızlanma ancak paketleme/açma da optimize edilirse görülür.
