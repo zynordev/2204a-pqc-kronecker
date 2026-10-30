@@ -3,7 +3,10 @@ name = "pqc-kronecker"
 version = "0.0.1"
 description = "TÜBİTAK 2204-A: ML-KEM ve merkezlenmiş Kronecker ikamesi"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = ["cryptography>=38"]
+
+[project.scripts]
+pqcdrop = "pqc.pqcdrop:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6"]

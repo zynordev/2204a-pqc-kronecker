@@ -69,15 +69,16 @@ Her aşamanın bir **çıkış kriteri** var. Kriter sağlanmadan sonraki aşama
 - **Çıkış:** H1 doğrulandı.
 
 ### Aşama 4 — Deneyler (5 – 18 Ara)
-- [ ] H2: teorik eşik vs ölçülen eşik; olasılık modeli vs ölçülen hata oranı (grafik) — **öncelik 1**
-- [ ] H4: dar ℓ ile gizli anahtara bağlı hata gösterimi — **öncelik 2**
-- [ ] H3: performans (tek çarpım + tam keygen/encaps/decaps), ≥1000 tekrar, medyan + çeyrekler arası aralık
+- [x] H2: teorik eşik vs ölçülen eşik; olasılık modeli vs ölçülen hata oranı (grafik) — **öncelik 1**
+- [x] H4: dar ℓ ile gizli anahtara bağlı hata gösterimi — **öncelik 2**
+- [x] H3: performans (tek çarpım + tam keygen/encaps/decaps), ≥1000 tekrar, medyan + çeyrekler arası aralık
 - **Çıkış:** her deney klasöründe betik + ham CSV + grafik + sonuc.md; betik tek komutla yeniden üretiyor.
 
 ### Aşama 5a — Asgari prototip (12 – 20 Ara)
-- [ ] CLI: `pqcdrop alici` / `pqcdrop gonder dosya ip`
-- [ ] El sıkışma: ML-KEM (bizim Kronecker motorumuzla) → HKDF → AES-256-GCM parça parça akış
-- [ ] Bütünlük: alınan dosyanın SHA-256'sı eşleşiyor; değiştirilmiş paket reddediliyor
+- [x] CLI: `pqcdrop alici` / `pqcdrop gonder dosya ip`
+- [x] El sıkışma: ML-KEM (bizim Kronecker motorumuzla) → HKDF → AES-256-GCM parça parça akış
+- [x] Bütünlük: alınan dosyanın SHA-256'sı eşleşiyor; değiştirilmiş paket reddediliyor
+- [x] İki makine arası fiziksel aktarım çalışıyor (Pardus 1 ↔ Pardus 2); ağ analizi yapıldı.
 - **Çıkış:** iki makine arası aktarım çalışıyor; rapora ekran görüntüsü + ölçüm girecek kadar.
 
 ### Aşama 6 — Rapor (16 – 31 Ara)

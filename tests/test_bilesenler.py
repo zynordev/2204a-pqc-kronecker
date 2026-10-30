@@ -18,6 +18,7 @@ def _rastgele_polinom():
 
 # --- kodlama (Bölüm 4.2.1) ---
 
+
 def test_bit_bayt_ters():
     B = bytes(rng.randrange(256) for _ in range(64))
     assert kodlama.bits_to_bytes(kodlama.bytes_to_bits(B)) == B
@@ -43,6 +44,7 @@ def test_sikistirma_hata_siniri(d):
 
 # --- NTT (Bölüm 4.3) ---
 
+
 def test_zeta_bilinen_degerler():
     assert ntt.ZETALAR[0] == 1
     assert ntt.ZETALAR[1] == 1729  # 17^64 mod 3329
@@ -63,6 +65,7 @@ def test_ntt_carpimi_okul_yontemiyle_ayni():
 
 # --- örnekleme (Bölüm 4.2.2) ---
 
+
 @pytest.mark.parametrize("eta", [2, 3])
 def test_cbd_araligi(eta):
     f = ornekleme.sample_poly_cbd(bytes(rng.randrange(256) for _ in range(64 * eta)), eta)
@@ -76,6 +79,7 @@ def test_sample_ntt():
 
 
 # --- ML-KEM uçtan uca ---
+
 
 @pytest.mark.parametrize("ad", PARAMETRELER)
 def test_kapsulle_ac(ad):

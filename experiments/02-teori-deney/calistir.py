@@ -36,7 +36,13 @@ L_KESIN = 40
 KLASOR = pathlib.Path(__file__).parent
 
 # (ad, k, η)
-DURUMLAR = [("tek-eta3", 1, 3), ("tek-eta2", 1, 2), ("modul-512", 2, 3), ("modul-768", 3, 2), ("modul-1024", 4, 2)]
+DURUMLAR = [
+    ("tek-eta3", 1, 3),
+    ("tek-eta2", 1, 2),
+    ("modul-512", 2, 3),
+    ("modul-768", 3, 2),
+    ("modul-1024", 4, 2),
+]
 SERILER = [(ad, k, eta, neg) for ad, k, eta in DURUMLAR for neg in (False, True)]
 
 
@@ -54,8 +60,10 @@ def varyant(l: int, k: int, neg: bool) -> Varyant:
 
 def cbd(rng: random.Random, eta: int) -> list[int]:
     """CBD(η): η yazı-tura farkı (FIPS 203 Alg. 8 ile aynı dağılım)."""
-    return [sum(rng.getrandbits(1) for _ in range(eta)) - sum(rng.getrandbits(1) for _ in range(eta))
-            for _ in range(N)]
+    return [
+        sum(rng.getrandbits(1) for _ in range(eta)) - sum(rng.getrandbits(1) for _ in range(eta))
+        for _ in range(N)
+    ]
 
 
 def merkezle(x: int) -> int:
@@ -65,8 +73,10 @@ def merkezle(x: int) -> int:
 def kesin_dilimler(buyuk: list[list[int]], kucuk: list[list[int]], neg: bool) -> list[int]:
     """Açılacak dilimlerin kesin değerleri: Σ_j büyük_j·küçük_j'nin tam çarpım katsayıları c_k
     (2n−1 tane) veya negasiklik d_k = c_k − c_{k+n} (n tane). Merkezlenmiş girdilerle, ℓ = 40'ta."""
-    C = sum(paketle_dongu([merkezle(x) for x in b], L_KESIN) * paketle_dongu([merkezle(x) for x in s], L_KESIN)
-            for b, s in zip(buyuk, kucuk))
+    C = sum(
+        paketle_dongu([merkezle(x) for x in b], L_KESIN) * paketle_dongu([merkezle(x) for x in s], L_KESIN)
+        for b, s in zip(buyuk, kucuk)
+    )
     c = ac_dongu_isaretli(C, L_KESIN, 2 * N - 1) + [0]
     if neg:
         return [c[i] - c[i + N] for i in range(N)]
@@ -87,6 +97,7 @@ def referans(dilimler: list[int], neg: bool) -> list[int]:
 
 # --- E2.1 / E2.2: en kötü durum ---
 
+
 def en_kotu_girdiler(k: int, eta: int, neg: bool) -> list[tuple[str, list[list[int]], list[list[int]]]]:
     """Önerme 1 (a) ve Önerme 2'nin keskinlik girdileri, k terime genişletilmiş (Sonuç 1)."""
     girdiler = []
@@ -94,8 +105,9 @@ def en_kotu_girdiler(k: int, eta: int, neg: bool) -> list[tuple[str, list[list[i
         if neg:
             for k0 in (0, N - 1):
                 a = [isaret * (A if i <= k0 else -A) for i in range(N)]
-                girdiler.append((f"negasiklik k0={k0} isaret={isaret:+d}", [[x % Q for x in a]] * k,
-                                 [[eta] * N] * k))
+                girdiler.append(
+                    (f"negasiklik k0={k0} isaret={isaret:+d}", [[x % Q for x in a]] * k, [[eta] * N] * k)
+                )
         else:
             girdiler.append((f"a=±A, s=η isaret={isaret:+d}", [[(isaret * A) % Q] * N] * k, [[eta] * N] * k))
     return girdiler
@@ -117,6 +129,7 @@ def en_kotu_deney() -> list[list]:
 
 
 # --- E2.3 / E2.4: rastgele girdi ---
+
 
 def seri_calistir(arg: tuple) -> tuple[str, list[list], int, int]:
     (ad, k, eta, neg), adet = arg
@@ -174,8 +187,10 @@ def main() -> int:
         for ad, satirlar, uyumsuz, okul in havuz.imap(seri_calistir, [(s, adet) for s in SERILER]):
             yaz.writerows(satirlar)
             toplam_uyumsuz += uyumsuz
-            print(f"{ad:20s} bitti  uyumsuz={uyumsuz}  okul_kontrol={okul}  {time.time() - basla:.0f} sn",
-                  flush=True)
+            print(
+                f"{ad:20s} bitti  uyumsuz={uyumsuz}  okul_kontrol={okul}  {time.time() - basla:.0f} sn",
+                flush=True,
+            )
     print(f"\nToplam süre {time.time() - basla:.0f} sn; Lemma 1 ölçütüyle uyumsuz {toplam_uyumsuz}")
     return 1 if beklenmeyen else 0
 
