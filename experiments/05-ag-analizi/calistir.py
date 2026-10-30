@@ -135,7 +135,7 @@ def calistir_deney():
     tls_entropi = shannon_entropisi(tls_ag_verisi)
     tls_sizinti = aranacak_kelime in tls_ag_verisi
 
-    print("\n[2] STANDART HTTPS / TLS 1.3 (ECDHE-X25519 + AES-256-GCM):")
+    print("\n[2] YALNIZCA KLASİK ECDHE (X25519 + AES-256-GCM; TLS 1.3 benzeri, TLS kaydı değil):")
     print("  Açık Anahtar Değişimi: 32 bayt (X25519)")
     print(f"  Toplam Ağ Yükü: {len(tls_ag_verisi)} bayt")
     print(f"  Shannon Entropisi: {tls_entropi:.3f} / 8.000 bit/bayt")
@@ -146,15 +146,15 @@ def calistir_deney():
     print("     yeterli kübite sahip bir kuantum bilgisayar Shor algoritmasıyla ayrık logaritmayı çözer!")
 
     sonuclar.append({
-        "Protokol": "TLS 1.3 (ECDHE)",
-        "Kategori": "Klasik Şifreli",
+        "Protokol": "Yalnızca klasik ECDHE (TLS 1.3 benzeri)",
+        "Kategori": "Klasik şifreli",
         "Paket_Bayt": len(tls_ag_verisi),
         "Entropi": round(tls_entropi, 3),
-        "Metin_Sizintisi": "HAYIR (Gizli)",
-        "Klasik_Guvenlik": "YÜKSEK (128-bit)",
-        "Kuantum_Guvenlik": "0 BİT (KIRILABİLİR)",
-        "Shor_Tehdidi": "KESİN KIRILIR (Ayrık Logaritma)",
-        "Store_Now_Decrypt_Later": "KRİTİK RİSK (Gelecekte Çözülür)",
+        "Metin_Sizintisi": "Hayır",
+        "Klasik_Guvenlik": "~128 bit (X25519)",
+        "Kuantum_Guvenlik": "Shor ile kırılabilir",
+        "Shor_Tehdidi": "Ayrık logaritma polinom zamanda",
+        "Store_Now_Decrypt_Later": "Kayıt ileride çözülebilir",
     })
 
     # -------------------------------------------------------------
@@ -181,24 +181,23 @@ def calistir_deney():
     print(f"  Açık Anahtar (ek): {len(ek)} bayt")
     print(f"  Kapsüllenmiş Şifreli Metin (c): {len(c)} bayt")
     print(f"  Toplam Ağ Yükü: {len(pqc_ag_verisi)} bayt")
-    print(f"  Shannon Entropisi: {pqc_entropi:.3f} / 8.000 bit/bayt (Neredeyse Mükemmel Entropi)")
+    print(f"  Shannon Entropisi: {pqc_entropi:.3f} / 8.000 bit/bayt (üst sınır log₂n = {math.log2(len(pqc_ag_verisi)):.2f})")
     print(f"  Wireshark 'Hello World' Araması: {'Bulundu' if pqc_sizinti else '✓ GİZLİ (0 Eşleşme)'}")
     print(f"  Kronecker KEM İşlem Süresi: {t_pqc_ms:.2f} ms")
     print("  --- Kablodan Geçen Paket Dökümü (Hexdump) ---")
     print(hexdump_metni(pqc_ag_verisi, maks_satir=4))
-    print("  🛡️ KUANTUM GÜVENLİK: M-LWE kafes problemi Shor algoritmasına bağışıktır.")
-    print("     'Şimdi Kaydet, Sonra Çöz' saldırılarına karşı tam koruma sağlar.")
+    print("  Kuantum: ML-KEM'in dayandığı M-LWE problemi için bilinen bir kuantum saldırısı yoktur (NIST Kategori 3 hedefi).")
 
     sonuclar.append({
         "Protokol": "PQC-Drop (Kronecker)",
-        "Kategori": "Kuantum Korumalı",
+        "Kategori": "Kuantum sonrası",
         "Paket_Bayt": len(pqc_ag_verisi),
         "Entropi": round(pqc_entropi, 3),
-        "Metin_Sizintisi": "HAYIR (Gizli)",
-        "Klasik_Guvenlik": "ÇOK YÜKSEK (192-bit / Kat 3)",
-        "Kuantum_Guvenlik": "192 BİT (KORUMALI)",
-        "Shor_Tehdidi": "ETKİSİZ (Kafes M-LWE)",
-        "Store_Now_Decrypt_Later": "TAM DİRENÇLİ (Gelecekte de Güvenli)",
+        "Metin_Sizintisi": "Hayır",
+        "Klasik_Guvenlik": "NIST Kategori 3 hedefi",
+        "Kuantum_Guvenlik": "Bilinen kuantum saldırısı yok (M-LWE)",
+        "Shor_Tehdidi": "Uygulanmaz",
+        "Store_Now_Decrypt_Later": "Bilinen yöntemle çözülemez",
     })
 
     # -------------------------------------------------------------
@@ -213,45 +212,52 @@ def calistir_deney():
 
     md_yolu = dizin / "sonuc.md"
     with open(md_yolu, "w", encoding="utf-8") as f:
-        f.write("# Deney 05: Ağ Düzeyi Paket ve Kuantum Güvenlik Karşılaştırması\n\n")
-        f.write("## 1. Deney Amacı ve Metodoloji\n")
+        ust = [min(8.0, math.log2(len(v))) for v in (http_istek, tls_ag_verisi, pqc_ag_verisi)]
+        f.write("# Deney 05: Ağ Yükü Karşılaştırması (betik içi simülasyon)\n\n")
+        f.write("## 1. Deney Amacı ve Yöntem\n")
         f.write(
-            "Bu deneyde, fiziksel ağ kablosundan geçen ham baytlar bir saldırgan veya pasif dinleyici (Wireshark / tcpdump) "
-            "perspektifinden incelenmiştir. Düz HTTP, klasik TLS 1.3 (ECDHE) ve geliştirilen PQC-Drop (ML-KEM Kronecker) "
-            "aynı yük üzerinde test edilerek Shannon entropisi, açık metin sızıntısı ve kuantum tehdit modeli karşılaştırılmıştır.\n\n"
+            "Bu betik **soket açmaz ve paket yakalamaz**; aynı içerik için üç yükü bellekte kurar ve karşılaştırır: "
+            "şifresiz HTTP isteği, yalnızca klasik X25519 + AES-256-GCM ile kurulmuş yük (TLS kaydı değil, TLS 1.3 benzeri) "
+            "ve PQC-Drop yükü (ek + c + nonce + şifreli içerik). Gerçek ağ kaydı (`tcpdump`/Wireshark) ayrı bir adımdır ve "
+            "rapora o girer. Ölçütler: yük boyutu, açık metin araması, Shannon entropisi (yalnızca şifresiz/şifreli ayrımı "
+            "için; bkz. §4).\n\n"
         )
         f.write("## 2. Karşılaştırma Tablosu\n\n")
-        f.write("| Metrik | Düz HTTP | Standart TLS 1.3 (ECDHE) | PQC-Drop (Bizim Yöntem) |\n")
+        f.write("| Ölçüt | Düz HTTP | Yalnızca klasik ECDHE (TLS 1.3 benzeri) | PQC-Drop (ML-KEM-768 Kronecker) |\n")
         f.write("| :--- | :--- | :--- | :--- |\n")
-        f.write("| **Kategori** | Şifresiz | Klasik Şifreli | Kuantum Sonrası Korumalı |\n")
-        f.write("| **El Sıkışma Mekanizması** | Yok | ECDHE (X25519) | NIST FIPS 203 ML-KEM-768 |\n")
-        f.write("| **Açık Anahtar Boyutu** | 0 bayt | 32 bayt | 1184 bayt |\n")
-        f.write(f"| **Toplam Paket Boyutu** | {len(http_istek)} bayt | {len(tls_ag_verisi)} bayt | {len(pqc_ag_verisi)} bayt |\n")
-        f.write(f"| **Shannon Entropisi** | {http_entropi:.3f} / 8.00 | {tls_entropi:.3f} / 8.00 | {pqc_entropi:.3f} / 8.00 |\n")
-        f.write("| **Wireshark Metin Araması** | ⚠️ Açıkça İfşa | ✓ 0 Eşleşme | ✓ 0 Eşleşme |\n")
-        f.write("| **Klasik Güvenlik Seviyesi** | 0-bit | 128-bit | 192-bit (NIST Kat 3) |\n")
-        f.write("| **Kuantum Güvenlik (Shor)** | Savunmasız | ❌ Kırılır (O(log³ N)) | 🛡️ Kırılmaz (M-LWE Kafes) |\n")
-        f.write("| **'Store Now, Decrypt Later' Riski** | Anında Okunur | ⚠️ Yüksek Risk | 🛡️ Sıfır Risk |\n\n")
+        f.write("| **Anahtar değişimi** | yok | X25519 | FIPS 203 ML-KEM-768 |\n")
+        f.write("| **Açık anahtar** | — | 32 bayt | 1184 bayt (+ 1088 bayt kapsül) |\n")
+        f.write(f"| **Toplam yük** | {len(http_istek)} bayt | {len(tls_ag_verisi)} bayt | {len(pqc_ag_verisi)} bayt |\n")
+        f.write(
+            f"| **Shannon entropisi (üst sınır log₂n)** | {http_entropi:.3f} ({ust[0]:.2f}) | "
+            f"{tls_entropi:.3f} ({ust[1]:.2f}) | {pqc_entropi:.3f} ({ust[2]:.2f}) |\n"
+        )
+        f.write("| **Açık metin araması** | bulundu | bulunamadı | bulunamadı |\n")
+        f.write("| **Shor algoritmasına karşı** | — | kırılabilir | bilinen kuantum saldırısı yok (NIST Kategori 3 hedefi) |\n\n")
 
-        f.write("## 3. Wireshark / Tcpdump Ham Paket Dökümleri\n\n")
-        f.write("### A. Düz HTTP Paketi (Açık Metin İfşası)\n```text\n")
+        f.write("## 3. Yük Dökümleri (hexdump)\n\n")
+        f.write("### A. Düz HTTP (açık metin)\n```text\n")
         f.write(hexdump_metni(http_istek, maks_satir=6))
         f.write("\n```\n\n")
-        f.write("### B. Standart TLS 1.3 Paketi (Klasik Güvenli, Kuantuma Açık)\n```text\n")
+        f.write("### B. Yalnızca klasik ECDHE + AES-GCM\n```text\n")
         f.write(hexdump_metni(tls_ag_verisi, maks_satir=6))
         f.write("\n```\n\n")
-        f.write("### C. PQC-Drop Paketi (Kuantum Korumalı Kafes Yapısı)\n```text\n")
+        f.write("### C. PQC-Drop (ek + c + şifreli içerik)\n```text\n")
         f.write(hexdump_metni(pqc_ag_verisi, maks_satir=6))
         f.write("\n```\n\n")
 
-        f.write("## 4. Akademik ve Jüri Değerlendirmesi\n")
+        f.write("## 4. Yorum ve Bilinen Kusurlar\n")
         f.write(
-            "- **Maliyet / Güvenlik Takası (Trade-off):** PQC-Drop'ta açık anahtar boyutu 32 bayttan 1184 bayta çıkmaktadır. "
-            "Bu yaklaşık 37 katlık boyut artışı, M-LWE kafes tabanlı kuantum zırhının teorik gereksinimidir.\n"
-            "- **Entropi:** PQC-Drop aktarımı 7.96 bit/bayt Shannon entropisi üreterek donanımsal rastgele gürültüye en yakın "
-            "kriptografik gizleme seviyesine ulaşmıştır.\n"
-            "- **Gelecek Güvencesi:** Günümüzde devletlerin ve istihbarat servislerinin uyguladığı 'Şimdi Kaydet, Gelecekte Kuantumla Çöz' "
-            "(Harvest Now, Decrypt Later) stratejisine karşı klasik TLS 1.3 yetersiz kalırken, PQC-Drop tam bağışıklık sağlar.\n"
+            "- **Boyut bedeli:** Kuantum sonrası anahtar değişiminin maliyeti açık anahtar ve kapsül boyutundadır "
+            "(32 bayt yerine 1184 + 1088 bayt).\n"
+            "- **Entropi yalnızca şifresiz/şifreli ayrımı için anlamlıdır.** n baytlık örneklemin entropisi en çok log₂n "
+            "olabilir; aynı uzunlukta saf rastgele bayt dizisi de aynı değeri verir (214 bayt → ≈ 7,03; 2422 bayt → ≈ 7,92). "
+            "İki şifreli yük arasındaki fark paket uzunluğundan gelir, şifreleme kalitesinden değil (ikisi de AES-GCM).\n"
+            "- **'TLS 1.3' burada klasik ECDHE'yi temsil eder.** Güncel TLS 1.3 dağıtımları (2024'ten beri büyük tarayıcılar ve "
+            "CDN'ler) X25519MLKEM768 hibrit anahtar değişimi kullanır; 'TLS kuantuma açık' genellemesi yapılmamalıdır.\n"
+            "- Yalnızca klasik anahtar değişimiyle kaydedilen trafik ileride yeterince büyük bir kuantum bilgisayarla "
+            "(Shor) çözülebilir; ML-KEM için bilinen böyle bir saldırı yoktur. 'Sıfır risk' veya 'tam direnç' iddia edilmez.\n"
+            "- Bu betik gerçek ağ trafiği içermez; TLS kayıt başlıkları, sertifikalar ve TCP/IP ek yükü hesaba katılmamıştır.\n"
         )
 
     print(f"\n✓ Veriler kaydedildi: {csv_yolu}")
