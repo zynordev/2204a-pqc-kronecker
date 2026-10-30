@@ -39,6 +39,15 @@ Madde 1–2'nin L5–L7'de zaten yapılıp yapılmadığı **Aşama 1'in ana sor
 
 ## Okuma notları
 *(Her kaynak için: ne okundu, ana sonuç, bizim için önemli cümle/denklem, sayfa numarası.)*
+
+
 Implementing RLWE-based Schemes Using an
-RSA Co-Processor Okuyan Halil Erdem Yanık 2026:
+RSA Co-Processor sayfa 22-28 Okuyan Halil Erdem Yanık 2026:
 Başka bir kaynak gostererek Kronecker Substition diye başlamış
+tam sayılarda carpmanın polinomlarda da olabiceğini gostermıs ve basit bir ornek vermış
+aynı şekilde basit ornek almaya polinomlarda mod almak ıcın de devam etmiş vve polinomlarda mod alma işlemini katsayılar kaybolmadan tam sayılarda gosterebıldı sonra ikisini birden kullanmayı gosterdi ikisini birlikte kullanmayı gosterırken önce ayrı ayrı modu ve polinomu tam sayıya cevirdi en sonda tekrar polinoma cevirdi ve birlestirmeden sonra t yi bulma kısmına gecti, araştırmacılar şu soruyu soruyor:
+x yerine hangi sayıyı yazarsak polinomun katsayıları birbirine karışmaz?
+bundan dolayı Lemma yani önerme kısmına giriş yapıyor t≥2 üzeri ℓ sınırını bulmuslar sonra 6400 bit degerini bulmuslar ama bu deger RSA işlemcisinin gücü olan 2200 ün çok yükseğinde kaldıgı için bundan sonra da t yi azaltmayı araştırmaya başlamışlar.ve bu sorunucu Halkalara bölme yani Splitt the Rings yöntemile çözüyorlalr yani bir işlem var onu parçalara ayırıp yapıyor özetle bu makalede Kronecker substitution, polinom işlemlerini tam sayı işlemlerine dönüştürerek mevcut RSA donanımından yararlanmamızı sağlıyor. Ancak klasik yöntem çok büyük sayılar gerektiriyor. Araştırmacılar polinomları bölme ve farklı çarpma yöntemlerini birleştirme yoluyla bu problemi aşarak Kyber768'i mevcut akıllı kart donanımında çalıştırmayı başarıyor. Peki bu makale bizim projemize için önemli olan ne biz projenın temelını burdan alıp başladıgımız için Raporda mutlaka belirtilmeldir ve bu yöntem kriptografi de kullanılabilri bizim projemızdekı kronecker ile ilişkilidir ( bir yanlışım varsa düzelt bu cümleleri doğru sayma) 
+
+
+
