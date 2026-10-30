@@ -1,0 +1,4 @@
+Protokol,Kategori,Orneklem_Bayt,Shannon_Entropisi,Metin_Sizintisi,Acik_Anahtar_Bayt,Klasik_Guvenlik_Bit,Kuantum_Guvenlik_Bit,Shor_Direnci,PCAP_Dosyasi
+Düz HTTP,Şifresiz,16493,4.13,EVET (Açık Metin),0,0,0,YOK,http_gercek.pcap
+Standart TLS 1.3,Klasik Şifreli,16435,7.989,HAYIR (Gizli),32,128,0,KIRILIR (X25519),tls_gercek.pcap
+PQC-Drop (Kronecker),Kuantum Korumalı,18684,7.992,HAYIR (Gizli),1184,192,192,TAM DİRENÇ (M-LWE),pqcdrop_gercek.pcap

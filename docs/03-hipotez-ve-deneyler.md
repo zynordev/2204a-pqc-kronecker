@@ -20,10 +20,10 @@ rastgele girdide hata olasılığını Model 2 tahmin eder.
 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
-| E2.1 | ℓ = ℓ_min: kötü durum girdileri (Önerme 1'deki yapı) | 0 hata | — |
-| E2.2 | ℓ = ℓ_min − 1: Önerme 1'deki keskinlik girdisi | hata var | — |
-| E2.3 | ℓ ∈ {16…22}, rastgele girdi (CBD ile s), her ℓ için N deneme | Model 2 eğrisi | — |
-| E2.4 | E2.3 grafiği: model eğrisi + ölçülen noktalar + %95 güven aralığı | eğri aralıkların içinde | — |
+| E2.1 | ℓ = ℓ_min: kötü durum girdileri (Önerme 1'deki yapı) | 0 hata | 10 seri × kötü durum girdileri: 0 hata [ölçüldü, `experiments/02-teori-deney`] |
+| E2.2 | ℓ = ℓ_min − 1: Önerme 1'deki keskinlik girdisi | hata var | 10 seri × kötü durum girdileri: hepsi hatalı [ölçüldü, `experiments/02-teori-deney`] |
+| E2.3 | ℓ ∈ {14…ℓ_min}, rastgele girdi (CBD ile s), her seri için 20.000 deneme | Model 2 eğrisi | Geçiş bölgelerinde model değeri tam %95 Wilson GA içinde (örn. tek-η3 ℓ=17 model 0,0306, ölçülen 0,0301) [ölçüldü] |
+| E2.4 | E2.3 grafiği: model eğrisi + ölçülen noktalar + %95 güven aralığı | eğri aralıkların içinde | `grafik_e24.png`, `grafik_e24_neg.png`, `grafik_fark.png` [ölçüldü, `experiments/02-teori-deney`] |
 
 ### H2 ön kaydı (2026-10-30, deneyden önce yazıldı; değiştirilmez)
 
@@ -72,10 +72,10 @@ kat hızlanır. Uçtan uca hızlanma ancak paketleme/açma da optimize edilirse 
 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
-| E3.1 | Yalnızca bigint çarpımı, 5632 vs 8192 bit | ≈ 1,8× | ön ölçüm: 1,93× |
-| E3.2 | Tek polinom çarpımı: schoolbook, Karatsuba, NTT, 5 KS varyantı | KS < NTT (Python'da) | — |
-| E3.3 | Süre dağılımı: paketleme / çarpım / açma / indirgeme ayrı ayrı | açma baskın | — |
-| E3.4 | Tam ML-KEM keyGen/encaps/decaps, NTT vs en iyi KS | — | — |
+| E3.1 | Yalnızca bigint çarpımı, 5632 vs 8192 bit | ≈ 1,8× | 2,05× hızlanma (20,35 µs vs 9,94 µs) [ölçüldü, `experiments/04-performans`] |
+| E3.2 | Tek polinom çarpımı: schoolbook, Karatsuba, NTT, 8 KS varyantı | KS < NTT (Python'da) | KS bayt (130 µs) < NTT (284 µs) < Schoolbook (3290 µs) [ölçüldü] |
+| E3.3 | Süre dağılımı: paketleme / çarpım / açma / indirgeme ayrı ayrı | açma baskın | Doğrulandı: döngülü açma sürenin %75'ini harcıyor; bayt açma bunu 4 kat hızlandırıyor [ölçüldü] |
+| E3.4 | Tam ML-KEM keyGen/encaps/decaps, NTT vs en iyi KS | — | Standart dönüşüm ek yükü (ADR 0003) sebebiyle NTT uçtan uca %20–30 daha hızlı [ölçüldü] |
 | E3.5 | Aynı ölçümler ikinci makinede (laptop) | sıralama aynı | — |
 
 Protokol: `time.perf_counter_ns`, ısınma turu, ≥1000 tekrar, medyan + çeyrekler arası aralık,
@@ -87,8 +87,8 @@ bozulmaması gizli anahtara bağlıdır (‖s‖₁ hakkında bilgi sızar).
 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
-| E4.1 | ℓ = ℓ_min − 1; farklı s'ler için saldırgan girdisi; hata ↔ ‖s‖₁ eşiği | hata ⇔ 1664·‖s‖₁ ≥ 2^(ℓ−1) | — |
-| E4.2 | Aynı şey tam decaps üzerinde: paylaşılan sır doğru/yanlış | aynı eşik | — |
+| E4.1 | ℓ = ℓ_min − 1; farklı s'ler için saldırgan girdisi; hata ↔ ‖s‖₁ eşiği | hata ⇔ 1664·‖s‖₁ ≥ 2^(ℓ−1) | 1500 örnekte 0 uyumsuzluk: hata tam olarak eşikte ortaya çıkıyor [ölçüldü, `experiments/03-guvenlik`] |
+| E4.2 | Aynı şey tam decaps üzerinde: paylaşılan sır doğru/yanlış | aynı eşik | 150 kurban anahtarında 0 uyumsuzluk: decapsulation hatası ‖s₀‖₁ ≥ 316 eşiğinde tetikleniyor [ölçüldü, `experiments/03-guvenlik`] |
 
 Not: Bu, kendi bilerek bozduğumuz uygulamamız üzerinde bir gösterimdir; gerçek bir sisteme saldırı değildir.
 

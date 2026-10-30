@@ -28,6 +28,7 @@ def l_min_isaretsiz(n: int, a_max: int, b_max: int, terim: int = 1) -> int:
 
 # --- Model 2: rastgele girdide taşma olasılığı (normal yaklaşım) ---
 
+
 def terim_sayilari(n: int, negasiklik: bool) -> list[int]:
     """Açılan her dilimdeki a_i·s_j terimi sayısı.
 
@@ -47,8 +48,9 @@ def dilim_tasma_olasiligi(yari_taban: float, sigma: float) -> float:
     return math.erfc(yari_taban / (sigma * math.sqrt(2)))
 
 
-def model_hata_taban(yari_taban: float, n: int, eta: int, terim: int = 1,
-                     negasiklik: bool = False) -> tuple[float, float]:
+def model_hata_taban(
+    yari_taban: float, n: int, eta: int, terim: int = 1, negasiklik: bool = False
+) -> tuple[float, float]:
     """Model 2: rastgele girdide (a düzgün, s ~ CBD(η)) B tabanında açmanın bozulma olasılığı.
 
     Her dilim yaklaşık N(0, σ_k²), σ_k² = terim·T_k·Var(a)·Var(s), Var(s) = η/2.

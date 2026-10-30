@@ -1,0 +1,8 @@
+# tohum=20261030 python=3.11.2 makine=x86_64
+varyant,paketleme_us,carpim_us,cozme_us,toplam_us
+isaretsiz32-dongu,80.771,21.45,102.60149999999999,204.8225
+isaretsiz32-bayt,25.367,20.556,51.825,97.748
+isaretli22-dongu,60.259,10.322,212.4035,282.9845
+isaretli24-bayt,28.825,12.484,55.0215,96.3305
+isaretli22-negmod,61.6075,46.092,48.8695,156.56900000000002
+isaretli24-bayt-negmod,27.598,54.5945,27.414,109.6065
