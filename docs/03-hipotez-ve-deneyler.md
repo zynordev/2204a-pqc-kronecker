@@ -87,8 +87,8 @@ bozulmaması gizli anahtara bağlıdır (‖s‖₁ hakkında bilgi sızar).
 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
-| E4.1 | ℓ = ℓ_min − 1; farklı s'ler için saldırgan girdisi; hata ↔ ‖s‖₁ eşiği | hata ⇔ 1664·‖s‖₁ ≥ 2^(ℓ−1) | — |
-| E4.2 | Aynı şey tam decaps üzerinde: paylaşılan sır doğru/yanlış | aynı eşik | — |
+| E4.1 | ℓ = ℓ_min − 1; farklı s'ler için saldırgan girdisi; hata ↔ ‖s‖₁ eşiği | hata ⇔ 1664·‖s‖₁ ≥ 2^(ℓ−1) | 1500 örnekte 0 uyumsuzluk: hata tam olarak eşikte ortaya çıkıyor [ölçüldü, `experiments/03-guvenlik`] |
+| E4.2 | Aynı şey tam decaps üzerinde: paylaşılan sır doğru/yanlış | aynı eşik | 150 kurban anahtarında 0 uyumsuzluk: decapsulation hatası ‖s₀‖₁ ≥ 316 eşiğinde tetikleniyor [ölçüldü, `experiments/03-guvenlik`] |
 
 Not: Bu, kendi bilerek bozduğumuz uygulamamız üzerinde bir gösterimdir; gerçek bir sisteme saldırı değildir.
 

@@ -30,7 +30,7 @@ olduğundan katsayıları merkezlenmiş (işaretli) tutarak paketleme genişliğ
 | 1 | Literatür + teori (ispat) | 3 – 15 Kas | 🟡 çıkış gözlemi (23²) + Lemma 1 / Teorem 1 ispatları yazıldı (`asama-1`), B'nin kontrolü ve künye doğrulama bekliyor |
 | 2 | Referans ML-KEM (NTT) + NIST test vektörleri | 3 – 22 Kas | 🟡 kod + 225/225 NIST testi geçti (`asama-2` dalı), kod okuma bekliyor |
 | 3 | Kronecker motorları + ML-KEM entegrasyonu | 23 Kas – 4 Ara | 🟡 8 varyant, her biri 225/225 NIST testi (`asama-3` dalı), kod okuma bekliyor |
-| 4 | Deneyler (H2–H4) | 5 – 18 Ara | 🟡 H2 tamamlandı (200.000 deneme + Model 2 doğrulaması), H4 ve H3 bekliyor |
+| 4 | Deneyler (H2–H4) | 5 – 18 Ara | 🟡 H2 (Teori-Deney) ve H4 (Güvenlik Sızıntısı) tamamlandı, H3 (Performans) bekliyor |
 | 5a | PQC-Drop asgari prototip (CLI) | 12 – 20 Ara | ⏳ |
 | 6 | Rapor | 16 – 31 Ara | ⏳ |
 | 5b | GUI, poster, sunum (başvuru sonrası) | Ocak – sergi | ⏳ |
