@@ -6,7 +6,7 @@ import random
 
 import pytest
 
-from pqc.teori import N, Q
+from pqc.parametreler import N, Q
 
 _YOL = pathlib.Path(__file__).parents[1] / "experiments" / "00-on-olcum" / "ks_bench.py"
 _spec = importlib.util.spec_from_file_location("ks_bench", _YOL)

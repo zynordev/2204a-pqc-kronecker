@@ -27,9 +27,9 @@ olduğundan katsayıları merkezlenmiş (işaretli) tutarak paketleme genişliğ
 | Aşama | Konu | Tarih | Durum |
 |---|---|---|---|
 | 0 | Repo, plan, dokümanlar, ön ölçüm | 26 Eki – 2 Kas 2026 | 🟡 iskelet + CI hazır, danışman toplantısı bekliyor |
-| 1 | Literatür + teori (ispat) | 3 – 15 Kas | ⏳ |
-| 2 | Referans ML-KEM (NTT) + NIST test vektörleri | 3 – 22 Kas | ⏳ |
-| 3 | Kronecker motorları + ML-KEM entegrasyonu | 23 Kas – 4 Ara | ⏳ |
+| 1 | Literatür + teori (ispat) | 3 – 15 Kas | 🟡 çıkış gözlemi (23²) + Lemma 1 / Teorem 1 ispatları yazıldı (`asama-1`), B'nin kontrolü ve künye doğrulama bekliyor |
+| 2 | Referans ML-KEM (NTT) + NIST test vektörleri | 3 – 22 Kas | 🟡 kod + 225/225 NIST testi geçti (`asama-2` dalı), kod okuma bekliyor |
+| 3 | Kronecker motorları + ML-KEM entegrasyonu | 23 Kas – 4 Ara | 🟡 8 varyant, her biri 225/225 NIST testi (`asama-3` dalı), kod okuma bekliyor |
 | 4 | Deneyler (H2–H4) | 5 – 18 Ara | ⏳ |
 | 5a | PQC-Drop asgari prototip (CLI) | 12 – 20 Ara | ⏳ |
 | 6 | Rapor | 16 – 31 Ara | ⏳ |
@@ -46,7 +46,7 @@ Ayrıntı: [docs/01-calisma-plani.md](docs/01-calisma-plani.md)
 - [04 — Teori](docs/04-teori.md)
 - [05 — Hata kontrolü ve kalite kapıları](docs/05-hata-kontrol.md)
 - [06 — Açık sorular](docs/06-acik-sorular.md)
-- [Aşama kayıtları](docs/kayit/) · [Kararlar (ADR)](docs/kararlar/)
+- [Aşama kayıtları](docs/kayit/) · [Kararlar (ADR)](docs/kararlar/) · [Kod okuma rehberleri](docs/kod-okuma/)
 
 ## Çalıştırma
 
@@ -55,14 +55,17 @@ python3 -m venv .venv && . .venv/bin/activate   # fish: . .venv/bin/activate.fis
 pip install -e '.[dev]'
 pytest                 # testler
 ruff check .           # kod stili
+python araclar/mutasyon_kontrolu.py              # testlerin hata yakalama gücü (~5 dk)
 python experiments/00-on-olcum/ks_bench.py      # ön ölçüm (birkaç dakika)
+python experiments/01-dogruluk/calistir.py      # E1.2: 10.000 örnek doğruluk deneyi
 ```
 
 ## Klasörler
 
 ```
 docs/          plan, teori, literatür, kayıtlar, kararlar
-src/pqc/       kütüphane kodu (Aşama 2'den itibaren dolacak)
-tests/         otomatik testler
+src/pqc/       ML-KEM (FIPS 203) ve çarpım yöntemleri
+tests/         otomatik testler (NIST ACVP vektörleri dahil)
+araclar/       yardımcı araçlar (mutasyon kontrolü)
 experiments/   her deney: betik + ham veri + sonuc.md
 ```
