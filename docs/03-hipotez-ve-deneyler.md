@@ -73,9 +73,9 @@ kat hızlanır. Uçtan uca hızlanma ancak paketleme/açma da optimize edilirse 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
 | E3.1 | Yalnızca bigint çarpımı, 5632 vs 8192 bit | ≈ 1,8× | 2,05× hızlanma (20,35 µs vs 9,94 µs) [ölçüldü, `experiments/04-performans`] |
-| E3.2 | Tek polinom çarpımı: schoolbook, Karatsuba, NTT, 8 KS varyantı | KS < NTT (Python'da) | KS bayt (130 µs) < NTT (284 µs) < Schoolbook (3290 µs) [ölçüldü] |
+| E3.2 | Tek polinom çarpımı: schoolbook, Karatsuba, NTT, 8 KS varyantı | KS < NTT (Python'da) | KS bayt (106–145 µs) < NTT (284 µs) < Schoolbook (3290 µs); **en hızlısı işaretsiz32-bayt (106 µs)**, merkezlemenin tek polinomda ölçülebilir kazancı yok [ölçüldü] |
 | E3.3 | Süre dağılımı: paketleme / çarpım / açma / indirgeme ayrı ayrı | açma baskın | Doğrulandı: döngülü açma sürenin %75'ini harcıyor; bayt açma bunu 4 kat hızlandırıyor [ölçüldü] |
-| E3.4 | Tam ML-KEM keyGen/encaps/decaps, NTT vs en iyi KS | — | Standart dönüşüm ek yükü (ADR 0003) sebebiyle NTT uçtan uca %20–30 daha hızlı [ölçüldü] |
+| E3.4 | Tam ML-KEM keyGen/encaps/decaps, NTT vs en iyi KS | — | Standart dönüşüm ek yükü (ADR 0003) sebebiyle NTT uçtan uca %20–63 daha hızlı (keygen %39/%49/%63, encaps %20/%32/%43, decaps %22/%36/%45; 512/768/1024) [ölçüldü, 100 tekrar] |
 | E3.5 | Aynı ölçümler ikinci makinede (laptop) | sıralama aynı | — |
 
 Protokol: `time.perf_counter_ns`, ısınma turu, ≥1000 tekrar, medyan + çeyrekler arası aralık,
@@ -87,10 +87,13 @@ bozulmaması gizli anahtara bağlıdır (‖s‖₁ hakkında bilgi sızar).
 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
-| E4.1 | ℓ = ℓ_min − 1; farklı s'ler için saldırgan girdisi; hata ↔ ‖s‖₁ eşiği | hata ⇔ 1664·‖s‖₁ ≥ 2^(ℓ−1) | 1500 örnekte 0 uyumsuzluk: hata tam olarak eşikte ortaya çıkıyor [ölçüldü, `experiments/03-guvenlik`] |
-| E4.2 | Aynı şey tam decaps üzerinde: paylaşılan sır doğru/yanlış | aynı eşik | 150 kurban anahtarında 0 uyumsuzluk: decapsulation hatası ‖s₀‖₁ ≥ 316 eşiğinde tetikleniyor [ölçüldü, `experiments/03-guvenlik`] |
+| E4.1 | ℓ ∈ {18…22}; farklı s'ler için saldırgan girdisi; hata ↔ ‖s‖₁ eşiği | hata ⇔ 1664·‖s‖₁ ≥ 2^(ℓ−1) | 1500 vektör × 5 ℓ'de 0 uyumsuzluk. Gerçek CBD vektörlerinde (700; max norm 282) ℓ = 18–19 hepsi bozuk, ℓ = 20–22 hiçbiri bozuk değil; ℓ = 20 eşiği (316) yalnızca yapay normlu vektörlerde aşıldı [ölçüldü, `experiments/03-guvenlik`] |
+| E4.2 | ML-KEM-512 iç çarpımı, sıkıştırmaya uygun şifreli metinle, ℓ = 20 | aynı eşik | 150 anahtarda 0 uyumsuzluk; 75 gerçek anahtarda 0 bozulma (max norm 270), 75 yapay büyütülmüş anahtarda eşik 316 üstü bozuk. **Decaps çağrılmadı** [ölçüldü, `experiments/03-guvenlik`] |
 
 Not: Bu, kendi bilerek bozduğumuz uygulamamız üzerinde bir gösterimdir; gerçek bir sisteme saldırı değildir.
+FIPS 203'ün örtük reddetmesi, geçersiz şifreli metinde taşma olsa da olmasa da sahte anahtar döndürdüğünden decaps
+çıktısı taşmayı dışarı vermez; gösterilen şey "anahtara bağlı davranış"tır, anahtar ele geçirme değil
+(bkz. `experiments/03-guvenlik/sonuc.md` §4).
 
 ## Deney klasörü şablonu
 ```

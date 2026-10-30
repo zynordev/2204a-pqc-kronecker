@@ -44,7 +44,9 @@
 | **KS: isaretli24-bayt-negmod** | 145,17 | 1,53 | Hızlı bayt + mod $2^{n\ell}+1$ |
 | **KS: isaretli24-bayt-modul** | 122,85 | 2,24 | İç çarpım modül toplamı entegre |
 
-*Bulgu:* Katsayı alanında verilen iki polinomun çarpımında bayt hizalı Kronecker motorları (106–130 µs), saf Python NTT'den (284 µs) **2 kattan daha hızlıdır**.
+*Bulgu:* Katsayı alanında verilen iki polinomun çarpımında bayt hizalı Kronecker motorları (106–145 µs), saf Python NTT'den (284 µs) hızlıdır; döngülü açma varyantları (isaretli22-dongu 315 µs) değildir.
+
+*Dikkat:* **En hızlı varyant işaretsiz 32 bitlik bayt varyantıdır (106 µs)**; işaretli 24 bitlik bayt varyantı 130 µs'dir. Merkezlemenin bigint çarpımında sağladığı ≈ 10 µs'lik kazanç, paketleme + açma (≈ 80–90 µs) içinde kaybolmaktadır. Python'da tek polinom çarpımında hızı belirleyen şey operand boyutu değil, açmanın C düzeyinde (bayt dönüşümü, Lemma 2) yapılıp yapılmadığıdır. NTT ölçümü iki ileri + bir ters dönüşüm içerir; ML-KEM'de A zaten NTT alanında olduğundan bu kıyas NTT aleyhine hafif önyargılıdır.
 
 ---
 
@@ -59,7 +61,7 @@
 | **isaretli22-negmod** | 61,61 (%39) | 46,09 (%30) | 48,87 (%31) | 156,57 | Dengeli |
 | **isaretli24-bayt-negmod** | 27,60 (%25) | 54,59 (%50) | 27,41 (%25) | 109,61 | Çarpım/Mod |
 
-*Bulgu:* `isaretli22-dongu` varyantında sürenin **%75'i** Lemma 1'deki dengeli açma döngüsünde (`ac_dongu_isaretli`) harcanmaktadır. Lemma 2 ile önerdiğimiz bayt hizalı açma (`isaretli24-bayt`) bu açma süresini 212 µs'den 55 µs'ye indirerek darboğazı kırmıştır!
+*Bulgu:* `isaretli22-dongu` varyantında sürenin **%75'i** Lemma 1'deki dengeli açma döngüsünde (`ac_dongu_isaretli`) harcanmaktadır. Lemma 2'deki bayt hizalı açma (`isaretli24-bayt`) bu süreyi 212 µs'den 55 µs'ye indirmiştir. Not: E3.3 yalnızca üç çekirdek adımı (paketleme, çarpım, açma) ölçer; E3.2'deki toplam süre ayrıca merkezleme ve mod q listelerini içerdiğinden daha büyüktür (96 vs 130 µs).
 
 ---
 
@@ -81,8 +83,7 @@
 
 ## 3. Bilimsel Yorum ve Projenin Ana Savunması
 
-1. **Bigint Hipotezi Doğrulandı:** 22 ve 21 bitlik merkezleme operandı küçülterek tamsayı çarpımını **2,05 kat** hızlandırmıştır.
-2. **Yalın Çarpımda Kronecker Üstünlüğü:** Salt polinom çarpımında Kronecker bayt varyantları saf Python NTT'den **2,18 kat** daha hızlıdır.
-3. **Uçtan Uca ML-KEM Paradoksu (Bilimsel Dürüstlük):**  
-   FIPS 203 standardı $\hat{A}$ matrisini ve $\hat{t}$ anahtarını doğrudan NTT alanında saklar. Kronecker'in standartla aynı çıktıyı üretmesi için bu nesneleri $\text{NTT}^{-1}$ ile katsayı alanına geri çevirmesi gerekir (ML-KEM-768 kapsüllemede fazladan 12 adet ters NTT). Bu dönüşüm ek yükü sebebiyle uçtan uca sistemde NTT %20–30 daha hızlı kalmaktadır.
-   *Jüriye Mesajımız:* Projemiz saman alevi gibi "her yerde daha hızlıyız" iddiasında bulunmaz; yöntemin nerede hız kazandırdığını (yalın bigint ve katsayı çarpımı) ve nerede standart mimari yüzünden bedel ödediğini dürüstçe ortaya koyar.
+1. **Bigint hipotezi desteklendi:** Operandın 8192 → 5632 bite inmesi tamsayı çarpımını **2,05 kat** hızlandırmıştır (teorik alt sınır 1,81×). 1,81'in üstüne çıkmasının nedeni ölçülmemiştir; olası açıklama CPython'un 70 basamak (30 bit) altında okul yöntemine geçmesi nedeniyle bu boyutlarda etkin üssün 1,585'ten büyük olmasıdır.
+2. **Tek polinom çarpımı:** Bayt hizalı Kronecker varyantları saf Python NTT'den hızlıdır; ancak merkezlemenin tek polinom düzeyinde ölçülebilir bir kazancı yoktur (işaretsiz 32 bit bayt 106 µs, işaretli 24 bit bayt 130 µs). Kazanç açma yönteminden gelir.
+3. **Uçtan uca ML-KEM:** FIPS 203 $\hat{A}$ ve $\hat{t}$'yi NTT alanında sakladığından Kronecker yolu önce $\text{NTT}^{-1}$ yapmak zorundadır (ML-KEM-768 kapsüllemede 12 adet). Bu bedelle NTT uçtan uca önde kalır: keygen %39 / %49 / %63, encaps %20 / %32 / %43, decaps %22 / %36 / %45 (ML-KEM-512 / 768 / 1024; `veri_e34.csv`). Fark parametre seti büyüdükçe artar (k² adet dönüşüm). "Kronecker ML-KEM'i hızlandırır" iddiası bu verilerle desteklenmemektedir; yöntemin alanı, verilerin katsayı alanında tutulduğu veya NTT donanımı bulunmayıp büyük tamsayı çarpıcısı bulunan ortamlardır.
+4. **Sınırlılık:** Tüm süreler Python'a aittir ve C uygulamalarına genellenemez (ADR 0001). Tek makine; E3.5 (ikinci makine) yapılmadı. E3.4'te 100 tekrar (01/03'teki "≥ 1000" protokolünün altında).

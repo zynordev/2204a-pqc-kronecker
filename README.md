@@ -30,9 +30,9 @@ olduğundan katsayıları merkezlenmiş (işaretli) tutarak paketleme genişliğ
 | 1 | Literatür + teori (ispat) | 3 – 15 Kas | 🟡 çıkış gözlemi (23²) + Lemma 1 / Teorem 1 ispatları yazıldı (`asama-1`), B'nin kontrolü ve künye doğrulama bekliyor |
 | 2 | Referans ML-KEM (NTT) + NIST test vektörleri | 3 – 22 Kas | 🟡 kod + 225/225 NIST testi geçti (`asama-2` dalı), kod okuma bekliyor |
 | 3 | Kronecker motorları + ML-KEM entegrasyonu | 23 Kas – 4 Ara | 🟡 8 varyant, her biri 225/225 NIST testi (`asama-3` dalı), kod okuma bekliyor |
-| 4 | Deneyler (H2–H4) | 5 – 18 Ara | 🟢 Tamamlandı (H2 Teori-Deney, H4 Güvenlik Sızıntısı, H3 Performans Kıyaslaması) |
-| 5a | PQC-Drop asgari prototip (CLI) | 12 – 20 Ara | ⏳ Sırada |
-| 6 | Rapor | 16 – 31 Ara | ⏳ |
+| 4 | Deneyler (H2–H4) | 5 – 18 Ara | 🟢 Tamamlandı 30 Eki (H2 teori–deney, H4 anahtara bağlı davranış, H3 performans); E3.5 (ikinci makine) yapılmadı |
+| 5a | PQC-Drop asgari prototip (CLI) | 12 – 20 Ara | 🟡 Kod + testler hazır (30 Eki); gerçek ağ kaydı (pcap) yapılıyor |
+| 6 | Rapor | 16 – 31 Ara | 🟡 Taslak: [docs/taslakfable.md](docs/taslakfable.md); eleştiri: [docs/analiz-fable.md](docs/analiz-fable.md); kaynak doğrulama ve YZ beyanı (S3) bekliyor |
 | 5b | GUI, poster, sunum (başvuru sonrası) | Ocak – sergi | ⏳ |
 
 Ayrıntı: [docs/01-calisma-plani.md](docs/01-calisma-plani.md)
@@ -46,6 +46,7 @@ Ayrıntı: [docs/01-calisma-plani.md](docs/01-calisma-plani.md)
 - [04 — Teori](docs/04-teori.md)
 - [05 — Hata kontrolü ve kalite kapıları](docs/05-hata-kontrol.md)
 - [06 — Açık sorular](docs/06-acik-sorular.md)
+- [Rapor taslağı (güncel)](docs/taslakfable.md) · [Repo eleştirisi ve düzeltme listesi](docs/analiz-fable.md) · [Örnek raporlar](docs/ornekler/)
 - [Aşama kayıtları](docs/kayit/) · [Kararlar (ADR)](docs/kararlar/) · [Kod okuma rehberleri](docs/kod-okuma/)
 
 ## Çalıştırma

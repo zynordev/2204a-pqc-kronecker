@@ -59,8 +59,11 @@ Her seri 20.000 rastgele deneme (büyük katsayılar $[0, q)$ düzgün, küçük
 
 ## 3. Bulgular ve Bilimsel Çıkarımlar
 
-1. **Hipotez H2 Doğrulandı:**
-   Model 2'nin öngördüğü hata olasılıkları, geçiş bölgesinde ($10^{-4} < p < 0,2$) ölçülen Wilson %95 güven aralıklarının tam içerisine düşmüştür.
+1. **Hipotez H2 desteklendi:**
+   Model 2'nin deneyden önce kaydedilen tahminleri, ölçülebilir aralıktaki ($10^{-3} < p < 1 - 10^{-3}$) her noktada
+   ölçümün %95 Wilson güven aralığı içinde kalmıştır (`ozet.csv`, `model_aralikta` sütunu). Aralık dışında tek sapma
+   tek-eta3-tam ℓ = 16'dadır (model 0,999997, ölçülen 19 999/20 000; üst sınır 0,999991) ve ölçülebilir aralığın
+   dışındadır. "Tam örtüşme" değil, "güven aralığı içinde" denmelidir.
 2. **Parametre Simetrisi Doğrulandı:**
    ML-KEM-512 ile ML-KEM-768 modül toplamı katsayı sınırları teoride aynıdır ($k \cdot \eta_1 = 2 \cdot 3 = 3 \cdot 2 = 6$). Deneyde her ikisinin medyanı da $\log_2 B \approx 17,11 - 17,12$ çıkmıştır.
 3. **Negasiklik İndirgeme Davranışı:**
@@ -71,5 +74,11 @@ Her seri 20.000 rastgele deneme (büyük katsayılar $[0, q)$ düzgün, küçük
 ---
 
 ## 4. Bilinen Kusurlar ve Sınırlılıklar
-- CLT (Merkezi Limit Teoremi) kuyruklarda ($p < 10^{-4}$) katsayıların sonlu aralıkta ($|a_i \cdot s_j| \le A \cdot \eta$) olmasından dolayı teorik olarak gerçek dağılımdan biraz daha kalın kuyrukludur.
-- Dilimler bağımsız değildir (aynı $a_i$ çarpanı birden fazla dilimde yer alır). Bu bağımlılık nedeniyle bağımsızlık formülü çok küçük olasılıklarda yaklaşık kalır; ancak geçiş bölgesinde deneysel veriyi mükemmel temsil etmektedir.
+- Terimler sınırlı ($|a_i \cdot s_j| \le A \cdot \eta$) olduğundan gerçek dağılımın kuyruğu normalden **incedir**; model
+  kuyrukta ($p < 10^{-4}$) hatayı fazla tahmin etmeye eğilimlidir (03'teki ön kayıt). Ölçümde sapmanın yönü
+  ayırt edilememiştir: tek-eta2-tam ℓ = 17'de model altta (9,1·10⁻⁴ vs 1,15·10⁻³), modul-1024-tam ℓ = 18'de üstte
+  (9,1·10⁻⁴ vs 6,0·10⁻⁴) kalmıştır; ikisi de güven aralığı içindedir. 20 000 deneme bu bölgede yönü belirlemeye yetmez.
+- Dilimler bağımsız değildir (aynı $a_i$ çarpanı birden fazla dilimde yer alır); bağımsızlık formülü bir yaklaşımdır.
+  Kod ayrıca birleşim üst sınırını da verir (`model_birlesim`); geçiş bölgesinde ikisi birbirine yakındır.
+- ℓ ≥ 19'da 20 000 denemede 0 hata, modelin 10⁻¹⁵'in altındaki tahminini **doğrulamaz**; yalnızca üst sınır
+  (Wilson, 1,9·10⁻⁴) verir.
