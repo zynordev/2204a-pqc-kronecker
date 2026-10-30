@@ -41,21 +41,24 @@ def send_bytes(sock: socket.socket, veri: bytes) -> None:
     sock.sendall(struct.pack(">I", len(veri)) + veri)
 
 
-def recv_bytes(sock: socket.socket) -> bytes:
-    """4 baytlık uzunluk önekini okuyup tam veriyi çeker."""
-    ham_uzunluk = sock.recv(4)
-    if not ham_uzunluk:
-        raise ConnectionError("Bağlantı beklenmedik şekilde kapandı.")
-    uzunluk = struct.unpack(">I", ham_uzunluk)[0]
+def recv_exact(sock: socket.socket, n: int) -> bytes:
+    """Belirtilen bayt miktarı tamamlanana kadar güvenli okuma yapar."""
     parcalar = []
-    kalan = uzunluk
+    kalan = n
     while kalan > 0:
-        veri = sock.recv(min(kalan, 65536))
+        veri = sock.recv(kalan)
         if not veri:
-            raise ConnectionError("Veri aktarımı yarım kaldı.")
+            raise ConnectionError("Bağlantı beklenmedik şekilde kapandı.")
         parcalar.append(veri)
         kalan -= len(veri)
     return b"".join(parcalar)
+
+
+def recv_bytes(sock: socket.socket) -> bytes:
+    """4 baytlık uzunluk önekini okuyup tam veriyi çeker."""
+    ham_uzunluk = recv_exact(sock, 4)
+    uzunluk = struct.unpack(">I", ham_uzunluk)[0]
+    return recv_exact(sock, uzunluk)
 
 
 def anahtar_turet(paylasilan_sir: bytes) -> bytes:
@@ -178,7 +181,7 @@ def dosya_gonder(
             }
         ).encode("utf-8")
 
-        meta_ct = aes.encrypt(b"METADATA_NONCE_", metadata, None)
+        meta_ct = aes.encrypt(b"METADATA_NC0", metadata, None)
         send_bytes(sock, meta_ct)
 
         # Şifreli dosya akışı
@@ -256,13 +259,17 @@ def dosya_al(
         # Metadata alımı
         meta_ct = recv_bytes(sock)
         try:
-            metadata = json.loads(aes.decrypt(b"METADATA_NONCE_", meta_ct, None).decode("utf-8"))
+            metadata = json.loads(aes.decrypt(b"METADATA_NC0", meta_ct, None).decode("utf-8"))
         except InvalidTag:
             print("❌ GÜVENLİK İHLALİ: Metadata kimlik doğrulama etiketi geçersiz! Saldırı tespit edildi.")
             sock.close()
             return
 
-        dosya_adi = metadata["ad"]
+        dosya_adi = pathlib.Path(metadata["ad"]).name
+        if not dosya_adi or dosya_adi in (".", ".."):
+            print("❌ GÜVENLİK İHLALİ: Geçersiz dosya adı tespit edildi.")
+            sock.close()
+            return
         toplam_bayt = metadata["boyut"]
         beklenen_sha256 = metadata["sha256"]
         cikti_yolu = hedef_klasor / dosya_adi
