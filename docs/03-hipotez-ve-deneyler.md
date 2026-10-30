@@ -20,10 +20,10 @@ rastgele girdide hata olasılığını Model 2 tahmin eder.
 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
-| E2.1 | ℓ = ℓ_min: kötü durum girdileri (Önerme 1'deki yapı) | 0 hata | — |
-| E2.2 | ℓ = ℓ_min − 1: Önerme 1'deki keskinlik girdisi | hata var | — |
-| E2.3 | ℓ ∈ {16…22}, rastgele girdi (CBD ile s), her ℓ için N deneme | Model 2 eğrisi | — |
-| E2.4 | E2.3 grafiği: model eğrisi + ölçülen noktalar + %95 güven aralığı | eğri aralıkların içinde | — |
+| E2.1 | ℓ = ℓ_min: kötü durum girdileri (Önerme 1'deki yapı) | 0 hata | 10 seri × kötü durum girdileri: 0 hata [ölçüldü, `experiments/02-teori-deney`] |
+| E2.2 | ℓ = ℓ_min − 1: Önerme 1'deki keskinlik girdisi | hata var | 10 seri × kötü durum girdileri: hepsi hatalı [ölçüldü, `experiments/02-teori-deney`] |
+| E2.3 | ℓ ∈ {14…ℓ_min}, rastgele girdi (CBD ile s), her seri için 20.000 deneme | Model 2 eğrisi | Geçiş bölgelerinde model değeri tam %95 Wilson GA içinde (örn. tek-η3 ℓ=17 model 0,0306, ölçülen 0,0301) [ölçüldü] |
+| E2.4 | E2.3 grafiği: model eğrisi + ölçülen noktalar + %95 güven aralığı | eğri aralıkların içinde | `grafik_e24.png`, `grafik_e24_neg.png`, `grafik_fark.png` [ölçüldü, `experiments/02-teori-deney`] |
 
 ### H2 ön kaydı (2026-10-30, deneyden önce yazıldı; değiştirilmez)
 
