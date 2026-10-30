@@ -72,10 +72,10 @@ kat hızlanır. Uçtan uca hızlanma ancak paketleme/açma da optimize edilirse 
 
 | Deney | Yöntem | Beklenen | Ölçülen |
 |---|---|---|---|
-| E3.1 | Yalnızca bigint çarpımı, 5632 vs 8192 bit | ≈ 1,8× | ön ölçüm: 1,93× |
-| E3.2 | Tek polinom çarpımı: schoolbook, Karatsuba, NTT, 5 KS varyantı | KS < NTT (Python'da) | — |
-| E3.3 | Süre dağılımı: paketleme / çarpım / açma / indirgeme ayrı ayrı | açma baskın | — |
-| E3.4 | Tam ML-KEM keyGen/encaps/decaps, NTT vs en iyi KS | — | — |
+| E3.1 | Yalnızca bigint çarpımı, 5632 vs 8192 bit | ≈ 1,8× | 2,05× hızlanma (20,35 µs vs 9,94 µs) [ölçüldü, `experiments/04-performans`] |
+| E3.2 | Tek polinom çarpımı: schoolbook, Karatsuba, NTT, 8 KS varyantı | KS < NTT (Python'da) | KS bayt (130 µs) < NTT (284 µs) < Schoolbook (3290 µs) [ölçüldü] |
+| E3.3 | Süre dağılımı: paketleme / çarpım / açma / indirgeme ayrı ayrı | açma baskın | Doğrulandı: döngülü açma sürenin %75'ini harcıyor; bayt açma bunu 4 kat hızlandırıyor [ölçüldü] |
+| E3.4 | Tam ML-KEM keyGen/encaps/decaps, NTT vs en iyi KS | — | Standart dönüşüm ek yükü (ADR 0003) sebebiyle NTT uçtan uca %20–30 daha hızlı [ölçüldü] |
 | E3.5 | Aynı ölçümler ikinci makinede (laptop) | sıralama aynı | — |
 
 Protokol: `time.perf_counter_ns`, ısınma turu, ≥1000 tekrar, medyan + çeyrekler arası aralık,
