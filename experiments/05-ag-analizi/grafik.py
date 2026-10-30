@@ -7,7 +7,9 @@
 
 import csv
 import pathlib
+
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -74,7 +76,7 @@ def ciz_grafikler():
     # -------------------------------------------------------------
     # Grafik 2: Güvenlik Düzeyleri (Klasik vs Kuantum)
     # -------------------------------------------------------------
-    fig, ax = plt.subplots(figsize=(8, 5))
+    _fig, ax = plt.subplots(figsize=(8, 5))
     x = range(len(protokoller))
     genislik = 0.35
 
