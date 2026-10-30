@@ -37,8 +37,14 @@ def ciz_e31():
     base = meds[0]
     for bar, med in zip(bars, meds):
         hiz = base / med
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3,
-                f"{med:.2f} µs\n({hiz:.2f}x)", ha="center", va="bottom", fontsize=8)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 0.3,
+            f"{med:.2f} µs\n({hiz:.2f}x)",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
 
     fig.tight_layout()
     fig.savefig(KLASOR / "grafik_e31.png", dpi=150)
@@ -67,8 +73,13 @@ def ciz_e32():
     ax.grid(axis="x", linestyle=":", alpha=0.6)
 
     for bar, med in zip(bars, meds):
-        ax.text(bar.get_width() * 1.05, bar.get_y() + bar.get_height() / 2,
-                f"{med:.1f} µs", va="center", fontsize=8)
+        ax.text(
+            bar.get_width() * 1.05,
+            bar.get_y() + bar.get_height() / 2,
+            f"{med:.1f} µs",
+            va="center",
+            fontsize=8,
+        )
 
     fig.tight_layout()
     fig.savefig(KLASOR / "grafik_e32.png", dpi=150)
@@ -94,7 +105,9 @@ def ciz_e33():
     ax.bar(labels, t_pack, label="Paketleme (Pack)", color="tab:blue")
     ax.bar(labels, t_mul, bottom=t_pack, label="Tamsayı Çarpımı (Mul)", color="tab:green")
     bottom_unpack = [p + m for p, m in zip(t_pack, t_mul)]
-    ax.bar(labels, t_unpack, bottom=bottom_unpack, label="Açma / İndirgeme (Unpack/Reduce)", color="tab:orange")
+    ax.bar(
+        labels, t_unpack, bottom=bottom_unpack, label="Açma / İndirgeme (Unpack/Reduce)", color="tab:orange"
+    )
 
     ax.set_ylabel("Süre (µs)")
     ax.set_title("E3.3 — Kronecker Varyantlarında Süre Dağılımı (Breakdown)")

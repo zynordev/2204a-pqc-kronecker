@@ -34,8 +34,10 @@ TOHUM = 20261030
 
 def cbd(rng: random.Random, eta: int) -> list[int]:
     """CBD(η): katsayılar [-eta, eta]."""
-    return [sum(rng.getrandbits(1) for _ in range(eta)) - sum(rng.getrandbits(1) for _ in range(eta))
-            for _ in range(N)]
+    return [
+        sum(rng.getrandbits(1) for _ in range(eta)) - sum(rng.getrandbits(1) for _ in range(eta))
+        for _ in range(N)
+    ]
 
 
 def esik_hesapla(l: int) -> float:
@@ -94,6 +96,7 @@ def e41_deneyi(adet: int = 1000):
 
 class KusurluKroneckerPKE(KroneckerPKE):
     """Deney amaçlı: güvenlik sınır kontrolünü devre dışı bırakır."""
+
     def _kontrol(self, p):
         pass
 
@@ -127,6 +130,7 @@ def e42_deneyi(adet: int = 150):
                     s0_merkez[idx] = rng.choice([-3, 3])
             # Güncellenmiş s0'ı dk'ya geri yaz
             from pqc.ntt import ntt
+
             s0_hat = ntt([x % Q for x in s0_merkez])
             dk = byte_encode(s0_hat, 12) + dk[384:]
 
@@ -141,7 +145,10 @@ def e42_deneyi(adet: int = 150):
         c1 + c2
 
         # PKE seviyesinde u^T s iç çarpımı:
-        u_cozulmus = [[decompress(x, p.du) for x in f] for f in [byte_decode(c1[32*p.du*j : 32*p.du*(j+1)], p.du) for j in range(p.k)]]
+        u_cozulmus = [
+            [decompress(x, p.du) for x in f]
+            for f in [byte_decode(c1[32 * p.du * j : 32 * p.du * (j + 1)], p.du) for j in range(p.k)]
+        ]
         s_vektor = [ntt_ters(f) for f in [byte_decode(dk[384 * j : 384 * (j + 1)], 12) for j in range(p.k)]]
 
         prod_guvenli = pke_guvenli.varyant.ic_carpim(u_cozulmus, s_vektor, p.eta1)
@@ -163,8 +170,22 @@ def main():
     with open(KLASOR / "veri_e41.csv", "w", newline="") as f:
         yaz = csv.writer(f)
         yaz.writerow([baslik])
-        yaz.writerow(["ornek", "norm_s", "hata_18", "beklenen_18", "hata_19", "beklenen_19",
-                      "hata_20", "beklenen_20", "hata_21", "beklenen_21", "hata_22", "beklenen_22"])
+        yaz.writerow(
+            [
+                "ornek",
+                "norm_s",
+                "hata_18",
+                "beklenen_18",
+                "hata_19",
+                "beklenen_19",
+                "hata_20",
+                "beklenen_20",
+                "hata_21",
+                "beklenen_21",
+                "hata_22",
+                "beklenen_22",
+            ]
+        )
         yaz.writerows(sonuclar_41)
 
     # Uyumsuzluk kontrolü

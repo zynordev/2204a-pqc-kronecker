@@ -42,12 +42,17 @@ def main():
 
     for idx, l in enumerate([18, 19, 20, 21, 22]):
         hatalar = [v[1 + idx] for v in veriler_41]
-        ax.scatter(norms, [h + idx * 0.02 for h in hatalar], s=12, alpha=0.6,
-                   color=renkler[l], label=f"ℓ = {l} (ölçülen hata)")
+        ax.scatter(
+            norms,
+            [h + idx * 0.02 for h in hatalar],
+            s=12,
+            alpha=0.6,
+            color=renkler[l],
+            label=f"ℓ = {l} (ölçülen hata)",
+        )
         e = esik(l)
         if e <= max(norms):
-            ax.axvline(e, color=renkler[l], linestyle="--", alpha=0.8,
-                       label=f"ℓ = {l} teorik eşik ({e:.1f})")
+            ax.axvline(e, color=renkler[l], linestyle="--", alpha=0.8, label=f"ℓ = {l} teorik eşik ({e:.1f})")
 
     ax.set_xlabel("Gizli Anahtar 1-Normu: ||s||₁")
     ax.set_ylabel("Çarpım Hatası Oluşumu (0 = Doğru, 1 = Taştı)")
