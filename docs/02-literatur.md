@@ -52,3 +52,11 @@ bundan dolayı Lemma yani önerme kısmına giriş yapıyor t≥2 üzeri ℓ sı
 
 
 
+
+**Nota cevap (inceleme, 2026-10-30):** Özet doğru. İki düzeltme/uyarı: (a) "RSA işlemcisinin gücü olan 2200" —
+makaledeki sınır koprosesörün **operand genişliğidir**; kesin sayıyı makaleden teyit edin, "2200" hatırlama olabilir.
+(b) Makalenin "x yerine hangi sayı yazılırsa katsayılar karışmaz" sorusu ve Lemma'sı bizim Teorem 1 ile **aynı
+sorudur**; dolayısıyla raporda "sınırı biz bulduk" denmez; "L6'daki sınırı merkezlenmiş katsayılar için keskinlik
+ispatı, olasılık modeli (Model 2) ve anahtara bağlı davranış deneyiyle (H4) genişlettik" denir. 07'deki "literatürde
+kesin olarak ispatlanmamış" cümlesi bu yüzden çıkarıldı. Makaleyi okurken şu da not edilmeli: işaretli (merkezlenmiş)
+katsayı kullanıyorlar mı, yoksa [0, q) mı? (02 §"Bizim konumumuz", madde 1–2.)

@@ -1,3 +1,11 @@
+> **ESKİ TASLAK — 2026-10-30 itibarıyla geçersiz.** Güncel taslak: [`taslakfable.md`](taslakfable.md).
+> Bu metindeki bilinen hatalar [`analiz-fable.md`](analiz-fable.md) §1 ve §4'te listelidir; başlıcaları:
+> "en çok vakit alan kısım polinom çarpımı" (00'da çıkarılmış iddia), "işaretsiz 23 bit" (doğrusu 32),
+> "i5" (doğrusu i3-14100), "NTT %20–30 önde" (doğrusu %20–63), "decapsulation hatasıyla norm ele geçirme"
+> (örtük reddetme bunu maskeler), "Wireshark ile doğrulandı" (betik içi simülasyon), entropi kıyası (örneklem
+> boyutu etkisi), Bernstein–Buchmann–Dahmen 2017 (doğrusu 2009), NIST'e standart değişikliği önerisi.
+> Arşiv amacıyla tutulmaktadır; rapora kaynak olarak kullanılmamalıdır.
+
 # TÜBİTAK 2204-A LİSE ÖĞRENCİLERİ ARAŞTIRMA PROJELERİ YARIŞMASI
 # PROJE RAPORU
 

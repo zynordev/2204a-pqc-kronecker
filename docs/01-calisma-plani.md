@@ -78,11 +78,15 @@ Her aşamanın bir **çıkış kriteri** var. Kriter sağlanmadan sonraki aşama
 - [x] CLI: `pqcdrop alici` / `pqcdrop gonder dosya ip`
 - [x] El sıkışma: ML-KEM (bizim Kronecker motorumuzla) → HKDF → AES-256-GCM parça parça akış
 - [x] Bütünlük: alınan dosyanın SHA-256'sı eşleşiyor; değiştirilmiş paket reddediliyor
-- [x] İki makine arası fiziksel aktarım çalışıyor (Pardus 1 ↔ Pardus 2); ağ analizi yapıldı.
-- **Çıkış:** iki makine arası aktarım çalışıyor; rapora ekran görüntüsü + ölçüm girecek kadar.
+- [ ] İki makine arası fiziksel aktarım (Pardus 1 ↔ Pardus 2) + `tcpdump -w` ile gerçek ağ kaydı (pcap) ve ekran
+      görüntüsü — **Halil yapıyor (30 Eki)**. `experiments/05-ag-analizi` şu an yalnızca betik içi simülasyondur.
+- [ ] Hedef makinede `python3 -c "import cryptography"` ile "sıfır kurulum" iddiası doğrulanacak.
+- **Çıkış:** iki makine arası aktarım çalışıyor; rapora pcap özeti + ekran görüntüsü + ölçüm girecek kadar.
 
 ### Aşama 6 — Rapor (16 – 31 Ara)
-- [ ] Rapor (şartname şablonuna göre), "problem → iddia → kanıt → ürün" akışı
+- [x] Taslak 0 (30 Eki): [taslakfable.md](taslakfable.md) — örnek raporların düzeniyle; `[…]` yerleri doldurulacak
+- [ ] [analiz-fable.md](analiz-fable.md)'deki "karar sizin" maddeleri: kaynak doğrulama (02'deki ✘'ler), YZ beyanı (S3),
+      kategori (S4), E5 gerçek kayıt, E3.5
 - [ ] Taslak 1: 22 Ara · danışman okuması: 23–26 Ara · son hali: 31 Ara
 - **Çıkış:** danışman onayı; 2 Ocak'ta yükleme.
 
