@@ -23,7 +23,7 @@ from pqc.kodlama import byte_decode, byte_encode, decompress
 from pqc.kpke_kronecker import KroneckerPKE
 from pqc.kronecker import Varyant, merkezle
 from pqc.mlkem import keygen
-from pqc.ntt import ntt_ters
+from pqc.ntt import ntt, ntt_ters
 from pqc.parametreler import ML_KEM_512, N, Q
 from pqc.polinom import carp_okul_yontemi
 from pqc.teori import A
@@ -129,8 +129,6 @@ def e42_deneyi(adet: int = 150):
                 for idx in rng.sample(range(N), min(N, hedef - mevcut)):
                     s0_merkez[idx] = rng.choice([-3, 3])
             # Güncellenmiş s0'ı dk'ya geri yaz
-            from pqc.ntt import ntt
-
             s0_hat = ntt([x % Q for x in s0_merkez])
             dk = byte_encode(s0_hat, 12) + dk[384:]
 
@@ -141,10 +139,10 @@ def e42_deneyi(adet: int = 150):
         # y=512 -> +1665 (-1664)
         y0 = [511 if s0_merkez[N - 1 - j] >= 0 else 512 for j in range(N)]
         c1 = byte_encode(y0, p.du) + byte_encode([0] * N, p.du)
-        c2 = byte_encode([0] * N, p.dv)
-        c1 + c2
 
-        # PKE seviyesinde u^T s iç çarpımı:
+        # PKE seviyesinde u^T s iç çarpımı. Not: burada decaps çağrılmaz; yalnızca çarpımın bozulup
+        # bozulmadığı ölçülür. FIPS 203'te saldırganın ürettiği c geçerli bir kapsülleme olmadığından
+        # örtük reddetme taşma olsa da olmasa da tetiklenir; decaps çıktısı tek başına taşmayı göstermez.
         u_cozulmus = [
             [decompress(x, p.du) for x in f]
             for f in [byte_decode(c1[32 * p.du * j : 32 * p.du * (j + 1)], p.du) for j in range(p.k)]
@@ -202,7 +200,7 @@ def main():
     with open(KLASOR / "veri_e42.csv", "w", newline="") as f:
         yaz = csv.writer(f)
         yaz.writerow([baslik])
-        yaz.writerow(["ornek", "norm_s0", "sahte_anahtar_mi", "beklenen_tasma"])
+        yaz.writerow(["ornek", "norm_s0", "carpim_bozuldu_mu", "beklenen_tasma"])
         yaz.writerows(sonuclar_42)
 
     uyumsuz_42 = sum(1 for s in sonuclar_42 if s[2] != s[3])

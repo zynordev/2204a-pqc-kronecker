@@ -1,77 +1,125 @@
 # Kod Okuma ve Algoritma Rehberi — Aşama 4 (Deneyler: H2, H4, H3)
 
-*Kim için: Öğrenci A (Halil) ve Öğrenci B.*  
-*Amaç: Deneylerin arkasındaki teoriyi, algoritmayı, kod satırlarını ve jüri karşısında çıkabilecek her soruyu ezbere değil, mantığıyla kavramak.*
+*Kim için: Öğrenci A (Halil) ve Öğrenci B.*
+*Amaç: Deneylerin arkasındaki teoriyi, algoritmayı, kod satırlarını ve jüri karşısında çıkabilecek soruları ezbere değil,
+mantığıyla kavramak. Her sayı repodaki CSV'den gelir; cevaplar abartısız olmalı — jüri CSV'yi açabilir.*
+
+*Düzeltme geçmişi: 2026-10-30 — Model 2 formülü, işaretsiz sınır (23 → 32), H4'ün çerçevesi ve E3.4 oranı
+`docs/analiz-fable.md`'ye göre düzeltildi.*
 
 ---
 
 ## 1. H2 Deneyi — Teori ve Deney Örtüşmesi (experiments/02-teori-deney/)
 
-### A. Deneyin Temel Mantığı (Nedir ve Neyi Kanıtlar?)
-Kronecker İkamesinde polinomları tek bir devasa tamsayıya çevirirken katsayılar arasına $\ell$ bitlik boşluklar (paketleme genişliği) bırakırız.
-- **Lemma 1:** Katsayıların çarpım sonucunda birbirinin üstüne taşmaması için gereken teorik minimum genişlik $\ell_{\min}$'dir:
-  $$\ell_{\min} = \lceil \log_2(2 \cdot h^* + 1) \rceil$$
-  Burada $h^*$ en kötü durumdaki maksimum katsayı büyüklüğüdür ($h^* = n \cdot q_{\max} \cdot \eta$).
-- **Soru:** En kötü durum yerine rastgele (günlük hayattaki gibi CBD gürültülü) girdiler verirsek katsayılar gerçekten $h^*$'a ulaşır mı?
-- **Cevap:** HAYIR! Merkezi Limit Teoremi gereği katsayılar ortalaması 0 olan bir Normal (Gauss) Dağılımı oluşturur. Varyans $\sigma^2 = n \cdot \frac{q^2}{12} \cdot \sigma_s^2$'dir.
-- **Model 2:** Hata olasılığı $P(\text{hata}) = 1 - (2\Phi(T) - 1)^n$ formülüyle teorik olarak hesaplanır.
+### A. Deneyin Temel Mantığı (Nedir ve Neyi Gösterir?)
+Kronecker ikamesinde polinomları tek bir büyük tamsayıya çevirirken katsayılar arasına ℓ bitlik dilimler bırakırız.
+- **Teorem 1 (docs/04):** Katsayıların birbirine karışmaması için gereken en küçük genişlik
+  ℓ_min = bitlen(n·A·η) + 1'dir (A = 1664). Eşdeğer yazım: ⌈log₂(2h* + 1)⌉, h* = n·A·η. η = 3 için 22, η = 2 için 21.
+  (Dikkat: 04'teki **Lemma 1** dengeli gösterimin tekliğidir; sınırı veren **Teorem 1**'dir. Raporda adları karıştırma.)
+- **Soru:** Rastgele girdide (büyük katsayı düzgün, küçük katsayı CBD) katsayılar h*'a ulaşır mı?
+- **Cevap:** Hayır. Her c_k, T_k = min(k+1, 2n−1−k) adet a_i·s_j teriminin toplamıdır; Merkezi Limit Teoremi ile
+  yaklaşık N(0, σ_k²), σ_k² = T_k · Var(a) · η/2, Var(a) = (q²−1)/12 ≈ 923 520.
+- **Model 2 (kodun hesapladığı formül):**
+  P(hata) ≈ 1 − Π_{k=0}^{2n−2} (1 − p_k),  p_k = 2Φ(−2^(ℓ−1)/σ_k).
+  Modül toplamında σ_k² k ile çarpılır; negasiklik açmada her dilim T_k = n'dir (n dilim).
+  Dilimler bağımsız değildir (aynı a_i birçok dilimde geçer); bu yüzden "yaklaşık" deriz ve kod ayrıca birleşim üst
+  sınırını (min(1, Σ p_k)) da döner.
 
 ### B. Kodda Nereye Bakacaksın?
-1. `src/pqc/teori.py` -> `model_hata(l, n, q, sigma_s, k_modul)`:
-   - Bu fonksiyon Merkezi Limit Teoremi'ni kullanarak henüz hiçbir kod çalıştırmadan matematiksel olarak hata ihtimalini tahmin eder.
+1. `src/pqc/teori.py` → `terim_sayilari`, `dilim_tasma_olasiligi`, `model_hata_taban`, `model_hata`:
+   deney yapılmadan hata olasılığını tahmin eder; dönüş değeri (bağımsızlık yaklaşımı, birleşim sınırı) çiftidir.
 2. `experiments/02-teori-deney/calistir.py`:
-   - 200.000 rastgele deneme yapar.
-   - Her denemede Kronecker ile çarpıp sonucu okul yöntemi (schoolbook) ile karşılaştırır.
-   - Ölçülen hata oranını %95 Wilson Güven Aralığı (Wilson Score Interval) ile hesaplar.
+   - 10 seri × 20 000 = 200 000 rastgele deneme (tohum 20261030).
+   - Her denemede dilimlerin **kesin** değeri ℓ = 40 ile hesaplanır (4·256·1664·3 < 2³⁹ olduğundan taşma imkânsız);
+     gereken en küçük yarım taban h* kaydedilir. Böylece hata oranı yalnızca tam sayı ℓ'de değil, sürekli log₂B
+     ekseninde de ölçülür.
+   - Her ℓ için gerçek dar-ℓ Kronecker açması da çalıştırılır; sonucu Lemma 1 ölçütü (h* ≤ 2^(ℓ−1)) ile
+     karşılaştırılır → `uyumsuz` sayacı (200 000 denemede 0).
+   - İlk 20 deneme okul yöntemine karşı da kontrol edilir (ℓ = 40 referansının kendisi doğrulanır).
+3. `experiments/02-teori-deney/grafik.py`: %95 Wilson aralığı (`wilson()`), `ozet.csv`, üç grafik.
 
 ### C. Jüri Sana Ne Sorar?
-- **Soru:** *"Madem teorik sınır 22 bit, rastgele girdilerde neden 17-18 bitte neredeyse hiç hata çıkmıyor?"*
-- **Cevabın:** *"Hocam, en kötü durum sınırı olan $\ell=22$, tüm 256 katsayının aynı anda maksimum değerde (+1664 ve +3) çakışması varsayımına dayanır. Bu olayın rastgele bir anahtarda gerçekleşme ihtimali $10^{-60}$'tan küçüktür. Girdiler rastgele olduğunda Merkezi Limit Teoremi devreye girer; katsayılar ortalaması sıfır olan bir çan eğrisi oluşturur ve 17-18 bitlik hacme rahatlıkla sığar. Model 2 eğrimiz ile 200.000 testte ölçtüğümüz sonuçların %95 Wilson güven aralığında birebir örtüşmesi teorimizin doğruluğunu kanıtlar."*
+- **Soru:** *"Madem teorik sınır 22 bit, rastgele girdilerde neden 17–18 bitte neredeyse hiç hata çıkmıyor?"*
+- **Cevap:** *"Sınır ℓ = 22, 256 terimin hepsinin aynı anda en büyük değerde ve aynı işaretli olduğu en kötü durum
+  içindir. Rastgele girdide terimler birbirini götürür; toplam, Merkezi Limit Teoremi ile standart sapması yaklaşık
+  19 000 olan bir çan eğrisi oluşturur, yani 17–18 bite sığar. Modelimiz ℓ = 17'de %3 hata öngördü, 20 000 denemede
+  %3,01 ölçtük; ℓ ≥ 19'da model 10⁻¹⁵'in altında, biz 20 000 denemede sıfır gördük. En kötü durum ile tipik durum
+  arasındaki bu 4–5 bitlik fark, H4 deneyinin konusu."*
+  (Söyleme: "10⁻⁶⁰" — hesaplanmış bir sayı değil. "Kanıtlar" yerine "destekler" de.)
 
 ---
 
-## 2. H4 Deneyi — Güvenlik ve L6 Norm Sızıntısı (experiments/03-guvenlik/)
-
-### A. Deneyin Temel Mantığı (En Kritik Deney!)
-Önceki deneyde "rastgele girdilerde 18 bit yetiyor" dedik. Peki bir mühendis *"O zaman 22 bit yerine 18 bit kullanalım, işlemci daha az yorulsun"* derse ne olur?
-- **Ölümcül Güvenlik Açığı (Chosen-Ciphertext Attack):**
-  Eğer paketleme genişliğini $\ell < \ell_{\min}$ seçerseniz, kurbanın gizli anahtarının büyüklüğüne bağlı olarak katsayılar birbirine taşar.
-- Bir saldırgan kurbana **özel seçilmiş bir şifreli metin** ($u$) gönderir.
-- Eğer kurbanın gizli anahtarının mutlak değerler toplamı ($\|s\|_1$) belirli bir eşiğin üzerindeyse, Kronecker çarpımı taşar, şifre çözme (decapsulation) başarısız olur!
-- Saldırgan şifrenin çözülüp çözülmediğini gözlemleyerek kurbanın gizli anahtarının normunu ($\|s\|_1$) adım adım deşifre eder!
-
-### B. FIPS 203 Sıkıştırma (Compress) İnceliği
-Bu deneyde keşfettiğimiz çok zarif bir detay vardır:
-- FIPS 203 şifreli metni 10 bite sıkıştırır (`compress(x, 10)`).
-- Saldırgan katsayıyı tam $+1664$ ve $-1664$ yapmak ister.
-- Ancak $\text{compress}(\pm 1664, 10) = 512$ çıkar ve ikisi birbirine karışır!
-- Biz bu problemi çözmek için $y=511$ ($+1661$) ve $y=512$ ($-1664$) değerlerini kullanarak sıkıştırma fonksiyonunu tersine çevirdik ve tam norm sızıntısını sıfır hata ile kanıtladık (`calistir.py` satır 100-140).
-
-### C. Jüri Sana Ne Sorar?
-- **Soru:** *"Rastgele girdide hata vermiyorsa neden $\ell_{\min}$'de ısrar ediyorsunuz?"*
-- **Cevabın:** *"Hocam, kriptografide 'ortalama durum güvenliği' diye bir kavram olamaz; saldırgan rastgele girdi göndermez, en kötü durumu bilerek tetikler (Seçilmiş Şifreli Metin Saldırısı). $\ell < \ell_{\min}$ yapıldığında, gizli anahtarın $\ell_1$ normunun sızdığını 1500 vaka ve 150 tam ML-KEM örneğinde %100 doğrulukla kanıtladık. Bu yüzden tam matematiksel sınır olan $\ell_{\min}$ şarttır."*
-
----
-
-## 3. H3 Deneyi — Performans ve Karatsuba Analizi (experiments/04-performans/)
+## 2. H4 Deneyi — Sınırın Altında Anahtara Bağlı Davranış (experiments/03-guvenlik/)
 
 ### A. Deneyin Temel Mantığı
-- Standart (eski) Kronecker ikamesinde katsayılar 32-bit paketlenir (8192-bit dev tamsayı).
-- Bizim merkezlenmiş Kronecker yöntemimizde paketleme 22-bite iner (5632-bit tamsayı).
-- **Karatsuba Teoremi:** Tamsayı çarpım karmaşıklığı $O(N^{\log_2 3}) \approx O(N^{1.585})$'dir.
-- Teorik hızlanma beklentisi: $(8192 / 5632)^{1.585} \approx 1.81\times$.
-- Python bigint motorunda **ölçülen gerçek hızlanma: $2.05\times$** (20.35 µs $\to$ 9.94 µs).
+H2'de "rastgele girdide 18 bit yetiyor" gördük. Bir mühendis *"o hâlde 22 yerine 18–20 bit kullanalım"* derse ne olur?
+- Önerme 1 (docs/04): saldırgan a_i = A·sgn(s_{n−1−i}) seçerse c_{n−1} = A·‖s‖₁ olur. Taşma koşulu
+  A·‖s‖₁ ≥ 2^(ℓ−1) ⇔ ‖s‖₁ ≥ ⌈2^(ℓ−1)/1664⌉: ℓ = 18 → 79, 19 → 158, 20 → 316, 21 → 631, 22 → 1261 (> 768 = n·η,
+  yani ℓ = 22'de imkânsız).
+- Bu, Hölder eşitsizliğinin (|Σ a_i s_j| ≤ max|a_i| · ‖s‖₁) eşitlik hâlidir (Cauchy–Schwarz değil).
+- Sonuç: ℓ < ℓ_min seçilirse çarpımın **doğru olup olmaması gizli anahtara bağlı** hâle gelir.
 
-### B. ADR 0003: Standart Dönüşüm Darboğazı
-- Tek polinom çarpımında Kronecker bayt yöntemi (130 µs), saf Python NTT'den (284 µs) **2.18 kat daha hızlıdır**.
-- Ancak tam ML-KEM'e entegre edildiğinde NIST FIPS 203 standardı girdileri frekans uzayında (NTT formatında) beklediği için fazladan `ntt_ters` dönüşümleri gerekir. Bu ek yük tam protokolde hız farkını dengeler.
+### B. Ne ölçtük, ne ölçmedik (dürüst çerçeve — jüri burada sıkıştırır)
+- **E4.1 (1500 vektör):** 700'ü gerçek CBD(3)/CBD(2); 800'ü eşik çevresini taramak için normu 156–673'e
+  **yapay olarak** ayarlanmış vektör. Teorik eşik ile ölçülen bozulma arasında 0 uyumsuzluk.
+- **Gerçek anahtarlarda durum:** CBD(3)'te E‖s‖₁ = 240; 700 gerçek örneğin en büyüğü 282 < 316. Yani **ℓ = 20'de
+  gerçek anahtarların hiçbiri bozulmadı**; ℓ = 19 (eşik 158) ve ℓ = 18 (eşik 79) için **hepsi** bozuldu.
+- **E4.2 (150 ML-KEM-512 anahtarı):** 75 gerçek anahtar → 0 bozulma; 75 anahtarın gizli vektörü yapay olarak
+  280–360 normuna büyütüldü → eşik 316'nın üstündekiler bozuldu. Şifreli metin, FIPS 203'ün 10 bitlik sıkıştırmasına
+  uygun uç değerlerle kuruldu (y = 511 → +1661, y = 512 → −1664; ±1664 ikisi de 512'ye sıkışır, bu yüzden 511).
+- **Decaps çağrılmadı.** Betik iç çarpımı doğrudan karşılaştırır (`carpim_bozuldu_mu`). Neden? FIPS 203'te kapsül
+  açma, mesajı yeniden şifreleyip gelen c ile karşılaştırır; saldırganın kurduğu c geçerli bir kapsülleme olmadığından
+  bu karşılaştırma **taşma olsa da olmasa da** başarısız olur ve örtük reddetme K̄ = J(z‖c) döner. Yani decaps
+  çıktısından taşma **okunamaz**. Bilginin sızması için ayrıca bir yan kanal (zamanlama, hata mesajı veren bir
+  protokol, hata enjeksiyonu) gerekir.
+
+### C. Jüri Sana Ne Sorar?
+- **Soru:** *"Rastgele girdide hata vermiyorsa neden ℓ_min'de ısrar ediyorsunuz?"*
+- **Cevap:** *"Çünkü sınırın altında çarpımın doğruluğu gizli anahtara bağlı hâle geliyor. 18–19 bitte uygun seçilmiş
+  bir girdi her anahtarda hata veriyor; 20 bitte ise anahtarın normu 316'yı geçerse hata veriyor, geçmezse vermiyor.
+  Kriptografik bir uygulamada 'anahtara bağlı davranış', sömürülebilir olduğu gösterilmese bile kabul edilmez.
+  Teorem 1'in sınırı bu bağımlılığı tamamen kaldırıyor."*
+- **Soru:** *"Bu gerçek bir saldırı mı? Anahtarı ele geçirdiniz mi?"*
+- **Cevap:** *"Hayır. Anahtara bağlı bir hata davranışı gösterdik; ML-KEM'in örtük reddetmesi bunu kapsül açma
+  çıktısından saklar. Saldırıya dönüşmesi için yan kanal gerekir; bunu ölçmedik, gelecek çalışma olarak önerdik."*
+  (Söyleme: "ölümcül", "CCA ile anahtarı ele geçirdik", "%100 doğrulukla kanıtladık".)
+
+---
+
+## 3. H3 Deneyi — Performans (experiments/04-performans/)
+
+### A. Bigint çarpımı (E3.1)
+- İşaretsiz 32 bit paketleme → 8192 bitlik operand; merkezlenmiş 22 bit → 5632 bit.
+- Karatsuba O(N^1,585) → teorik hızlanma (8192/5632)^1,585 ≈ 1,81×. Ölçülen: **2,05×** (20,35 → 9,94 µs).
+- Neden 1,81'den büyük? Ölçülmedi. Olası açıklama: CPython 70 basamağın (30 bit) altında okul yöntemine geçer;
+  bu boyutlarda etkin üs 1,585'ten büyük. "Önbellek" deme — ölçülmemiş bir neden.
+
+### B. Tek polinom çarpımı (E3.2) ve süre dağılımı (E3.3) — dikkat
+- Bayt varyantları (106–145 µs) saf Python NTT'den (284 µs) hızlı; döngülü açma (isaretli22-dongu 315 µs) değil.
+- **En hızlı varyant işaretsiz 32 bit bayt (106 µs)**, işaretli 24 bit bayt 130 µs. Yani Python'da tek polinom
+  çarpımında **merkezlemenin uçtan uca kazancı yok**: bigint çarpımındaki ~10 µs'lik kazanç, paketleme + açma
+  (~80–90 µs) içinde kayboluyor. Hızı belirleyen şey açmanın C düzeyinde (bayt) yapılıp yapılmadığı (Lemma 2).
+- E3.3: isaretli22-dongu'da sürenin %75'i `ac_dongu_isaretli`; bayt açma bunu 212 → 55 µs'ye indiriyor.
+
+### C. Uçtan uca ML-KEM (E3.4, ADR 0003)
+- Standart Â ve t̂'yi NTT alanında sakladığı için Kronecker yolu önce NTT⁻¹ yapmak zorunda (ML-KEM-768 encaps'te 12).
+- NTT önde: keygen %39 / %49 / %63, encaps %20 / %32 / %43, decaps %22 / %36 / %45 (512 / 768 / 1024).
+  Parametre büyüdükçe fark artar (k² adet NTT⁻¹). "%20–30" deme; "%20–63" doğru.
+- Jüriye: "Kronecker ML-KEM'i hızlandırmıyor; nerede kazandırdığını (bigint çarpımı, katsayı alanı) ve nerede
+  bedel ödediğini ölçtük." Tüm süreler Python; C'ye genellenmez.
 
 ---
 
 ## Kendini Kontrol Soruları (Jüri Provası)
-1. **S:** Neden katsayıları $[0, q)$ yerine $[-(q-1)/2, (q-1)/2]$ aralığına merkezledik?  
-   **C:** Çünkü işaretsiz aralıkta maksimum değer 3328 iken, merkezlendiğinde maksimum mutlak değer 1664'e düşer. Bu da paketleme genişliğini 23 bitten 22 bite indirir; tamsayı boyutunu %31 küçültür!
-2. **S:** Wilson Güven Aralığı neden normal yaklaşım yerine kullanıldı?  
-   **C:** Çünkü hata olasılığı 0'a veya 1'e çok yakınken ($p < 0.01$ gibi uç noktalarda) klasik normal yaklaşım negatif sınırlar verir ve geçersizleşir; Wilson skoru ise asimetrik ve kesindir.
-3. **S:** E4.1 deneyinde saldırgan katsayıları nasıl seçti?  
-   **C:** Saldırgan $a_i$ katsayılarını $+1664 \cdot \text{sign}(s_i)$ olacak şekilde kurbanın işaretleriyle aynı yönde eşleştirdi. Böylece Cauchy-Schwarz eşitsizliğine göre iç çarpım maksimuma ulaştı ($1664 \cdot \|s\|_1$) ve taşma tetiklendi.
+1. **S:** Neden katsayıları [0, q) yerine [−1664, 1664] aralığına merkezledik?
+   **C:** İşaretsiz katsayılarda çarpım sınırı n·3328² ≈ 2,8·10⁹ → **32 bit**; merkezlenmiş küçük çarpanla
+   n·1664·3 ≈ 1,28·10⁶ → 22 bit. Operand 8192 → 5632 bit (%31). (Not: ciddi uygulamalar zaten merkezler; 32 bit
+   "saman adam" değil, merkezlemenin neden gerektiğini gösteren başlangıç noktasıdır — docs/04 Teorem 1 notu.)
+2. **S:** Wilson güven aralığı neden normal yaklaşım yerine kullanıldı?
+   **C:** p 0'a veya 1'e yakınken (ör. 4/20 000) normal yaklaşım negatif alt sınır verir; Wilson aralığı bu uçlarda
+   geçerli kalır ve sıfır hatada da anlamlı üst sınır verir (0/20 000 → üst sınır 1,9·10⁻⁴).
+3. **S:** E4.1'de saldırgan katsayıları nasıl seçti?
+   **C:** a_i = 1664·sgn(s_{n−1−i}): her terim pozitif katkı verir, c_{n−1} = 1664·‖s‖₁ (Hölder eşitliği).
+4. **S:** 200 000 denemede 0 uyumsuzluk ne demek, ne demek değil?
+   **C:** Gerçek açma algoritmasının Lemma 1 ölçütüyle (h* ≤ 2^(ℓ−1)) birebir davrandığı demek. Kodun her girdide
+   doğru olduğunu "kanıtlamaz"; onu ispat + en kötü durum testleri yapar.
