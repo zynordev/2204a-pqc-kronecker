@@ -20,6 +20,7 @@ import struct
 import threading
 import time
 from collections import Counter
+
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -131,7 +132,7 @@ def calistir_gercek_http(payload: bytes, pcap: PCAPWriter) -> tuple[int, bytes, 
     sunucu.listen(1)
 
     toplam_gecen = []
-    istek_baslik = f"POST /yukle HTTP/1.1\r\nHost: 127.0.0.1:8081\r\nContent-Length: {len(payload)}\r\n\r\n".encode("utf-8")
+    istek_baslik = f"POST /yukle HTTP/1.1\r\nHost: 127.0.0.1:8081\r\nContent-Length: {len(payload)}\r\n\r\n".encode()
     toplam_beklenen = len(istek_baslik) + len(payload)
 
     def sunucu_thread():
@@ -178,8 +179,8 @@ def calistir_gercek_tls(payload: bytes, pcap: PCAPWriter) -> tuple[int, bytes, f
         .issuer_name(name)
         .public_key(key.public_key())
         .serial_number(1000)
-        .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
-        .not_valid_after(datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1))
+        .not_valid_before(datetime.datetime.now(datetime.UTC))
+        .not_valid_after(datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1))
         .sign(key, hashes.SHA256())
     )
 
@@ -460,14 +461,14 @@ def calistir_deney():
         f.write("## 2. Ölçülen Değerler Tablosu\n\n")
         f.write("| Metrik | Düz HTTP | Standart TLS 1.3 | PQC-Drop (Bizim Yöntem) |\n")
         f.write("| :--- | :--- | :--- | :--- |\n")
-        f.write(f"| **Kategori** | Şifresiz | Klasik Şifreli | Kuantum Sonrası Korumalı |\n")
-        f.write(f"| **Test Veri Yükü** | 16.384 bayt | 16.384 bayt | 16.384 bayt |\n")
+        f.write("| **Kategori** | Şifresiz | Klasik Şifreli | Kuantum Sonrası Korumalı |\n")
+        f.write("| **Test Veri Yükü** | 16.384 bayt | 16.384 bayt | 16.384 bayt |\n")
         f.write(f"| **Toplam Ağ Trafiği** | {b_http} bayt | {b_tls} bayt | {b_pqc} bayt |\n")
         f.write(f"| **Shannon Entropisi** | {ent_http:.3f} / 8.00 | {ent_tls:.3f} / 8.00 | {ent_pqc:.3f} / 8.00 |\n")
-        f.write(f"| **Wireshark Metin Araması** | ⚠️ Açık Metin İfşa | ✓ 0 Eşleşme | ✓ 0 Eşleşme |\n")
-        f.write(f"| **Açık Anahtar Boyutu** | 0 bayt | 32 bayt | 1184 bayt |\n")
-        f.write(f"| **Kuantum Güvenlik (Shor)** | Yok | ❌ Kırılır (X25519) | 🛡️ Kırılmaz (M-LWE Kafes) |\n")
-        f.write(f"| **PCAP Dosyası** | `http_gercek.pcap` | `tls_gercek.pcap` | `pqcdrop_gercek.pcap` |\n\n")
+        f.write("| **Wireshark Metin Araması** | ⚠️ Açık Metin İfşa | ✓ 0 Eşleşme | ✓ 0 Eşleşme |\n")
+        f.write("| **Açık Anahtar Boyutu** | 0 bayt | 32 bayt | 1184 bayt |\n")
+        f.write("| **Kuantum Güvenlik (Shor)** | Yok | ❌ Kırılır (X25519) | 🛡️ Kırılmaz (M-LWE Kafes) |\n")
+        f.write("| **PCAP Dosyası** | `http_gercek.pcap` | `tls_gercek.pcap` | `pqcdrop_gercek.pcap` |\n\n")
 
         f.write("## 3. Wireshark Doğrulama Kanıtı\n")
         f.write(
@@ -478,7 +479,7 @@ def calistir_deney():
             "Bu komut, soket üzerinden akan gerçek Ethernet, IP ve TCP paket başlıklarını doğrular.\n"
         )
 
-    print(f"\n✓ Gerçek PCAP dosyaları oluşturuldu:")
+    print("\n✓ Gerçek PCAP dosyaları oluşturuldu:")
     print(f"    - {pcap_http_yol}")
     print(f"    - {pcap_tls_yol}")
     print(f"    - {pcap_pqc_yol}")
