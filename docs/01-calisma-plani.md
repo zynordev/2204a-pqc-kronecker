@@ -1,6 +1,6 @@
 # 01 — Çalışma Planı
 
-*Son güncelleme: 2026-10-27. **Başvuru son tarihi: 4 Ocak 2027, 17.30** (şartname, Halil doğruladı).
+*Son güncelleme: 2026-10-27 (Aşama 2 kodu). **Başvuru son tarihi: 4 Ocak 2027, 17.30** (şartname, Halil doğruladı).
 Hedef yükleme tarihi: **2 Ocak 2027** — son güne bırakılmaz.*
 
 ## Ekip ve rol dağılımı
@@ -45,22 +45,27 @@ Her aşamanın bir **çıkış kriteri** var. Kriter sağlanmadan sonraki aşama
 ### Aşama 1 — Literatür ve teori (3 – 15 Kas) · Öğrenci B
 - [ ] [02](02-literatur.md)'deki her kaynağı bul, oku, künyesini doğrula (✘ → ✔)
 - [ ] FIPS 203'ün ilgili bölümlerini oku: parametreler, CBD, NTT, K-PKE
-- [ ] Taşma lemmasının ispatını elle yaz ([04](04-teori.md)), keskinlik örneğini elle hesapla
+- [x] Çıkış gözlemi (23², elde) teoriye bağlandı ([04 §0](04-teori.md), `src/pqc/taban.py`)
+- [x] Lemma 1, Teorem 1, Önerme 1 kesin ifade + ispat yazıldı (Claude)
+- [ ] B ispatları elle kontrol etti, keskinlik örneğini elle hesapladı
 - [ ] Olasılık modelini (normal yaklaşım) kur
 - [ ] Kategori kararı (Matematik / Bilgisayar)
 - **Çıkış:** iki öğrenci de ispatı tahtada anlatıyor; 02 tablosunda ✘ kalmadı; kategori yazıldı.
 
 ### Aşama 2 — Referans ML-KEM (3 – 22 Kas) · Öğrenci A
-- [ ] Saf Python ML-KEM-512/768/1024: SHAKE, CBD, NTT, K-PKE, KEM (FIPS 203 algoritma numaralarıyla)
-- [ ] NIST ACVP test vektörleri ile test (keyGen, encaps, decaps)
-- [ ] Okul yöntemi (schoolbook) negasiklik çarpım = altın standart
+- [x] Saf Python ML-KEM-512/768/1024: SHAKE, CBD, NTT, K-PKE, KEM (FIPS 203 algoritma numaralarıyla)
+- [x] NIST ACVP test vektörleri ile test (keyGen, encaps, decaps)
+- [x] Okul yöntemi (schoolbook) negasiklik çarpım = altın standart
+- [ ] Halil'in kod okuma notu ([rehber](kod-okuma/asama-2.md))
 - **Çıkış:** tüm resmî test vektörleri geçiyor; CI yeşil.
 
 ### Aşama 3 — Kronecker motorları (23 Kas – 4 Ara)
-- [ ] Varyantlar: işaretsiz 32 bit · işaretli 22 bit · ofset hileli · mod 2^(nℓ)+1 negasiklik ·
-      modül toplamını paketli alanda yapan
-- [ ] Her varyant ML-KEM'e takılabilir (çarpım fonksiyonu parametre)
-- [ ] Her varyant: schoolbook'a karşı 10.000 rastgele + kenar durum testi; ML-KEM test vektörleri hâlâ geçiyor
+- [x] Varyantlar (8): işaretsiz 32 bit (döngü/bayt) · işaretli 22 bit · bayt hizalı 24 bit (ofset hilesi) ·
+      mod 2^(nℓ)+1 negasiklik · modül toplamını paketli alanda yapan ([kronecker.py](../src/pqc/kronecker.py))
+- [x] Her varyant ML-KEM'e takılabilir (`KroneckerPKE`, ADR 0003)
+- [x] Kenar durum testleri; ML-KEM test vektörleri 8 varyantla geçiyor
+- [x] 10.000 rastgele örnek (E1.2): 8 varyant, 0 hata ([sonuç](../experiments/01-dogruluk/sonuc.md))
+- [ ] Halil'in kod okuma notu ([rehber](kod-okuma/asama-3.md))
 - **Çıkış:** H1 doğrulandı.
 
 ### Aşama 4 — Deneyler (5 – 18 Ara)

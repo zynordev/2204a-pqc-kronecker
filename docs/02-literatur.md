@@ -12,7 +12,7 @@ kullanılır. Doğrulayan kişi ve tarih yazılır.
 |---|---|---|---|---|
 | L1 | NIST, *FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism Standard*, Ağustos 2024 | ML-KEM standardı | Temel aldığımız standart; parametreler, NTT, CBD | ✘ |
 | L2 | Bos, Ducas, Kiltz, Lepoint, Lyubashevsky, Schanck, Schwabe, Seiler, Stehlé, *CRYSTALS-Kyber: a CCA-secure module-lattice-based KEM*, IEEE EuroS&P 2018 | Kyber'ın tanımı | ML-KEM'in kökeni | ✘ |
-| L3 | Kronecker, L., *Grundzüge einer arithmetischen Theorie der algebraischen Grössen*, 1882 | Polinomu tamsayıya çevirme fikri | Yöntemin kökeni | ✘ |
+| L3 | Kronecker, L., *Grundzüge einer arithmetischen Theorie der algebraischen Grössen*, 1882 | Polinomu tamsayıya çevirme fikri | Yöntemin kökeni; çıkış gözlemimizin (taban 10, elde ile) ters yönlü ve eldesiz genellemesi (04 §0) | ✘ |
 | L4 | Schönhage, A., *Asymptotically fast algorithms for the numerical multiplication and division of polynomials with complex coefficients*, EUROCAM 1982 | Kronecker ikamesini hızlı çarpımda kullanma | Yöntemin modern hali | ✘ |
 | L5 | Harvey, D., *Faster polynomial multiplication via multipoint Kronecker substitution*, Journal of Symbolic Computation, 2009 | 2^ℓ ve −2^ℓ'de değerlendirme, işaretli katsayılar | **İşaretli Kronecker'in zaten var olduğunun kanıtı** | ✘ |
 | L6 | Albrecht, Hanser, Höller, Pöppelmann, Virdia, Wallner, *Implementing RLWE-based Schemes Using an RSA Co-Processor*, IACR TCHES 2019(1) | Kyber/NewHope'u akıllı karttaki RSA hızlandırıcısında Kronecker ile çalıştırma | **En yakın çalışma**; bizim farkımızı buna göre yazmalıyız | OK |
@@ -22,6 +22,7 @@ kullanılır. Doğrulayan kişi ve tarih yazılır.
 | L10 | Shor, P., *Algorithms for quantum computation: discrete logarithms and factoring*, FOCS 1994 | Kuantum çarpanlara ayırma | Problem tanımı | ✘ |
 | L11 | NIST ACVP sunucusu, ML-KEM test vektörleri (github.com/usnistgov/ACVP-Server) | Resmî test vektörleri | H1 doğrulaması | ✘ |
 | L12 | CPython, `Objects/longobject.c` | Python büyük tamsayı çarpımı (Karatsuba eşiği) | H3 yorumu | ✘ |
+| L13 | Tirthaji, Bharati Krishna, *Vedic Mathematics*, 1965 — "Urdhva Tiryagbhyam" (dikey-çapraz) çarpma | Basamak çarpımlarını katsayı gibi toplayıp elde ile birleştirme | Çıkış gözlemimizin (23², elde) bilinen karşılığı; elle çarpma da aynı ilkeye dayanır | ✘ |
 
 ## Bizim konumumuz (Aşama 1 sonunda kesinleşecek)
 
