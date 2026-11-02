@@ -1,0 +1,12 @@
+kategori,parametre,yontem,tekrar,medyan_ns,iqr_ns,peak_memory_bytes,operation_count,clock_mhz,ops_per_mhz
+Saf R_q polinom çarpımı,N=256,NTT (ileri+çarpım+ters),500,432008.5,3224,25684,65536,800.416,0.189527
+Saf R_q polinom çarpımı,N=256,Kronecker işaretsiz32-bayt,500,175443.0,1802,36757,65536,800.416,0.46669
+Saf R_q polinom çarpımı,N=256,Kronecker işaretli24-bayt,500,194640.0,2647,40309,65536,800.416,0.420661
+Saf R_q polinom çarpımı,N=256,Kronecker işaretli22-döngü,500,348445.0,2848,34820,65536,800.416,0.234979
+Saf R_q polinom çarpımı,N=256,Schoolbook,500,4946651.5,33830,16768,65536,800.416,0.016552
+Uçtan uca ML-KEM,ML-KEM-512,NTT (FIPS 203),500,14640345.5,59241,181760,262144,800.416,0.02237
+Uçtan uca ML-KEM,ML-KEM-512,Kronecker (önbellekli katsayı A),500,16340315.0,49283,139886,262144,800.416,0.020043
+Uçtan uca ML-KEM,ML-KEM-768,NTT (FIPS 203),500,21251290.0,69586,281089,589824,800.416,0.034675
+Uçtan uca ML-KEM,ML-KEM-768,Kronecker (önbellekli katsayı A),500,24910262.0,66030,181270,589824,800.416,0.029582
+Uçtan uca ML-KEM,ML-KEM-1024,NTT (FIPS 203),500,29395095.5,88319,405770,1048576,800.416,0.044567
+Uçtan uca ML-KEM,ML-KEM-1024,Kronecker (önbellekli katsayı A),500,35867846.0,99181,219262,1048576,800.416,0.036524
