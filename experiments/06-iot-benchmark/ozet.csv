@@ -1,0 +1,8 @@
+kategori,parametre,baseline,aday,baseline_median_ns,aday_median_ns,speedup_x,aday_memory_reduction_pct
+Saf R_q polinom çarpımı,N=256,NTT (ileri+çarpım+ters),Kronecker işaretsiz32-bayt,432008.5,175443.0,2.4624,-43.11
+Saf R_q polinom çarpımı,N=256,NTT (ileri+çarpım+ters),Kronecker işaretli24-bayt,432008.5,194640.0,2.2195,-56.94
+Saf R_q polinom çarpımı,N=256,NTT (ileri+çarpım+ters),Kronecker işaretli22-döngü,432008.5,348445.0,1.2398,-35.57
+Saf R_q polinom çarpımı,N=256,NTT (ileri+çarpım+ters),Schoolbook,432008.5,4946651.5,0.0873,34.71
+Uçtan uca ML-KEM,ML-KEM-512,NTT (FIPS 203),Kronecker (önbellekli katsayı A),14640345.5,16340315.0,0.896,23.04
+Uçtan uca ML-KEM,ML-KEM-768,NTT (FIPS 203),Kronecker (önbellekli katsayı A),21251290.0,24910262.0,0.8531,35.51
+Uçtan uca ML-KEM,ML-KEM-1024,NTT (FIPS 203),Kronecker (önbellekli katsayı A),29395095.5,35867846.0,0.8195,45.96
