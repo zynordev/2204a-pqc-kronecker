@@ -90,18 +90,17 @@ Her aşamanın bir **çıkış kriteri** var. Kriter sağlanmadan sonraki aşama
 - [ ] Taslak 1: 22 Ara · danışman okuması: 23–26 Ara · son hali: 31 Ara
 - **Çıkış:** danışman onayı; 2 Ocak'ta yükleme.
 
+### Aşama 7 — IoT, Uç Donanım (Edge) Optimizasyonu ve Çoklu Platform Objektif Benchmark
+- [ ] Raspberry Pi 5 üzerinde süre, IQR ve `tracemalloc` tepe tahsis ölçümü
+- [ ] Saf polinom çarpımında NTT, Kronecker varyantları ve okul yöntemi karşılaştırması
+- [ ] FIPS 203 ML-KEM akışında NTT ile katsayı alanı/Kronecker yolunun karşılaştırması
+- [ ] ESP32/mikrodenetleyici için 24-bit bayt hizalı kuramsal bellek modeli ve C/Assembly gelecek çalışma sınırı
+- [ ] Sonuçların `veri_iot_benchmark.csv`, `ozet.csv` ve iki grafikle arşivlenmesi
+- **Çıkış:** ölçüm protokolü yeniden üretilebilir; donanım iddiası yalnızca ölçülen Raspberry Pi 5 ile sınırlı, ESP32 modeli açıkça kuramsal.
+
 ### Aşama 5b — Sergi hazırlığı (başvuru sonrası)
 - [ ] Basit GUI + canlı ölçüm paneli, poster, 5 dakikalık sunum, demo senaryosu
 - [ ] 30 olası jüri sorusu ve cevapları; iki öğrenci karşılıklı prova
-
-### Aşama 7 — IoT, Uç Donanım (Edge) Optimizasyonu ve Çoklu Platform Objektif Benchmark
-- [ ] Raspberry Pi 5 üzerinde süre, IQR, tepe Python tahsisi ve saat-normalize başarım ölçümü
-- [ ] Saf polinom çarpımında NTT, okul yöntemi ve dört Kronecker varyantının karşılaştırılması
-- [ ] Standart FIPS 203 akışı ile katsayı alanında önbellekli Kronecker akışının uçtan uca kıyaslanması
-- [ ] ESP32/mikrodenetleyici için 24-bit bayt hizalaması, Comba MAC ve kuramsal 768 bayt RAM modelinin belgelenmesi
-- [ ] Gömülü Linux kameralarda RTSP öncesi PQC el sıkışması için bellek/zaman sınırlarının çıkarılması
-- [ ] Python benchmark sonuçlarının gerçek ESP32 donanım kanıtı olmadığı sınırlılığının rapora eklenmesi
-- **Çıkış:** `experiments/06-iot-benchmark` tek komutla CSV ve iki grafik üretir; testler yeşildir; donanım iddiası kuramsal modelden ayrıdır.
 
 ## Kesilecekler listesi (takvim kayarsa, bu sırayla)
 1. Aşama 5a'nın iki makine testi → tek makinede iki terminal

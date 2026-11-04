@@ -9,7 +9,7 @@ dependencies = ["cryptography>=38"]
 pqcdrop = "pqc.pqcdrop:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8"]
 
 [build-system]
 requires = ["setuptools>=68"]

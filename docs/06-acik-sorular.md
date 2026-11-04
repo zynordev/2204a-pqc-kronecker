@@ -1,13 +1,13 @@
 # 06 — Açık Sorular
 
-*Son güncelleme: 2026-10-30. Kapanan soru silinmez; cevabı ve tarihi yazılır.*
+*Son güncelleme: 2026-11-01. Kapanan soru silinmez; cevabı ve tarihi yazılır.*
 
 | # | Soru | Kime / nasıl | Durum |
 |---|---|---|---|
 | S1 | 2026-2027 dönemi 2204-A başvuru son tarihi, bölge sergisi tarihi | Şartname, TÜBİTAK BİDEB sayfası | **Kapandı** (2026-10-27): son tarih 4 Ocak 2027, 17.30. Plan 01'de buna göre sıkıştırıldı |
 | S2 | Rapor şablonu ve sayfa sınırı | Şartname | Kısmen — engel yok (2026-10-27); ayrıntılar Aşama 6 öncesi yazılacak |
-| S3 | Yapay zekâ destekli araç kullanımı için şartnamede kural/beyan zorunluluğu var mı? Raporda nasıl ele alınacak? | Şartname + danışman + Halil'in danıştığı kişiler | Açık — kullanıcı danışıp dönecek |
-| S4 | Kategori: Matematik mi, Bilgisayar (Yazılım) mı? | Danışman, Aşama 1 sonu | Açık |
+| S3 | Yapay zekâ destekli araç kullanımı için şartnamede kural/beyan zorunluluğu var mı? Raporda nasıl ele alınacak? | Şartname + danışman + Halil'in danıştığı kişiler | **Kapandı** (2026-11-01): Şeffaflık ve etik ilkesi gereği raporda "Yapay Zekâ Destekli" (kod refaktörü, test/grafik ve dil düzeltme desteği) olarak açıkça beyan edilecek |
+| S4 | Kategori: Matematik mi, Bilgisayar (Yazılım) mı? | Danışman, Aşama 1 sonu | **Kapandı** (2026-11-01): Ana alan **Bilgisayar** (Yazılım / Siber Güvenlik) olarak belirlendi |
 | S5 | Kaynak koduna rapor ekinde mi, depo bağlantısıyla mı yer verilir? | Şartname | Açık |
 | S6 | Danışman toplantı takvimi (önerilen: her aşama sonunda 30 dk) | Danışman | Açık |
 | S7 | Ölçümler için hangi makineler: Pi 5 + laptop yeterli mi? | Ekip | Açık |
