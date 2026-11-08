@@ -1,5 +1,7 @@
 # PQC-Kronecker — Kuantum Sonrası Anahtar Kapsüllemede Merkezlenmiş Kronecker İkamesi
 
+**Güncel okunabilir rapor (6 Kasım 2026):** [Sadeleştirilmiş rapor](docs/rapor-sade.md). Danışmanın dil geri bildirimiyle hazırlanmıştır; önceki teknik taslak ispat ve ayrıntılı tablo kaynağı olarak korunmuştur.
+
 TÜBİTAK 2204-A Lise Öğrencileri Araştırma Projeleri Yarışması projesi.
 
 **Problem.** Bugün şifrelenip kaydedilen veriler, ileride yeterince büyük bir kuantum bilgisayarla çözülebilir

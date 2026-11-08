@@ -1,5 +1,7 @@
 # Danışman Bilgilendirme ve Proje İnceleme Dosyası
 
+> **6 Kasım 2026 güncellemesi:** Önce [sadeleştirilmiş raporu](04-SADELESTIRILMIS-RAPOR.md) okuyunuz. Özet ve bütün ana bölümler danışman geri bildirimiyle yeniden düzenlenmiştir. Aşağıdaki eski yönetici özetinde geçen anahtar sızıntısı, harici paket kullanılmaması ve Wireshark ile güvenliğin kanıtlanması ifadeleri güncel sonuçları doğru yansıtmamaktadır; yeni rapordaki açıklamalar esas alınmalıdır. Önceki rapor ayrıntılı teknik başvuru metni olarak korunmuştur.
+
 **TÜBİTAK 2204-A Lise Öğrencileri Araştırma Projeleri Yarışması**  
 **Proje Adı:** Kuantum Sonrası Kriptografide Merkezlenmiş Kronecker İkamesi ile Polinom Çarpımı: NIST FIPS 203 (ML-KEM) İçin Teori, Başarım, Güvenlik Sınırları ve PQC-Drop Güvenli Veri Aktarımı Uygulaması  
 **Ana Alan:** Bilgisayar ve Yazılım *(veya Matematik — aşağıda tartışılmıştır)*  
