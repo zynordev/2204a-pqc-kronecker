@@ -24,8 +24,9 @@ Bu çalışmanın amacı, güvenli iletişimde kullanılan ML-KEM yönteminin i�
 1. Sayılara ayrılan alan, hesaplama sonucu bozulmadan ne kadar azaltılabilir?
 2. Bu küçülme, çarpma işlemini ve anahtar oluşturma sürecinin tamamını ne kadar etkiler?
 3. Alan gereğinden fazla küçültülürse hangi durumlarda hata oluşur?
+4. Geliştirilen düşük bellekli model gerçek bir mikrodenetleyici donanımı (ESP32) üzerinde nasıl bir başarım gösterir?
 
-Araştırmanın uygulama bölümünde, incelenen yöntem bir dosya aktarım prototipine eklenmiştir.
+Araştırmanın uygulama bölümünde, incelenen yöntem bir dosya aktarım prototipine (PQC-Drop) eklenmiş ve fiziksel bir ESP32 mikrodenetleyicisi üzerinde donanımsal sayaçlarla test edilmiştir.
 
 ## Giriş
 
@@ -76,6 +77,8 @@ Bu ayrım, normal koşullarda görülen sonuçlarla sınırı araştırmak için
 PQC-Drop, önce ML-KEM-768 ile ortak anahtar oluşturur, ardından dosyayı AES-256-GCM ile şifreler. İkinci yöntem, aktarım sırasında verinin değiştirilip değiştirilmediğinin kontrolüne de yardımcı olur. ML-KEM ve Kronecker bölümleri proje koduyla, dosya şifreleme bölümü hazır bir yazılım kütüphanesiyle gerçekleştirilmiştir.
 
 Ağ deneyinde aynı büyüklükteki 16.384 baytlık veri, farklı aktarım biçimleriyle karşılaştırılmıştır. Kod gerçek TCP soketlerini kullanmaktadır. Bununla birlikte PCAP dosyalarındaki ağ başlıkları deney betiği tarafından oluşturulmaktadır; bu dosyalar bağımsız bir ağ dinleme aracıyla yakalanmış paketlerin kanıtı olarak değerlendirilmemiştir. İki ayrı fiziksel bilgisayardaki ölçüm ortamı ve bağımsız paket yakalama doğrulaması ayrıca belgelenmelidir.
+
+Ayrıca geliştirilen 24-bit Comba katsayı akümülatörü, C/C++ dili ile derlenerek fiziksel bir ESP32-D0WD-V3 mikrodenetleyicisine yüklenmiş; mikrodenetleyicinin donanımsal saat sayacı () ile 100 bağımsız çalıştırmada gerçek donanım çevrimleri ölçülmüştür.
 
 ## Proje İş-Zaman Çizelgesi
 
@@ -160,7 +163,7 @@ Süre ölçümlerinin temel sonucu, tek bir aşamadaki hızlanmanın bütün uyg
 
 Ek ölçümde daha hızlı polinom çarpımına daha yüksek Python bellek tahsisi eşlik etmiştir. Dolayısıyla süre, sayıların paketleme alanı ve programın bellek kullanımı ayrı ölçütler olarak değerlendirilmelidir.
 
-Çalışmanın sonuçları kullanılan Python uygulamaları ve ölçüm koşullarıyla sınırlıdır. ESP32 gibi küçük cihazlarda gerçek süre, enerji ve bellek ölçümü henüz yapılmamıştır. Ayrıca uygulamanın işlem süresi girdilere göre değişebilir; bu durumun bilgi sızıntısına yol açıp açmadığı araştırılmamıştır. PQC-Drop'ta karşı tarafın kimliğini doğrulayacak açık anahtar doğrulama katmanı da eksiktir. Prototip bu nedenlerle araştırma amaçlı değerlendirilmelidir.
+Çalışmanın sonuçları genel olarak Python ortamı ve ölçüm koşullarıyla değerlendirilmiştir. Bununla birlikte, polinom çarpımı seviyesinde gerçek ESP32 mikrodenetleyicisinde C/C++ ile donanım saat çevrimi ölçümü yapılmış; %100 doğruluk ve 768 baytlık yerel bellek modeli fiziksel donanımda kanıtlanmıştır. Uçtan uca tüm ML-KEM sürecinin mikrodenetleyicideki tam enerji tüketimi ve çevre birim etkileri ise gelecek çalışmalara bırakılmıştır. Ayrıca uygulamanın işlem süresi girdilere göre değişebilir; bu durumun bilgi sızıntısına yol açıp açmadığı araştırılmamıştır. PQC-Drop'ta karşı tarafın kimliğini doğrulayacak açık anahtar doğrulama katmanı da eksiktir. Prototip bu nedenlerle araştırma amaçlı değerlendirilmelidir.
 
 ## Öneriler
 
