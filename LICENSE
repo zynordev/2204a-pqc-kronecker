@@ -1,0 +1,26 @@
+PQC-Drop / PQC-Kronecker — Source-Available License (View & Discuss Only)
+
+Copyright (c) 2026 Halil Erdem Yanik. All rights reserved.
+
+This repository is published for scientific transparency, review and discussion.
+It is NOT open-source software.
+
+You MAY:
+  - read the source code, documents, data and results;
+  - run the code locally for personal evaluation and to verify the published results;
+  - quote short excerpts with attribution (name, project and repository link);
+  - discuss, criticise and cite this work, including in academic writing.
+
+You MAY NOT, without prior written permission from the copyright holder:
+  - copy, modify, merge, publish or distribute the code or documents, in whole or in part;
+  - use them in any product, service or project, commercial or non-commercial;
+  - redistribute the released binaries;
+  - present this work, or derivatives of it, as your own.
+
+Third-party components (for example the Python "cryptography" package, PyQt6 and the
+NIST ACVP test vectors) remain under their own licenses; this license does not change them.
+
+THE WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. It is a research prototype
+and has not been independently security-audited.
+
+Contact for permissions: https://github.com/zynordev
