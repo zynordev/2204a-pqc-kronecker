@@ -114,6 +114,63 @@ Bu bölüm bilerek abartısızdır:
 
 Bir bulgu daha: sınırın **altına** inmek sadece hata değil, güvenlik açığı. Seçilmiş girdilerle çarpımın bozulup bozulmaması gizli anahtarın normuna bağlı hâle geliyor ([deney 03](experiments/03-guvenlik/sonuc.md)). Kısaca: bit sayısı keyfî seçilemez.
 
+## Nerelerde çalıştırdık?
+
+Aynı fikri üç farklı donanımda, iki farklı şekilde denedik: **algoritma ölçümü** ve **uygulama (PQC-Drop)**.
+
+| Donanım | Ne yaptık | Nerede |
+|---|---|---|
+| 💻 **x86_64 bilgisayar** (Intel i3-14100 ve laptop, Linux) | Performans (E3) ve IoT benchmark deneyleri, 1884 testin tamamı, masaüstü GUI | [E3](experiments/04-performans/sonuc.md), [IoT](experiments/06-iot-benchmark/sonuc.md) |
+| 🍓 **Raspberry Pi 5** (ARM64) | Ön ölçüm, doğruluk deneyi, NIST testleri, **GUI/TUI ile gerçek dosya aktarımı** | [E0](experiments/00-on-olcum/sonuc.md), [E1](experiments/01-dogruluk/sonuc.md) |
+| 🔌 **ESP32** (Xtensa, gerçek kart) | C ile polinom çarpımı, çevre sayacıyla ölçüm | [ESP32](experiments/07-esp32-donanim/sonuc.md) |
+
+### 🍓 Raspberry Pi 5
+
+- **Ön ölçüm (E0)**, tek polinom çarpımı, Python, medyan:
+
+  | Yöntem | Süre |
+  |---|---:|
+  | Okul yöntemi | 9773 µs |
+  | NTT (saf Python) | 903 µs |
+  | Kronecker, işaretsiz 32 bit | 607 µs |
+  | Kronecker, mod 2^(256·22)+1 | **420 µs** |
+  | Yalnız bigint çarpımı: 8192 bit / 5632 bit | 47,8 / 24,7 µs (**1,93×**) |
+
+  Bu ön ölçüm sadece "fikir işe yarar mı?" içindi. Sonraki deneyler bunun yerine geçti.
+- **Doğruluk (E1):** 8 Kronecker varyantının her biri 10.000 rastgele örnekte **0 hata** verdi (405 sn).
+- **Referans ML-KEM hızı (NTT):** ML-KEM-768 keygen 13,0 ms, encaps 18,5 ms, decaps 19,5 ms.
+- **NIST testleri:** 225/225 ACVP vakası geçti. Pi bu testlerin ana koşucusuydu.
+- **Ders:** Bilerek bozduğumuz bir koddaki sonsuz döngü büyük olasılıkla Pi'yi çökertti. Bundan sonra riskli işler bellek sınırı (`prlimit`) ve `nice` ile çalıştırıldı ve mutasyon aracına zaman aşımı eklendi ([kayıt](docs/kayit/2026-10-27-asama-2.md)).
+- **PQC-Drop:** TUI doğrudan Pi'de çalışır. Laptop (GUI) ile Pi (TUI) arasında gerçek bir kabloyla (1 Gbps) ve Wi-Fi'da karşılıklı keşif ve dosya aktarımı denendi. Bu sırada GUI'de gerçek bir hata bulundu ve düzeltildi: keşif paketleri geliyordu ama arayüze iş parçacığından güvenli iletilmediği için laptop Pi'yi listelemiyordu.
+
+### 🔌 ESP32
+
+Gerçek bir **ESP32-D0WD-V3** kartında (çift çekirdek Xtensa LX6, 80 MHz) [`esp32_pqc_benchmark.ino`](experiments/07-esp32-donanim/esp32_pqc_benchmark.ino) çalıştırıldı. Çevre sayacı (`esp_cpu_get_cycle_count`) ile **100 ardışık çalıştırma**, N=256, q=3329:
+
+| Yöntem | Çevrim | Süre | Hız |
+|---|---:|---:|---:|
+| Okul yöntemi | 677.956 | 8,47 µs | 1,00× |
+| Merkezlenmiş Kronecker / Comba (24 bit) | 841.234 | 10,51 µs | **0,81×** |
+
+Sonuç %100 doğru (256 katsayının hepsi eşleşti). Ama Kronecker yöntemi bu kartta **daha yavaş** çıktı. Bu, x86 ve Pi'deki uçtan uca ML-KEM sonucuyla (0,85×–0,90×) aynı yönde. Ayrıca: bu ESP32 kodu paketli tamsayı yerine Comba tipi bir çarpım-toplama çekirdeği kullanıyor. Yani "Kronecker fikrinin ESP32 için bir uyarlaması", birebir aynı Python algoritması değil. Enerji ve yan kanal güvenliği ölçülmedi.
+
+### 🖥️ PQC-Drop uygulaması (GUI + TUI)
+
+Aynı çekirdeği kullanan iki arayüz var:
+
+| | GUI (`pqcdrop-gui`) | TUI (`pqcdrop-tui`) |
+|---|---|---|
+| Teknoloji | PyQt6 | curses (ASCII) |
+| Nerede | Masaüstü | SSH / headless (Raspberry Pi) |
+| Keşif radarı, görünürlük açma-kapama | ✅ | ✅ (`V`, `R`) |
+| Dosya gönderme / alma | ✅ | ✅ (`S`) |
+| Canlı hex/ASCII + entropi | ✅ | ✅ (↑/↓ ile paket seç) |
+| Rakip kıyaslama ve simülatör sekmeleri | ✅ | — |
+
+İkisi de aynı UDP 8766 keşif protokolünü ve aynı aktarım motorunu konuşur, yani GUI'deki bir cihaz TUI'deki cihazı görür ve dosya yollayabilir.
+
+> Not: PQC-Drop varsayılan olarak 24 bitlik motoru (`isaretli24-bayt-negmod`) kullanır. Arayüzlerde geçen "22-bit" ifadesi teorik sınırı anlatır.
+
 ## Güvenlik notu
 
 PQC-Drop bir **araştırma prototipidir**: bağımsız güvenlik denetiminden geçmedi. Önemli veriler için denetlenmiş araçları kullan. ML-KEM kısmı NIST'in resmî test vektörlerinin hepsini (225/225) geçer, ancak bu bütün sistemin güvenli olduğunu kanıtlamaz.
