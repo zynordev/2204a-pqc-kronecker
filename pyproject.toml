@@ -1,12 +1,14 @@
 [project]
 name = "pqc-kronecker"
-version = "0.0.1"
-description = "TÜBİTAK 2204-A: ML-KEM ve merkezlenmiş Kronecker ikamesi"
+version = "1.0.0"
+description = "TÜBİTAK 2204-A: ML-KEM ve merkezlenmiş Kronecker ikamesi (PQC-Drop)"
 requires-python = ">=3.11"
 dependencies = ["cryptography>=38"]
 
 [project.scripts]
 pqcdrop = "pqc.pqcdrop:main"
+pqcdrop-gui = "pqc.gui:main"
+pqcdrop-tui = "pqc.tui:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6"]
