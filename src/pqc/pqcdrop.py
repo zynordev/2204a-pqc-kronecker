@@ -31,7 +31,7 @@ from pqc.kronecker import VARYANT
 from pqc.parametreler import PARAMETRELER, Parametre
 
 CHUNK_BOYUTU = 64 * 1024  # 64 KB
-VARSAYILAN_PORT = 8765
+VARSAYILAN_PORT = 8787
 VARSAYILAN_MOTOR = "isaretli24-bayt-negmod"
 VARSAYILAN_PARAM = "ML-KEM-768"
 
