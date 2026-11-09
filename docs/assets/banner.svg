@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-label="PQC-Drop">
+  <rect width="1280" height="420" fill="#0A0A0A"/>
+  <rect x="0" y="0" width="14" height="420" fill="#EF4444"/>
+  <g font-family="'Arial Black','Helvetica Neue',Arial,sans-serif" fill="#FAFAFA">
+    <text x="64" y="70" font-size="18" font-weight="700" letter-spacing="4" fill="#A3A3A3">KUANTUM SONRASI · YEREL AĞ · DOSYA AKTARIMI</text>
+    <text x="60" y="190" font-size="128" font-weight="900" letter-spacing="-4">PQC<tspan fill="#EF4444">-</tspan>DROP</text>
+    <text x="64" y="262" font-size="30" font-weight="700">AirDrop gibi kolay. Kuantum bilgisayarlara karşı hazır.</text>
+  </g>
+  <g font-family="'Courier New',monospace" font-size="20" fill="#A3A3A3">
+    <text x="64" y="330">ML-KEM-768 (FIPS 203)  +  AES-256-GCM  +  SHA-256</text>
+    <text x="64" y="364">0000  7a 8f 12 c9 40 ee 31 b4 d2 09 5c a1 66 e3 0b 9d   |z...@.1...\..f...|</text>
+    <text x="64" y="398" fill="#EF4444">entropi: 7.992 / 8.000</text>
+  </g>
+</svg>
