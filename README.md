@@ -202,6 +202,6 @@ Daha derin okumak için: [teori ve ispatlar](docs/04-teori.md) · [sadeleştiril
 
 ---
 
-<sub>**Lisans:** Kaynak kodu şeffaflık ve tartışma için herkese açıktır; ancak açık kaynak değildir. Okuyabilir, çalıştırıp sonuçları doğrulayabilir, atıfla alıntılayabilir ve tartışabilirsin. Kopyalamak, değiştirmek, dağıtmak veya kendi projende kullanmak için yazılı izin gerekir. Ayrıntı: [LICENSE](LICENSE).</sub>
+<sub>**Lisans:** Kaynak kodu şeffaflık ve tartışma için herkese açıktır; ancak açık kaynak değildir. Okuyabilir, çalıştırıp sonuçları doğrulayabilir, atıfla alıntılayabilir ve tartışabilirsin. Fork'lamak serbesttir. Kopyalamak, değiştirmek, dağıtmak, kendi projende kullanmak ve **bu çalışmayı veya türevini herhangi bir yarışmaya/başvuruya (TÜBİTAK 2204-A dahil) başkası adına sunmak yasaktır**; yazılı izin gerekir. Ayrıntı: [LICENSE](LICENSE).</sub>
 
 <sub>Bu çalışma bir **TÜBİTAK 2204-A** lise araştırma projesi olarak başladı; proje dokümanları [`docs/`](docs/) ve [`danisman/`](danisman/) altında duruyor. Yazar: Halil Erdem Yanık · [ZynorDev](https://github.com/zynordev)</sub>

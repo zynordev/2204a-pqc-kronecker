@@ -15,7 +15,14 @@ You MAY NOT, without prior written permission from the copyright holder:
   - copy, modify, merge, publish or distribute the code or documents, in whole or in part;
   - use them in any product, service or project, commercial or non-commercial;
   - redistribute the released binaries;
-  - present this work, or derivatives of it, as your own.
+  - present this work, or derivatives of it, as your own;
+  - submit this work, or any substantial part, idea, text, figure, data or result of it, or work
+    derived from it, to any competition, application, grant, thesis or publication
+    (including TUBITAK 2204-A and similar programs) as the work of anyone other than the
+    copyright holder.
+
+Forking on GitHub for viewing and discussion is permitted. A fork gives no right to the above.
+Violations may be reported to the relevant organisers, institutions and platforms.
 
 Third-party components (for example the Python "cryptography" package, PyQt6 and the
 NIST ACVP test vectors) remain under their own licenses; this license does not change them.
