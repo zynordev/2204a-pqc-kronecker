@@ -1,122 +1,148 @@
-# PQC-Kronecker — Kuantum Sonrası Anahtar Kapsüllemede Merkezlenmiş Kronecker İkamesi
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="PQC-Drop" width="100%">
+</p>
 
-[![Release](https://img.shields.io/github/v/release/zynordev/2204a-pqc-kronecker?style=flat-square)](https://github.com/zynordev/2204a-pqc-kronecker/releases/latest)
-![Testler](https://img.shields.io/badge/pytest-1884%20ge%C3%A7ti-brightgreen?style=flat-square)
-![NIST](https://img.shields.io/badge/NIST%20FIPS%20203-ML--KEM-black?style=flat-square)
+<p align="center">
+  <a href="https://github.com/zynordev/2204a-pqc-kronecker/releases/latest"><img src="https://img.shields.io/github/v/release/zynordev/2204a-pqc-kronecker?style=for-the-badge&color=EF4444&labelColor=0A0A0A" alt="release"></a>
+  <img src="https://img.shields.io/badge/NIST-FIPS%20203%20ML--KEM-FAFAFA?style=for-the-badge&labelColor=0A0A0A" alt="FIPS 203">
+  <img src="https://img.shields.io/badge/testler-1884%20ge%C3%A7ti-FAFAFA?style=for-the-badge&labelColor=0A0A0A" alt="tests">
+  <img src="https://img.shields.io/badge/Linux%20%C2%B7%20Raspberry%20Pi-FAFAFA?style=for-the-badge&labelColor=0A0A0A" alt="platform">
+</p>
 
-TÜBİTAK 2204-A Lise Öğrencileri Araştırma Projeleri Yarışması projesi.
+<p align="center"><b>Aynı ağdaki cihazlara dosya gönder. Şifreleme, bir kuantum bilgisayar geldiğinde de dayansın.</b></p>
 
-**Güncel okunabilir rapor:** [docs/rapor-sade.md](docs/rapor-sade.md) (danışman geri bildirimiyle sadeleştirilmiş; ispatlar ve ayrıntılı tablolar [teknik taslakta](docs/taslakfable.md) korunur).
+<p align="center">
+  <a href="https://github.com/zynordev/2204a-pqc-kronecker/releases/latest"><b>⬇ İndir (kurulum yok)</b></a> ·
+  <a href="#nasıl-çalışır">Nasıl çalışır</a> ·
+  <a href="#kanıt-şifreli-mi-gerçekten">Kanıt</a> ·
+  <a href="#dürüst-sonuçlar">Dürüst sonuçlar</a>
+</p>
 
-## ⬇️ İndir (kurulum gerektirmez)
+---
 
-**[PQC-Drop v1.0.0 — Releases](https://github.com/zynordev/2204a-pqc-kronecker/releases/latest)** · Linux x86_64 · `.tar.gz` veya `.zip` (~132 MB)
+## Neden var?
+
+Bugün şifrelenip kaydedilen trafik, yıllar sonra yeterince büyük bir kuantum bilgisayarla çözülebilir.
+Buna **"şimdi topla, sonra çöz"** (harvest now, decrypt later) deniyor. Bugünkü anahtar değişimi yöntemlerinin çoğu (RSA, X25519) kuantumda kırılır.
+NIST 2024'te bunun için **ML-KEM**'i (FIPS 203) standartlaştırdı.
+
+**PQC-Drop**, bu standardı gerçek bir işe koyar: yakındaki cihazı otomatik bulur, tek tıkla dosya yollar ve **şifrelemenin gerçekten çalıştığını ekranda canlı gösterir**.
+
+## 30 saniyede dene
 
 ```bash
+# 1. İndir ve aç (Python / kütüphane kurulumu gerekmez)
 tar -xzf pqc-drop-v1.0.0-linux-x86_64.tar.gz && cd pqc-drop-v1.0.0-linux-x86_64
-./run-gui.sh    # masaüstü arayüzü (VoiceBox tasarımı)
-./run-tui.sh    # terminal / SSH arayüzü (ör. Raspberry Pi)
+
+# 2. Başlat — iki cihazda da çalıştır, birbirini kendisi bulur
+./run-gui.sh      # masaüstü arayüzü
+./run-tui.sh      # terminal / SSH arayüzü (Raspberry Pi'de de çalışır)
 ```
 
-Python veya PyQt6 kurulumu gerekmez (PyInstaller ile paketlenmiştir). Aynı ağdaki iki cihazda çalıştırınca birbirini otomatik bulur.
-Güvenlik duvarında **UDP 8766** (keşif) ve **TCP 8787–8802** (aktarım) açık olmalıdır.
+> Güvenlik duvarı: **UDP 8766** (keşif) ve **TCP 8787–8802** (aktarım) açık olmalı.
+> Paket Linux x86_64 içindir. Diğer platformlarda kaynaktan çalıştır ([aşağıda](#kaynaktan-çalıştır)).
 
-## Problem ve yaklaşım
+## Ne yapar?
 
-**Problem.** Bugün şifrelenip kaydedilen veriler, ileride yeterince büyük bir kuantum bilgisayarla çözülebilir
-("şimdi topla, sonra çöz"). NIST bu yüzden 2024'te kuantum sonrası anahtar kapsülleme standardı
-**FIPS 203 (ML-KEM)**'i yayımladı. ML-KEM'in temel işlemi, `Z_3329[X]/(X^256+1)` halkasında polinom çarpımıdır.
+| | |
+|---|---|
+| 📡 **Otomatik keşif** | Aynı ağdaki cihazlar birbirini bulur. Her cihazın bir adı var, istersen **görünmez** olursun. |
+| 🔐 **Kuantuma dayanıklı** | ML-KEM-768 anahtar değişimi + AES-256-GCM + SHA-256 bütünlük doğrulaması. |
+| 🔬 **Canlı denetçi** | Wireshark tarzı paket listesi, 16 baytlık hex/ASCII dökümü ve Shannon entropi ölçer. |
+| 🖥️ **İki arayüz** | Siyah-beyaz, keskin köşeli masaüstü GUI ve headless cihazlar için ASCII terminal arayüzü. |
+| 🎓 **Anlatan arayüz** | "Nasıl çalışır?" sekmesinde lise düzeyinde küçük simülatörler. |
 
-**Ne yapıyoruz.** Bu çarpımı, polinomları tek bir büyük tamsayıya paketleyip tek seferde çarpan
-**Kronecker ikamesi** ile yapıyoruz. ML-KEM'de çarpanlardan biri hep küçük katsayılı (gizli vektör)
-olduğundan katsayıları merkezlenmiş (işaretli) tutarak paketleme genişliğini 32 bitten **22 bite** (η=3) indirebiliyoruz.
-Gereken genişlik: **ℓ_min = bitlen(n·A·η) + 1** (Teorem 1, [docs/04-teori.md](docs/04-teori.md)); n=256, A=1664, η=3 için 22, η=2 için 21 bit.
+## Nasıl çalışır?
 
-> Yeni bir şifreleme algoritması icat etmiyoruz. NIST standardını temel alıyor, standardın içindeki
-> çarpım işlemini literatürdeki bir yöntemin merkezlenmiş varyantıyla inceliyoruz.
+```mermaid
+sequenceDiagram
+    participant A as Gönderen
+    participant B as Alıcı
+    A-->>B: UDP 8766 · "ben buradayım" (keşif)
+    B-->>A: UDP 8766 · "ben de" (BEACON_REPLY)
+    A->>B: TCP 8787 · bağlan
+    B->>A: ML-KEM-768 açık anahtar (1184 bayt)
+    A->>B: ML-KEM kapsülü (1088 bayt)
+    Note over A,B: iki taraf aynı gizli anahtarı türetir
+    A->>B: AES-256-GCM ile 64 KB parçalar
+    B->>A: SHA-256 doğrulama
+```
 
-## Bulgular (ölçülmüş, dürüst özet)
+Ağdan geçen her bayt şifreli parçalardır. Anahtar hiç ağa çıkmaz, yalnızca KEM kapsülü gider.
 
-| Konu | Sonuç | Kayıt |
-|---|---|---|
-| Genişlik sınırı | 22 bit yeterli ve keskin (21 bit yetmez); 200.000 denemeyle doğrulandı | [E2](experiments/02-teori-deney/) |
-| Doğruluk | 8 varyantın hepsi 10.000 örnekte ve 225 NIST vakasında doğru | [E1](experiments/01-dogruluk/) |
-| Yalnız bigint çarpımı | 32→22 bit: 20,35 → 9,94 µs (**2,05×**) | [E3](experiments/04-performans/sonuc.md) |
-| Uçtan uca ML-KEM-768 (x86, Python) | Kronecker NTT'den **yavaş: 0,85×** (dönüşüm maliyeti) | [E7 IoT](experiments/06-iot-benchmark/sonuc.md) |
-| ESP32 (gerçek donanım, 100 çalıştırma) | Kronecker/Comba okul yöntemine göre **0,81×**; sonuç %100 doğru | [ESP32](experiments/07-esp32-donanim/sonuc.md) |
-| Sınırın altı (H4) | Hata, gizli anahtarın normuna bağlı → yalnız hata değil **güvenlik açığı** | [E4](experiments/03-guvenlik/sonuc.md) |
+## Kanıt: şifreli mi gerçekten?
 
-Kısaca: yöntem matematiksel olarak doğru ve paketleme küçülüyor, ancak ML-KEM'in tamamında standart NTT hâlâ daha hızlı. Python'daki %56,9 tepe bellek artışı da bellek tasarrufu anlamına gelmiyor; 768 bayt çalışma alanı kuramsal modeldir.
+Aynı 16 KB'lık içerik üç şekilde gerçek TCP soketiyle yollandı ve `.pcap` olarak kaydedildi ([deney 05](experiments/05-ag-analizi/sonuc.md)):
 
-## PQC-Drop — güvenli dosya aktarım prototipi
+| | Düz HTTP | TLS 1.3 | **PQC-Drop** |
+|---|:---:|:---:|:---:|
+| Shannon entropisi (maks. 8) | 4,130 | 7,989 | **7,992** |
+| Wireshark'ta düz metin araması | ⚠️ ifşa | ✅ 0 eşleşme | ✅ 0 eşleşme |
+| Açık anahtar boyutu | — | 32 bayt | 1184 bayt |
+| Kuantuma karşı (Shor) | yok | ❌ kırılır (X25519) | 🛡️ dirençli (kafes tabanlı) |
+| Toplam trafik | 16 493 B | 16 435 B | 18 684 B |
 
-ML-KEM-768 el sıkışması + AES-256-GCM (64 KB parçalar) + SHA-256 bütünlük doğrulaması. Varsayılan motor: `isaretli24-bayt-negmod`.
+Entropi 8'e ne kadar yakınsa veri o kadar rastgele görünür, yani okunabilir bir şey sızmıyor. Bedeli: TLS 1.3'e göre ~2,2 KB ek trafik (1184 baytlık açık anahtar + 1088 baytlık kapsül).
+Kendin de bakabilirsin: `tcpdump -r experiments/05-ag-analizi/pqcdrop_gercek.pcap`
 
-- **Otomatik keşif:** UDP 8766, tüm alt ağlara broadcast + doğrudan `BEACON_REPLY`; cihaz adı ve **görünür / gizli** modu.
-- **Canlı paket denetçisi:** Wireshark benzeri 16 baytlık hex/ASCII dökümü ve Shannon entropisi.
-- **İki arayüz:** PyQt6 GUI (VoiceBox tasarım sistemi, keskin köşeler, siyah/beyaz + `#EF4444`) ve curses ASCII TUI (headless Raspberry Pi / SSH).
-- **GUI sekmeleri:** Aktarım & ağ denetimi · literatür/rakip kıyası · "Nasıl çalışır?" (9. sınıf düzeyi simülatörler).
-- **Gerçek ağ kanıtı:** 16 KB aynı yükle HTTP / TLS 1.3 / PQC-Drop karşılaştırması, `.pcap` dosyalarıyla ([E5](experiments/05-ag-analizi/sonuc.md)):
+## Altındaki fikir: Kronecker ikamesi
 
-| | Düz HTTP | TLS 1.3 | PQC-Drop |
-|---|---|---|---|
-| Shannon entropisi | 4,130 | 7,989 | 7,992 |
-| Wireshark'ta düz metin | açık | yok | yok |
-| Kuantum (Shor) | yok | kırılır (X25519) | dirençli (M-LWE) |
+ML-KEM'in en sık yaptığı iş polinom çarpımıdır. Biz bunu klasik NTT yerine **Kronecker ikamesiyle** yapıyoruz:
+polinomun tüm katsayılarını tek bir dev tamsayıya paketle, tek seferde çarp, sonucu geri aç.
 
-CLI sürümü: `pqcdrop` (`python -m pqc.pqcdrop`).
+Kilit nokta, katsayıların **ne kadar yer kapladığı**:
 
-## Durum
+- Klasik paketleme katsayı başına **32 bit** ayırır.
+- ML-KEM'de çarpanlardan biri hep küçüktür (gizli vektör). Katsayıları sıfırın çevresinde (işaretli) tutunca ayrılması gereken alan **22 bite** iner (η=3; η=2'de 21 bit).
+- Gereken genişlik kesin bir formülle ispatlandı: `ℓ_min = bitlen(n·A·η) + 1`. Bir bit eksik olursa çarpım bozulur ([docs/04-teori.md](docs/04-teori.md)).
 
-**Başvuru son tarihi: 4 Ocak 2027, 17.30** · hedef yükleme: 2 Ocak 2027
+Yeni bir şifreleme algoritması icat etmedik. NIST standardının içindeki çarpımı, literatürdeki bir yöntemin merkezlenmiş varyantıyla inceledik.
 
-| Aşama | Konu | Durum |
-|---|---|---|
-| 0 | Repo, plan, dokümanlar, ön ölçüm | 🟡 iskelet + CI hazır, danışman toplantısı bekliyor |
-| 1 | Literatür + teori (ispat) | 🟡 Lemma 1 / Teorem 1 yazıldı, B'nin kontrolü ve künye doğrulama bekliyor |
-| 2 | Referans ML-KEM (NTT) + NIST vektörleri | 🟡 225/225 geçti, kod okuma bekliyor |
-| 3 | Kronecker motorları + ML-KEM entegrasyonu | 🟡 8 varyant, her biri 225/225, kod okuma bekliyor |
-| 4 | Deneyler (H2–H4) | 🟢 Tamamlandı |
-| 5a | PQC-Drop prototip (CLI) | 🟢 Tamamlandı |
-| 5b | GUI + TUI + ağ keşfi + canlı denetçi | 🟢 **v1.0.0 yayında** (9 Kasım 2026) |
-| 6 | Rapor | 🟡 [rapor-sade](docs/rapor-sade.md) güncel; kaynak doğrulama ve YZ beyanı bekliyor |
-| 7 | IoT/Edge benchmark + gerçek ESP32 ölçümü | 🟢 Tamamlandı (8 Kasım) |
-| — | Poster, sunum | ⏳ |
+## Dürüst sonuçlar
 
-Ayrıntı: [docs/01-calisma-plani.md](docs/01-calisma-plani.md)
+Bu bölüm bilerek abartısızdır:
 
-## Dokümanlar
+| Ölçüm | Sonuç |
+|---|---|
+| Sadece büyük tamsayı çarpımı (32→22 bit) | **2,05× daha hızlı** (20,35 → 9,94 µs) |
+| Tek polinom çarpımı, saf Python | Kronecker, Python NTT'den **2,2× hızlı** |
+| Tam ML-KEM-768 (KeyGen+Encaps+Decaps) | Kronecker **0,85×**, yani standart NTT daha hızlı |
+| ESP32 (gerçek donanım, 100 çalıştırma) | Kronecker/Comba okul yöntemine göre **0,81×**; sonuçlar %100 doğru |
+| Bellek | Paketlenen alan 8192 → 5632 bit (%31 küçük); ama Python'da tepe tahsis **%56,9 arttı** |
 
-- [00 — Proje özeti](docs/00-proje-ozeti.md) · [01 — Çalışma planı](docs/01-calisma-plani.md) · [02 — Literatür](docs/02-literatur.md)
-- [03 — Hipotezler ve deneyler](docs/03-hipotez-ve-deneyler.md) · [04 — Teori](docs/04-teori.md) · [05 — Hata kontrolü](docs/05-hata-kontrol.md) · [06 — Açık sorular](docs/06-acik-sorular.md)
-- [Sadeleştirilmiş rapor](docs/rapor-sade.md) · [Teknik taslak](docs/taslakfable.md) · [Repo eleştirisi](docs/analiz-fable.md) · [IoT mimarisi](docs/mimari-iot.md) · [Örnek raporlar](docs/ornekler/)
-- [Aşama kayıtları](docs/kayit/) · [Kararlar (ADR)](docs/kararlar/) · [Kod okuma rehberleri](docs/kod-okuma/) · [Danışman klasörü](danisman/)
-- Öğrenim / jüri PDF'leri: [`docs/`](docs/) içinde `*_OGRENIM_*` ve `*JURI*` dosyaları
+**Yani:** yöntem matematiksel olarak doğru ve çarpma adımı gerçekten hızlanıyor. Ancak veriyi NTT alanına/alanından dönüştürmek bu kazancı yiyor, bu yüzden ML-KEM'in tamamında standart yöntem hâlâ önde. Bunu saklamıyoruz.
 
-## Kaynaktan çalıştırma
+Bir bulgu daha: sınırın **altına** inmek sadece hata değil, güvenlik açığı. Seçilmiş girdilerle çarpımın bozulup bozulmaması gizli anahtarın normuna bağlı hâle geliyor ([deney 03](experiments/03-guvenlik/sonuc.md)). Kısaca: bit sayısı keyfî seçilemez.
+
+## Güvenlik notu
+
+PQC-Drop bir **araştırma prototipidir**: bağımsız güvenlik denetiminden geçmedi. Önemli veriler için denetlenmiş araçları kullan. ML-KEM kısmı NIST'in resmî test vektörlerinin hepsini (225/225) geçer, ancak bu bütün sistemin güvenli olduğunu kanıtlamaz.
+
+## Kaynaktan çalıştır
 
 ```bash
 git clone https://github.com/zynordev/2204a-pqc-kronecker.git && cd 2204a-pqc-kronecker
-python3 -m venv .venv && . .venv/bin/activate   # fish: . .venv/bin/activate.fish
+python3 -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'
 pytest                 # 1884 test
-ruff check .           # kod stili
-./pqcdrop-gui.sh       # GUI (PyQt6 gerekir; yoksa TUI'ye düşer)
-./pqcdrop-tui.sh       # terminal arayüzü
-python araclar/mutasyon_kontrolu.py              # testlerin hata yakalama gücü (~5 dk)
-python experiments/01-dogruluk/calistir.py       # 10.000 örnek doğruluk deneyi
+./pqcdrop-gui.sh       # PyQt6 gerekir; yoksa TUI'ye düşer
+./pqcdrop-tui.sh
 ```
 
-Taşınabilir paketi kendin derlemek için: `pip install pyinstaller && pyinstaller --onefile --paths src src/pqc/gui.py`.
+Kendi paketini derlemek için: `pip install pyinstaller && pyinstaller --onefile --paths src src/pqc/gui.py`
 
-## Klasörler
+## Depo haritası
 
 ```
-docs/          plan, teori, literatür, kayıtlar, kararlar, raporlar
-src/pqc/       ML-KEM, çarpım yöntemleri, PQC-Drop (engine, discovery, gui, tui)
-tests/         otomatik testler (NIST ACVP vektörleri dahil)
-araclar/       yardımcı araçlar (mutasyon kontrolü)
-experiments/   00 ön ölçüm · 01 doğruluk · 02 teori · 03 güvenlik · 04 performans
-               05 ağ analizi · 06 IoT benchmark · 07 ESP32 donanım
-danisman/      danışman öğretmen için rapor taslakları ve özetler
+src/pqc/        ML-KEM, çarpım yöntemleri ve PQC-Drop (engine · discovery · gui · tui)
+tests/          NIST ACVP vektörleri dahil otomatik testler
+experiments/    00 ön ölçüm · 01 doğruluk · 02 teori · 03 güvenlik · 04 performans
+                05 ağ analizi (.pcap) · 06 IoT benchmark · 07 ESP32 donanım
+docs/           teori, literatür, raporlar, kararlar (ADR)
 ```
+
+Daha derin okumak için: [teori ve ispatlar](docs/04-teori.md) · [sadeleştirilmiş rapor](docs/rapor-sade.md) · [literatür](docs/02-literatur.md) · [IoT mimarisi](docs/mimari-iot.md)
+
+---
+
+<sub>Bu çalışma bir **TÜBİTAK 2204-A** lise araştırma projesi olarak başladı; proje dokümanları [`docs/`](docs/) ve [`danisman/`](danisman/) altında duruyor. Yazar: Halil Erdem Yanık · [ZynorDev](https://github.com/zynordev)</sub>
