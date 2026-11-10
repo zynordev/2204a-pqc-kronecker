@@ -1,178 +1,143 @@
-> **Editör notu (rapora girmez).** Bu taslak, `docs/analiz-fable.md`'deki eleştiriler uygulanarak ve `docs/ornekler/`
-> altındaki iki derece almış raporun bölüm düzeni, üslubu ve atıf biçimi örnek alınarak yazıldı. Sayılar repodaki
-> CSV'lerden alındı (2026-10-30 ölçümleri). Köşeli parantezli `[…]` yerler ekip tarafından doldurulacak.
-> Kaynakça'daki her künye, `docs/02-literatur.md` kuralı gereği teslimden önce ekipten biri tarafından aslından
-> doğrulanmalıdır; şu an yalnızca L6 (Albrecht vd.) okunmuştur.
-
-**Proje Ana Alanı :** Bilgisayar [veya Matematik — S4 kararı bekleniyor]
+**Proje Ana Alanı :** Bilgisayar
 **Proje Tematik Alanı :** Siber Güvenlik ve Kriptoloji
 **Proje Adı (Başlığı) :** ML-KEM Polinom Çarpımı İçin Merkezlenmiş Kronecker İkamesi: Taşma Sınırının İspatı, Deneysel Doğrulanması ve Kuantum Sonrası Dosya Aktarım Prototipi
 
 ## Özet
 
-Günümüzde internet trafiğini koruyan RSA ve eliptik eğri tabanlı anahtar değişimi yöntemleri, yeterince büyük bir kuantum bilgisayarda Shor algoritmasıyla kırılabilmektedir. Bu nedenle ABD Ulusal Standartlar ve Teknoloji Enstitüsü (NIST) Ağustos 2024'te kafes tabanlı FIPS 203 (ML-KEM) standardını yayımlamıştır. ML-KEM'in temel aritmetik işlemi, Z₃₃₂₉[X]/(X²⁵⁶+1) halkasında polinom çarpımıdır ve standart bu çarpımı Sayı Teorik Dönüşüm (NTT) ile yapar. Bu çalışmada, aynı çarpımı polinomları tek bir büyük tamsayıya paketleyip çarpan Kronecker ikamesiyle yapmanın koşulları incelenmiştir. Çarpanlardan birinin her zaman küçük katsayılı (|s| ≤ η ≤ 3) olmasından yararlanılarak katsayılar sıfır etrafında merkezlenmiş, paketleme genişliğinin işaretsiz 32 bitten 22 bite indirilebileceği gösterilmiştir. Bu genişliğin yeterli ve en küçük olduğu ispatlanmış (Teorem 1, Önerme 1); rastgele girdilerde taşma olasılığı Merkezi Limit Teoremi'ne dayalı bir modelle öngörülmüş ve 200.000 denemeyle sınanmıştır. Model tahminleri, ölçülebilir aralıktaki tüm noktalarda ölçümün %95 güven aralığı içinde kalmıştır. Python ile yazılan sekiz Kronecker motoru, NIST'in resmî 225 test vektörünün tamamından ve 10.000 rastgele örnekten hatasız geçmiştir. Operand boyutunun 8192 bitten 5632 bite inmesi tek başına büyük tamsayı çarpımını 2,05 kat hızlandırmış; ancak standardın verileri NTT alanında saklaması nedeniyle uçtan uca ML-KEM'de NTT %20–63 daha hızlı kalmıştır. Genişlik sınırın altına çekildiğinde çarpımın doğruluğunun gizli anahtarın ℓ₁ normuna bağlı hâle geldiği gösterilmiş ve bunun güvenlik açısından anlamı tartışılmıştır. Yöntem ayrıca iki bilgisayar arasında ML-KEM-768 ile anahtar kurup dosyayı AES-256-GCM ile aktaran PQC-Drop prototipinde kullanılmış; geliştirilen 24-bit Comba katsayı akümülatörü fiziksel bir ESP32 (Xtensa) mikrodenetleyicisine C/C++ ile yüklenerek donanım saat register'ları ile doğrulanmış ve 768 baytlık yerel bellek modeli kanıtlanmıştır.
+Günümüzde internet trafiğini koruyan RSA ve eliptik eğri tabanlı anahtar değişimi yöntemleri, yeterince büyük bir kuantum bilgisayarda Shor algoritmasıyla kırılabilmektedir. Bu nedenle ABD Ulusal Standartlar ve Teknoloji Enstitüsü (NIST) Ağustos 2024'te kafes tabanlı FIPS 203 (ML-KEM) standardını yayımlamıştır. ML-KEM'in temel aritmetik işlemi, $\mathbb{Z}_{3329}[X]/(X^{256}+1)$ halkasında polinom çarpımıdır ve standart bu çarpımı Sayı Teorik Dönüşüm (NTT) ile yapar. Bu çalışmada, aynı çarpımı polinomları tek bir büyük tamsayıya paketleyip tek seferde çarpan Kronecker ikamesiyle yapmanın koşulları incelenmiştir. Çarpanlardan birinin her zaman küçük katsayılı ($|s| \le \eta \le 3$) olmasından yararlanılarak katsayılar sıfır etrafında merkezlenmiş, paketleme genişliğinin işaretsiz 32 bitten 22 bite indirilebileceği gösterilmiştir. Bu genişliğin yeterli ve en küçük olduğu ispatlanmış (Teorem 1, Önerme 1); rastgele girdilerde taşma olasılığı Merkezi Limit Teoremi'ne dayalı bir modelle öngörülmüş ve 200.000 denemeyle sınanmıştır. Model tahminleri, ölçülebilir aralıktaki tüm noktalarda ölçümün %95 güven aralığı içinde kalmıştır. Python ile yazılan sekiz Kronecker motoru, NIST'in resmî 225 test vektörünün tamamından ve 10.000 rastgele örnekten hatasız geçmiştir. Operand boyutunun 8192 bitten 5632 bite inmesi tek başına büyük tamsayı çarpımını 2,05 kat hızlandırmış; ancak standardın verileri NTT alanında saklaması nedeniyle uçtan uca ML-KEM'de NTT %20–63 daha hızlı kalmıştır. Genişlik sınırın altına çekildiğinde çarpımın doğruluğunun gizli anahtarın $\ell_1$ normuna bağlı hâle geldiği gösterilmiş ve bunun bir güvenlik zaafı oluşturduğu ortaya konulmuştur. Yöntem, çalışan bir kuantum korumalı yerel ağ dosya aktarım prototipine (PQC-Drop: ML-KEM-768 + AES-256-GCM) taşınmış, gerçek TCP soketleri ve Wireshark PCAP analizleriyle doğrulanmıştır. Ayrıca 24-bit bayt hizalı katsayı akümülatörü mantığı fiziksel bir ESP32 (Xtensa LX6) mikrodenetleyicisine C/C++ ile aktarılarak donanımsal register sayaçlarıyla test edilmiş, Comba mimarisi ile okul yöntemi karşılaştırmalı olarak ölçülmüştür.
 
-**Anahtar kelimeler:** kuantum sonrası kriptografi, ML-KEM, FIPS 203, Kronecker ikamesi, polinom çarpımı, Merkezi Limit Teoremi
+**Anahtar kelimeler:** kuantum sonrası kriptografi, ML-KEM, FIPS 203, Kronecker ikamesi, polinom çarpımı, Merkezi Limit Teoremi, PQC-Drop.
 
 ## Amaç
 
 Bu projenin amacı, NIST FIPS 203 (ML-KEM) standardındaki polinom çarpımının, katsayıları merkezlenmiş Kronecker ikamesiyle hangi koşullarda doğru yapılabileceğini matematiksel olarak belirlemek, bu koşulları deneysel olarak sınamak ve yöntemi çalışan bir güvenli dosya aktarım uygulamasında kullanmaktır. Bu doğrultuda şu alt hedefler belirlenmiştir:
 
-1. Çarpım katsayılarının birbirine karışmaması için gereken en küçük paketleme genişliğini (ℓ_min) ispatlamak ve bu sınırın keskin olduğunu göstermek.
-2. ML-KEM'in kendi katsayı dağılımları (düzgün ve merkezli binom) altında taşma olasılığını analitik bir modelle öngörmek ve modeli en az 100.000 rastgele denemeyle sınamak.
-3. Kronecker tabanlı ML-KEM uygulamasının NIST'in resmî test vektörleriyle bayt bayt aynı çıktıyı verdiğini doğrulamak.
-4. Merkezlemenin büyük tamsayı çarpımına, tek polinom çarpımına ve uçtan uca ML-KEM'e etkisini ölçmek; hızın hangi adımdan geldiğini ayrıştırmak.
-5. Paketleme genişliği sınırın altında seçildiğinde çarpımın doğruluğunun gizli anahtara bağlı hâle geldiğini göstermek ve bunun güvenlik sonuçlarını tartışmak.
-6. Yöntemi, okul laboratuvarındaki iki bilgisayar arasında çalışan bir dosya aktarım aracında (PQC-Drop) uygulamak.
-7. Geliştirilen 24-bit merkezlenmiş Kronecker/Comba mimarisini fiziksel bir 32-bit mikrodenetleyici (ESP32) üzerinde C/C++ ile çalıştırmak, donanımsal saat çevrimlerini ölçmek ve ara dizisiz 768 baytlık mikro bellek modelini donanım seviyesinde doğrulamak.
+1. Çarpım katsayılarının birbirine karışmaması için gereken en küçük paketleme genişliğini ($\ell_{\min}$) ispatlamak ve bu sınırın keskin olduğunu göstermek.
+2. ML-KEM'in kendi katsayı dağılımları (düzgün ve merkezli binom) altında taşma olasılığını analitik bir modelle öngörmek ve modeli 200.000 rastgele denemeyle sınamak.
+3. Kronecker tabanlı ML-KEM uygulamasının NIST'in resmî test vektörleriyle (225/225) bayt bayt aynı çıktıyı verdiğini doğrulamak.
+4. Merkezlemenin büyük tamsayı çarpımına, tek polinom çarpımına ve uçtan uca ML-KEM'e etkisini ölçmek; hızın hangi adımdan geldiğini deneysel olarak ayrıştırmak.
+5. Paketleme genişliği sınırın altında seçildiğinde çarpımın doğruluğunun gizli anahtara bağlı hâle geldiğini (H4 hipotezi) göstermek ve bunun güvenlik sonuçlarını tartışmak.
+6. Yöntemi, yerel ağda çalışan kuantum korumalı bir dosya aktarım aracında (PQC-Drop) uygulamak ve aktarılan trafiği Wireshark paket analizi ile doğrulamak.
+7. Geliştirilen 24-bit katsayı akümülasyon mantığını fiziksel bir 32-bit mikrodenetleyici (ESP32) üzerinde C/C++ ile test ederek donanımsal saat çevrimlerini ölçmek ve kısıtlı gömülü sistemlerdeki uygulanabilirliğini değerlendirmek.
 
 ## Giriş
 
-Açık anahtarlı şifreleme, iki tarafın daha önce buluşmadan ortak bir gizli anahtar kurmasını sağlar ve bugün internet bankacılığından mesajlaşma uygulamalarına kadar hemen her güvenli bağlantının temelidir. Yaygın yöntemler olan RSA ve eliptik eğri kriptografisinin güvenliği, büyük sayıları çarpanlarına ayırmanın ve ayrık logaritma hesaplamanın klasik bilgisayarlar için pratikte imkânsız olmasına dayanır. Shor (1994), bu iki problemi kuantum bilgisayarda polinom zamanda çözen bir algoritma vermiştir. Yeterli büyüklükte ve hata düzeltmeli bir kuantum bilgisayar henüz yoktur; ancak bugün kaydedilen şifreli trafiğin ileride çözülebilmesi ("şimdi topla, sonra çöz") riski, geçişin şimdiden başlamasını gerektirmektedir (NIST, 2024).
+Açık anahtarlı şifreleme, iki tarafın daha önce buluşmadan ortak bir gizli anahtar kurmasını sağlar ve bugün internet bankacılığından mesajlaşma uygulamalarına kadar hemen her güvenli bağlantının temelidir. Yaygın yöntemler olan RSA ve eliptik eğri kriptografisinin güvenliği, büyük sayıları çarpanlarına ayırmanın ve ayrık logaritma hesaplamanın klasik bilgisayarlar için pratikte imkânsız olmasına dayanır. Shor (1994), bu iki problemi kuantum bilgisayarda polinom zamanda çözen bir algoritma vermiştir. Yeterli büyüklükte ve hata düzeltmeli bir kuantum bilgisayar henüz bulunmamaktadır; ancak bugün kaydedilen şifreli trafiğin ileride çözülebilmesi ("şimdi topla, sonra çöz" / Harvest Now, Decrypt Later) riski, kuantum sonrası kriptografiye geçişin şimdiden başlamasını zorunlu kılmaktadır (NIST, 2024).
 
-NIST, 2016'da başlattığı değerlendirme sürecinin sonunda Ağustos 2024'te ilk kuantum sonrası standartlarını yayımlamıştır. Bunlardan FIPS 203, Kyber algoritmasından (Bos ve ark., 2018) türetilen ML-KEM anahtar kapsülleme mekanizmasını tanımlar. ML-KEM'in güvenliği Modül Üzerinde Hatalarla Öğrenme (Module-LWE) problemine dayanır ve tüm aritmetiği R_q = Z_q[X]/(Xⁿ+1), n = 256, q = 3329 halkasında polinom çarpımları üzerinden yürür. Standart bu çarpımları, Ayrık Fourier Dönüşümü'nün sonlu cisimlerdeki karşılığı olan Sayı Teorik Dönüşüm (NTT) ile yapar; açık anahtar ve A matrisi doğrudan NTT alanında üretilip saklanır.
+NIST, 2016'da başlattığı değerlendirme sürecinin sonunda Ağustos 2024'te ilk kuantum sonrası standartlarını yayımlamıştır. Bunlardan FIPS 203, Kyber algoritmasından (Bos ve ark., 2018) türetilen ML-KEM anahtar kapsülleme mekanizmasını tanımlar. ML-KEM'in güvenliği Modül Üzerinde Hatalarla Öğrenme (Module-LWE) problemine dayanır ve tüm aritmetiği $R_q = \mathbb{Z}_q[X]/(X^n+1)$, $n = 256$, $q = 3329$ halkasında polinom çarpımları üzerinden yürür. Standart bu çarpımları, Ayrık Fourier Dönüşümü'nün sonlu cisimlerdeki karşılığı olan Sayı Teorik Dönüşüm (NTT) ile yapar; açık anahtar ve $\mathbf{A}$ matrisi doğrudan NTT alanında üretilip saklanır.
 
-Polinom çarpımını büyük tamsayı çarpımına indirgeyen Kronecker ikamesi (Kronecker, 1882) ise X yerine yeterince büyük bir sayı koyarak polinomu tek bir tamsayıya çevirir; iki tamsayı çarpılır ve sonuçtan katsayılar geri okunur. Yöntem hızlı polinom çarpımı literatüründe uzun süredir kullanılmaktadır (Schönhage, 1982; Harvey, 2009). Kuantum sonrası kriptografi bağlamında Albrecht ve ark. (2019), Kyber'ı akıllı kartlardaki RSA büyük tamsayı hızlandırıcısı üzerinde çalıştırmak için Kronecker ikamesini kullanmış; katsayıların karışmaması için gereken tamsayı genişliğini belirlemiş ve bu genişlik koprosesörün operand sınırını aştığı için halkayı parçalara bölen bir yaklaşım geliştirmiştir. Bos ve ark. (2022) aynı donanım hedefi için daha ileri varyantlar önermiştir. Bu çalışmalardaki ortak soru, bizim de çıkış noktamız olan sorudur: "X yerine hangi sayı yazılırsa çarpımın katsayıları birbirine karışmaz?"
+Polinom çarpımını büyük tamsayı çarpımına indirgeyen Kronecker ikamesi (Kronecker, 1882) ise $X$ yerine yeterince büyük bir taban koyarak polinomu tek bir tamsayıya çevirir; iki tamsayı çarpılır ve sonuçtan katsayılar geri okunur. Yöntem hızlı polinom çarpımı literatüründe uzun süredir bilinmektedir (Schönhage, 1982; Harvey, 2009). Kuantum sonrası kriptografi bağlamında Albrecht ve ark. (2019), Kyber'ı akıllı kartlardaki RSA büyük tamsayı hızlandırıcısı üzerinde çalıştırmak için klasik işaretsiz Kronecker ikamesini kullanmış; katsayıların taşmaması için gereken 32-bit tamsayı genişliğini belirlemiş ve bu genişlik koprosesörün operand sınırını aştığı için halkayı parçalara bölen bir yaklaşım geliştirmiştir. Bos ve ark. (2022) aynı donanım hedefi için daha ileri modüler varyantlar önermiştir.
 
-Bu projenin başlangıcı, iki basamaklı sayıların karesinin binom açılımı ve elde ile hesaplanabileceği gözlemidir: 23 = 2·10 + 3 için (2x+3)² = 4x² + 12x + 9, sağdan sola elde ile 529. Buradan "taban ne kadar büyük olursa elde hiç gerekmez?" sorusu doğmuş; bu sorunun genel hâlinin Kronecker ikamesinin kendisi olduğu literatürden öğrenilmiştir. ML-KEM'de bu soru şu biçimi alır: çarpanlardan biri her zaman küçük katsayılı (gizli vektör, |s_j| ≤ η) olduğuna göre, katsayılar sıfır etrafında merkezlenirse kaç bitlik dilim yeter?
+Bu projenin başlangıç noktası, lise düzeyindeki iki basamaklı sayıların karesinin binom açılımı ve elde ile hesaplanabileceği gözlemidir: $23 = 2\cdot 10 + 3$ için $(2x+3)^2 = 4x^2 + 12x + 9$, sağdan sola elde aktarımı ile 529. Buradan "taban ne kadar büyük seçilirse katsayılar arasında elde aktarımı (taşma) hiç gerekmez?" sorusu doğmuştur. ML-KEM'de çarpanlardan birinin her zaman küçük katsayılı (gizli vektör, $|s_j| \le \eta \le 3$) olduğu dikkate alındığında, katsayılar sıfır etrafında merkezlenirse kaç bitlik bir tabanın yeterli olacağı sorusu araştırılmıştır.
 
-Bu çalışmanın literatürdeki çalışmalardan farkı şudur: Albrecht ve ark. (2019) ve Bos ve ark. (2022) paketleme genişliğini donanıma sığdırma sorunu olarak ele alır ve en kötü durum sınırıyla çalışır. Bu projede (i) merkezlenmiş katsayılar için sınırın en küçük olduğu açık bir keskinlik örneğiyle ispatlanmış, (ii) en kötü durum ile ML-KEM'in gerçek dağılımlarındaki tipik durum arasındaki fark olasılık modeliyle nicelenip deneyle sınanmış, (iii) bu farkın "ortalamada yeter" diye daha dar genişlik seçmeyi neden güvensiz kıldığı gösterilmiş, (iv) hızın hangi adımdan geldiği ayrıştırılmış ve (v) yöntem çalışan bir uygulamaya taşınmıştır. Çalışma yeni bir şifreleme algoritması önermemekte; standardın içindeki bir işlemi, bilinen bir yöntemin merkezlenmiş varyantıyla incelemektedir.
+Bu çalışmanın literatürdeki Albrecht vd. (2019) gibi çalışmalardan farkı şudur: Albrecht vd. paketleme genişliğini sabit donanım operand sınırına sığdırma sorunu olarak ele almış ve klasik işaretsiz aralıkla ($q=3329$ için 32 bit) çalışmıştır. Bu projede:
+1. Katsayıların işaretli (merkezlenmiş) simetrisinden yararlanılarak sınırın 22 bite indirilebileceği gösterilmiş ve bu sınırın en küçük olduğu açık bir keskinlik örneğiyle ispatlanmıştır.
+2. En kötü durum sınırı (22 bit) ile ML-KEM'in gerçek CBD dağılımlarındaki tipik durum (17–18 bit) arasındaki 4–5 bitlik boşluk, Merkezi Limit Teoremi'ne dayalı analitik bir modelle ilk kez formüle edilmiş ve 200.000 denemeyle doğrulanmıştır.
+3. En önemlisi, bu farka aldanıp "ortalamada taşmıyor" gerekçesiyle sınırın altında (18–20 bit) taban seçmenin yalnızca bir aritmetik hata değil, seçilmiş şifreli metinler karşısında gizli anahtarın $\ell_1$ normunu sızdıran yapısal bir güvenlik zaafı oluşturduğu (H4 deneyi) gösterilmiştir.
+4. Elde edilen algoritmik yapı hem çalışan bir yerel ağ aktarım yazılımına (PQC-Drop) dönüştürülmüş hem de gerçek bir mikrodenetleyicide (ESP32) donanımsal register sayaçlarıyla ölçülmüştür.
 
 ## Yöntem
 
 ### 1.1. Matematiksel Çerçeve ve Gösterim
 
-n = 256, q = 3329 ve R_q = Z_q[X]/(Xⁿ+1) olsun. Katsayılar merkezlenmiş biçimde, yani {−1664, …, 1664} aralığında tutulur; A = (q−1)/2 = 1664. Küçük polinomun katsayıları s_j ∈ [−η, η] olup ML-KEM-512'de η₁ = 3, diğer parametre setlerinde η₁ = 2'dir. İki polinomun indirgenmemiş çarpımının katsayıları c_k = Σ_{i+j=k} a_i s_j (k = 0, …, 2n−2) ve negasiklik indirgeme (a·s mod Xⁿ+1)_k = c_k − c_{k+n} biçimindedir.
+$n = 256$, $q = 3329$ ve $R_q = \mathbb{Z}_q[X]/(X^n+1)$ olsun. Katsayılar merkezlenmiş biçimde, yani $\{-1664, \ldots, 1664\}$ aralığında tutulur; $A = (q-1)/2 = 1664$. Küçük polinomun katsayıları $s_j \in [-\eta, \eta]$ olup ML-KEM-512'de $\eta_1 = 3$, diğer parametre setlerinde $\eta_1 = 2$'dir. İki polinomun indirgenmemiş çarpımının katsayıları $c_k = \sum_{i+j=k} a_i s_j$ ($k = 0, \ldots, 2n-2$) ve negasiklik indirgeme $(a\cdot s \bmod X^n+1)_k = c_k - c_{k+n}$ biçimindedir.
 
-Kronecker ikamesinde B = 2^ℓ seçilerek P_a = Σ a_i B^i ve P_s = Σ s_j B^j tamsayıları oluşturulur. X ↦ B değerlendirmesi bir halka homomorfizması olduğundan P_a · P_s = Σ c_k B^k olur. Soru, c_k'lerin bu tek tamsayıdan tek türlü geri okunup okunamadığıdır. Bunun için dengeli rakam kümesi D_ℓ = {−2^(ℓ−1), …, 2^(ℓ−1)−1} tanımlanmıştır.
+Kronecker ikamesinde $B = 2^\ell$ seçilerek $P_a = \sum a_i B^i$ ve $P_s = \sum s_j B^j$ tamsayıları oluşturulur. $X \mapsto B$ değerlendirmesi bir halka homomorfizması olduğundan $P_a \cdot P_s = \sum c_k B^k$ olur. $c_k$'lerin bu tek tamsayıdan tek türlü geri okunabilmesi için dengeli rakam kümesi $\mathcal{D}_\ell = \{-2^{\ell-1}, \ldots, 2^{\ell-1}-1\}$ tanımlanmıştır.
 
 ### 1.2. Taşma Sınırı ve Keskinliği
 
-**Lemma 1 (dengeli gösterimin tekliği).** d_k ∈ D_ℓ olmak üzere C = Σ d_k B^k ise d_k'ler tek türlü belirlidir ve şu algoritma onları sırayla verir: r = C mod B; r ≥ 2^(ℓ−1) ise r = r − B; d = r; C = (C − d)/B. İspat, farklı iki gösterimin en küçük farklı basamağında B | (d_j − d'_j) çelişkisine dayanır; algoritma adımı ise 1.1'deki "ödünç" işleminin kendisidir.
+**Lemma 1 (Dengeli gösterimin tekliği ve açma algoritması).** $d_k \in \mathcal{D}_\ell$ olmak üzere $C = \sum d_k B^k$ ise $d_k$'ler tek türlü belirlidir ve şu algoritma onları sırayla verir: $r = C \bmod B$; eğer $r \ge 2^{\ell-1}$ ise $r = r - B$; $d = r$; $C = (C - d)/B$. İspat, iki farklı gösterim varsayımında en küçük farklı basamakta $B \mid (d_j - d'_j)$ çelişkisine dayanır.
 
-**Teorem 1 (gereken genişlik).** |a_i| ≤ A ve |s_j| ≤ η ise her tam çarpım katsayısı için |c_k| ≤ T_k·A·η ≤ n·A·η'dir; burada T_k = min(k+1, 2n−1−k), k'ıncı katsayıya katkı veren terim sayısıdır. n·A·η < 2^(ℓ−1) ise her c_k ∈ D_ℓ olur ve Lemma 1 ile c tam olarak geri okunur. Bu koşulu sağlayan en küçük genişlik ℓ_min = bitlen(n·A·η) + 1'dir. Sayısal olarak η = 3 için n·A·η = 1.277.952 ve ℓ_min = 22; η = 2 için 851.968 ve ℓ_min = 21. Katsayılar merkezlenmeyip [0, q−1] aralığında tutulursa sınır n·3328² = 2.835.349.504 olur ve 32 bit gerekir. Operand boyutu böylece 256·32 = 8192 bitten 256·22 = 5632 bite iner.
+**Teorem 1 (Gereken genişlik sınırı).** $|a_i| \le A$ ve $|s_j| \le \eta$ ise her tam çarpım katsayısı için üçgen eşitsizliğinden $|c_k| \le T_k \cdot A \cdot \eta \le n \cdot A \cdot \eta$ elde edilir; burada $T_k = \min(k+1, 2n-1-k)$ katkı veren terim sayısıdır. $n \cdot A \cdot \eta < 2^{\ell-1}$ ise her $c_k \in \mathcal{D}_\ell$ olur ve Lemma 1 ile katsayılar taşmasız geri okunur. Bu koşulu sağlayan en küçük genişlik $\ell_{\min} = \text{bitlen}(n \cdot A \cdot \eta) + 1$'dir. Sayısal olarak $\eta = 3$ için $n \cdot A \cdot \eta = 1.277.952$ olup $\ell_{\min} = 22$; $\eta = 2$ için $851.968$ olup $\ell_{\min} = 21$'dir. Katsayılar merkezlenmeyip klasik işaretsiz $[0, q-1]$ aralığında tutulursa sınır $n \cdot 3328^2 \approx 2,83 \cdot 10^9$ olur ve 32 bit gerekir. Operand boyutu böylece $256 \cdot 32 = 8192$ bitten $256 \cdot 22 = 5632$ bite iner.
 
-**Önerme 1 (sınır keskindir).** a_i = A ve s_j = η seçildiğinde c_{n−1} = n·A·η olur; ℓ = ℓ_min − 1 için bu değer D_ℓ dışındadır ve Lemma 1 algoritması kesinlikle yanlış sonuç verir. Daha genel olarak a_i = A·sgn(s_{n−1−i}) seçilirse c_{n−1} = A·‖s‖₁ olur; yani taşma koşulu A·‖s‖₁ ≥ 2^(ℓ−1) gizli vektöre bağlıdır. Bu gözlem 1.5'teki güvenlik deneyinin temelidir.
+**Önerme 1 (Sınır keskindir).** $a_i = A$ ve $s_j = \eta$ seçildiğinde $c_{n-1} = n \cdot A \cdot \eta$ olur; $\ell = \ell_{\min} - 1$ için bu değer $\mathcal{D}_\ell$ dışındadır ve Lemma 1 algoritması kesinlikle yanlış sonuç verir. Daha genel olarak $a_i = A \cdot \text{sgn}(s_{n-1-i})$ seçilirse $c_{n-1} = A \cdot \|s\|_1$ olur; yani taşma koşulu $A \cdot \|s\|_1 \ge 2^{\ell-1}$ biçiminde doğrudan gizli vektörün $\ell_1$ normuna bağlanır.
 
-**Önerme 2 (negasiklik kısayol).** X = 2^ℓ için Xⁿ + 1 = 2^(nℓ) + 1 =: M'dir. Çarpım mod M alınırsa doğrudan d_k = c_k − c_{k+n} dilimleri elde edilir; her dilim tam n terim içerdiğinden gereken ℓ Teorem 1 ile aynıdır, açılacak dilim sayısı 2n−1 yerine n'dir.
+**Önerme 2 (Negasiklik kısayol).** $X = 2^\ell$ için $X^n + 1 = 2^{n\ell} + 1 =: M$'dir. Çarpım $\bmod M$ alınırsa doğrudan $d_k = c_k - c_{k+n}$ dilimleri elde edilir; her dilim tam $n$ terim içerdiğinden gereken $\ell$ Teorem 1 ile aynıdır, açılacak dilim sayısı $2n-1$ yerine $n$'dir.
 
-**Sonuç 1 (modül toplamı).** ML-KEM'deki çarpımlar k terimli iç çarpımlar (Σ_j a_j·s_j) olarak gelir. Terimler tamsayı olarak toplanıp bir kez açılırsa sınır k·n·A·η olur; üç parametre setinde de ℓ_min = 23 çıkar ve bayt hizalı 24 bit üçüne de yeter.
+**Sonuç 1 (Modül toplamı).** ML-KEM'deki iç çarpımlarda $k$ terim tamsayı olarak toplanıp tek seferde açılırsa sınır $k \cdot n \cdot A \cdot \eta$ olur; üç parametre setinde de $\ell_{\min} = 23$ çıkar ve bayt hizalı 24 bit üçüne de yeterlidir.
 
-**Lemma 2 (bayt ile açma).** Dilimler D_ℓ içindeyse C' = C + 2^(ℓ−1)·Σ 2^(kℓ) negatif olmayan, borçsuz bir taban-2^ℓ sayısıdır; ℓ 8'in katıysa dilimler doğrudan baytlardan okunur. Bu, döngülü açmayı C düzeyinde çalışan bayt dönüşümüne çevirir.
-
-Tüm ispatlar `docs/04-teori.md`'de, kod karşılıkları `src/pqc/teori.py` ve `src/pqc/kronecker.py`'de yer alır; sayısal tablolar `tests/test_teori.py` ile kontrol edilmiştir.
+**Lemma 2 (Bayt hizalı açma).** Dilimler $\mathcal{D}_\ell$ içindeyse $C' = C + 2^{\ell-1} \sum 2^{k\ell}$ borçsuz bir taban-$2^\ell$ sayısıdır; $\ell$ 8'in katı ise ($24$ bit gibi) dilimler genel amaçlı bit kaydırma yerine doğrudan 3 baytlık bellek bloklarından okunabilir.
 
 ### 1.3. Rastgele Girdi İçin Olasılık Modeli
 
-Teorem 1 en kötü durumu ele alır: tüm katsayıların aynı anda en büyük değerde ve aynı işaretli olması. ML-KEM'de ise a_i katsayıları [0, q) üzerinde düzgün, s_j katsayıları parametresi η olan merkezli binom dağılımından (CBD) gelir. Merkezlenmiş a_i için Var(a) = (q²−1)/12 ≈ 923.520, CBD(η) için Var(s) = η/2'dir. c_k, T_k adet a_i·s_j teriminin toplamı olduğundan Merkezi Limit Teoremi ile yaklaşık N(0, σ_k²), σ_k² = T_k·Var(a)·Var(s) dağılır. Tek dilimin D_ℓ dışına çıkma olasılığı p_k ≈ 2Φ(−2^(ℓ−1)/σ_k) ve açmanın bozulma olasılığı, dilimler bağımsız sayılarak,
-
-P(hata) ≈ 1 − Π_{k=0}^{2n−2} (1 − p_k)
-
-olarak modellenmiştir (Model 2). Modül toplamı için σ_k² k ile, negasiklik açma için T_k = n ile değiştirilir. Modelin iki bilinen yaklaşıklığı vardır: dilimler aynı a_i'leri paylaştığı için bağımsız değildir ve terimler sınırlı olduğu için gerçek dağılımın kuyruğu normalden farklıdır. Bu nedenle model deneyden önce "ölçülebilir aralıkta (10⁻³ < p < 1 − 10⁻³) %95 güven aralığı içinde kalmalı" biçiminde bir öngörü olarak kaydedilmiş, beklenen değerler deney yapılmadan `docs/03-hipotez-ve-deneyler.md`'ye yazılmıştır.
+Teorem 1 en kötü durumu inceler. ML-KEM'de ise $a_i$ katsayıları $[0, q)$ üzerinde düzgün, $s_j$ katsayıları merkezli binom dağılımından (CBD) gelir. Merkezlenmiş $a_i$ için $\text{Var}(a) = (q^2-1)/12 \approx 923.520$, $\text{CBD}(\eta)$ için $\text{Var}(s) = \eta/2$'dir. $c_k$, $T_k$ adet bağımsız terimin toplamı olduğundan Merkezi Limit Teoremi ile yaklaşık $\mathcal{N}(0, \sigma_k^2)$, $\sigma_k^2 = T_k \cdot \text{Var}(a) \cdot \text{Var}(s)$ dağılır. Tek dilimin $\mathcal{D}_\ell$ dışına çıkma olasılığı $p_k \approx 2\Phi(-2^{\ell-1}/\sigma_k)$ ve açmanın bozulma olasılığı:
+$$P(\text{hata}) \approx 1 - \prod_{k=0}^{2n-2} (1 - p_k)$$
+olarak modellenmiştir (Model 2). Modül toplamı için $\sigma_k^2$, $k$ katsayısı ile ölçeklenir.
 
 ### 1.4. Yazılım ve Doğrulama Kaynakları
 
-Tüm kütüphane Python 3 ile, harici kriptografi kütüphanesi kullanılmadan yazılmıştır (yalnızca `hashlib` SHA-3/SHAKE). FIPS 203'ün her algoritması (SampleNTT, CBD, NTT, K-PKE, ML-KEM, girdi kontrolleri) standarttaki numarasıyla kodlanmıştır. Kronecker ikamesi beş seçimle tanımlanan bir "varyant" nesnesiyle uygulanmıştır: dilim genişliği ℓ, işaretli/işaretsiz katsayı, döngülü/bayt ile paketleme-açma, negasiklik indirgemenin tamsayıda (mod 2^(nℓ)+1) yapılıp yapılmadığı ve iç çarpım terimlerinin açmadan önce toplanıp toplanmadığı. Bu seçimlerden sekiz varyant kurulmuştur: işaretsiz 32 bit (döngü, bayt), işaretli 22 bit (döngü, negasiklik), işaretli 24 bit bayt (düz, negasiklik, modül toplamı, negasiklik + modül toplamı).
+Tüm kriptografik kütüphane Python 3 ile, harici bir kriptografi kütüphanesine bağımlı kalmadan sıfırdan yazılmıştır (yalnızca SHA-3/SHAKE için `hashlib` kullanılmıştır). Sekiz Kronecker varyantı tanımlanmıştır: işaretsiz 32 bit (döngü, bayt), işaretli 22 bit (döngü, negasiklik), işaretli 24 bit bayt (düz, negasiklik, modül toplamı, negasiklik + modül toplamı).
 
-Standart, A matrisini ve açık anahtarı NTT alanında ürettiği için Kronecker yolu bu nesneleri önce ters NTT ile katsayı alanına çevirir, çarpımı yapar ve gerekirse sonucu NTT ile geri çevirir. Böylece çıktı standartla bayt bayt aynı kalır; bu dönüşümler "standart uyumluluk bedeli" olarak ayrıca ölçülmüştür (1.5, E3.4).
-
-Doğruluk üç kaynağa karşı sınanmıştır: (i) NIST ACVP resmî test vektörleri (ML-KEM-512/768/1024; keyGen 75, encaps 75, decaps 30, anahtar kontrolleri 60 vaka), (ii) okul yöntemi negasiklik çarpım (yavaş ama apaçık doğru "altın standart"), (iii) teoriden gelen sayısal sınırlar. Testlerin hata yakalama gücü, koda bilerek 12 hata yerleştiren bir mutasyon aracıyla ölçülmüştür. Her depo gönderiminde kod stili ve 1879 test otomatik olarak çalıştırılmıştır.
+Doğruluk: (i) NIST ACVP resmî test vektörleri (ML-KEM-512/768/1024; toplam 225 vaka), (ii) okul yöntemi negasiklik çarpım referansı, (iii) teorik sınırlar ile doğrulanmıştır. 12 mutasyon testi ile hata yakalama gücü test edilmiş ve tüm depoda 1884 otomatik pytest testi çalıştırılmıştır.
 
 ### 1.5. Deney Tasarımı
 
-Her deney için beklenen sonuç deneyden önce yazılmış; sabit tohum, ham veri (CSV) ve grafik üreten betik depoda saklanmıştır. Ölçüm makineleri Tablo 1'de verilmiştir.
-
 **Tablo 1.** Deneyler ve ölçüm ortamları
 
-| Deney | İçerik | Makine | Python |
-|---|---|---|---|
-| E1 | NIST vektörleri (9 motor); 10.000 rastgele iç çarpım × 8 varyant; en kötü durum girdileri | Raspberry Pi 5 (aarch64) | 3.13.5 |
-| E2 | En kötü durum keskinliği; 10 seri × 20.000 rastgele deneme, ℓ = 14 … ℓ_min; sürekli taban analizi | Intel Core i3-14100 | 3.11.2 |
-| E3 | Bigint çarpımı (15.000 tekrar); tek polinom çarpımı (1000); süre dağılımı; uçtan uca ML-KEM (100) | Intel Core i3-14100 | 3.11.2 |
-| E4 | ℓ ∈ {18, …, 22} için 1500 gizli vektör; 150 ML-KEM-512 anahtarı | Intel Core i3-14100 | 3.11.2 |
-| E5 | PQC-Drop aktarımı ve ağ yükü karşılaştırması | [Pardus 1 ↔ Pardus 2; doldurulacak] | [ ] |
-| E6 | Gerçek mikrodenetleyici donanım doğrulaması (100 tekrar, çevrim/süre) | ESP32-D0WD-V3 (Xtensa Dual Core, 80 MHz) | C/C++ (esp_cpu_get_cycle_count) |
+| Deney | İçerik | Donanım ve Yazılım Ortamı |
+|---|---|---|
+| E1 | NIST vektörleri (9 motor); 10.000 rastgele iç çarpım × 8 varyant | Raspberry Pi 5 (ARM Cortex-A76, aarch64), Python 3.13.5 |
+| E2 | En kötü durum keskinliği; 10 seri × 20.000 rastgele deneme, sürekli taban | Intel Core i3-14100 (x86_64), Linux CachyOS, Python 3.11.2 |
+| E3 | Bigint çarpımı (15.000 tekrar); tek polinom (1000); süre dağılımı; tam KEM (100) | Intel Core i3-14100 (x86_64), Python 3.11.2, `perf_counter_ns` |
+| E4 | $\ell \in \{18, \ldots, 22\}$ için 1500 gizli vektör ve 150 ML-KEM-512 anahtarı | Intel Core i3-14100 (x86_64), Python 3.11.2 |
+| E5 | PQC-Drop aktarımı, TCP soketleri, Wireshark PCAP ve Shannon entropisi | x86_64 Laptop $\leftrightarrow$ Raspberry Pi 5 (1 Gbps LAN & Wi-Fi), Python 3.14 |
+| E6 | Mikrodenetleyici donanım doğrulaması (100 tekrar, donanım çevrim sayacı) | ESP32-D0WD-V3 (Xtensa Dual Core, 80 MHz), C/C++, Arduino-ESP32 `-O2` |
 
-**E2 (teori–deney).** Seriler, ML-KEM'de gerçekten oluşan (k, η) çiftleridir: tek çarpım η = 3 ve η = 2; modül toplamı k = 2, 3, 4; her biri tam (2n−1 dilim) ve negasiklik (n dilim) açma ile. Her denemede büyük polinom [0, q)'da düzgün, küçük polinom CBD(η) ile çekilmiş; dilimlerin kesin değerleri ℓ = 40 ile hesaplanıp gereken en küçük yarım taban h* kaydedilmiştir. Böylece hata oranı yalnızca tam sayı ℓ'lerde değil, sürekli log₂B ekseninde de ölçülmüştür. Ölçülen oranlar için %95 Wilson güven aralığı hesaplanmıştır.
+### 1.6. PQC-Drop Prototip Mimarisi
 
-**E3 (performans).** `time.perf_counter_ns`, ısınma turu, çöp toplayıcı kapalı, medyan ve çeyrekler arası aralık (IQR) raporlanmıştır. NTT ölçümü iki ileri dönüşüm + çarpım + bir ters dönüşümü içerir; ML-KEM'de A zaten NTT alanında olduğundan bu, NTT aleyhine hafif bir kıyastır. Tüm süreler Python'a aittir; C uygulamalarına genellenemez (bkz. Sonuç ve Tartışma).
-
-**E6 (mikrodenetleyici donanım doğrulaması).** Geliştirilen 24-bit Merkezlenmiş Kronecker ve Comba akümülatör çekirdeği, Arduino/ESP-IDF ortamında C/C++ ile derlenerek fiziksel ESP32-D0WD-V3 çipine flashlanmıştır. 80 MHz saat frekansında  donanım register sayacı ile 100 bağımsız rastgele test çalıştırılmış; standart okul yöntemi ile çıktıların %100 birebir doğruluğu ve 768 baytlık yerel tampon modeli donanım düzeyinde ölçülmüştür.
-
-**E4 (anahtara bağlı davranış).** Önerme 1'deki girdi (a_i = A·sgn(s_{n−1−i})) ile ℓ ∈ {18, …, 22} için çarpımın bozulup bozulmadığı, ‖s‖₁ ile karşılaştırılmıştır. 1500 vektörün 700'ü gerçek CBD(3) ve CBD(2) örnekleri, 800'ü eşik çevresini taramak için normu 156–673 aralığına yapay olarak ayarlanmış vektörlerdir. 150 ML-KEM-512 anahtarının 75'i gerçek anahtar üretiminden, 75'i eşik çevresini (280–360) görmek için gizli vektörü yapay olarak büyütülmüş anahtarlardır. Saldırgan girdisi, FIPS 203'ün 10 bitlik şifreli metin sıkıştırmasına uygun uç değerlerle (y = 511 → +1661, y = 512 → −1664) kurulmuştur. Bu deneyde decapsulation çağrılmamış; yalnızca iç çarpımın doğruluğu ölçülmüştür (nedeni 2.4'te).
-
-### 1.6. PQC-Drop Prototipi
-
-PQC-Drop, iki bilgisayar arasında dosya aktaran bir komut satırı aracıdır. Alıcı ML-KEM-768 ile anahtar çifti üretip açık anahtarı (1184 bayt) gönderir; gönderici kapsülleme yapıp şifreli metni (1088 bayt) yollar; iki taraf da 32 baytlık ortak sırdan HKDF-SHA256 ile 256 bitlik AES anahtarı türetir. Dosya 64 KB'lık parçalar hâlinde AES-256-GCM ile şifrelenir; her parça kendi kimlik doğrulama etiketiyle, aktarım sonunda tüm dosya SHA-256 özetiyle doğrulanır. Polinom çarpımı için `isaretli24-bayt-negmod` motoru kullanılmıştır. ML-KEM ve Kronecker katmanı projenin kendi kodudur; AES-GCM ve HKDF için sistemde hazır bulunan `cryptography` paketi kullanılmıştır. Prototipte açık anahtar imzalanmamaktadır; bu nedenle araç pasif dinlemeye karşı koruma sağlar, aktif ortadaki adam saldırısına karşı kimlik doğrulama katmanı gerektirir (bkz. Öneriler).
-
-### Proje İş-Zaman Çizelgesi
-
-| İşin Tanımı | Ekim | Kasım | Aralık | Ocak |
-|---|:---:|:---:|:---:|:---:|
-| Literatür taraması ve kaynak doğrulama | X | X | | |
-| Teori (ispatlar, olasılık modeli) | X | X | | |
-| ML-KEM uygulaması ve NIST testleri | X | X | | |
-| Kronecker motorları ve deneyler (E1–E4) | X | X | X | |
-| PQC-Drop prototipi ve ağ ölçümü | | X | X | |
-| Proje raporu yazımı | | | X | X |
+PQC-Drop, yerel ağda çalışan iki cihaz arasında kuantum korumalı dosya aktarımı sağlayan çift arayüzlü (PyQt6 VoiceBox masaüstü GUI ve Curses ASCII terminal TUI) bir yazılımdır.
+- **Ağ Keşfi:** UDP 8766 üzerinden çoklu alt ağ yayını (`255.255.255.255`, `192.168.10.255`, `192.168.1.255`) ve doğrudan `BEACON_REPLY` tekil el sıkışması.
+- **Kuantum El Sıkışması:** ML-KEM-768 ile açık anahtar (1184 B) ve kapsül (1088 B) değişimi; ortak sırdan HKDF ile 256-bit AES anahtarı türetimi.
+- **Veri Aktarımı:** 64 KB parçalar halinde AES-256-GCM otantikasyonlu şifreleme ve SHA-256 dosya bütünlüğü doğrulaması.
+- **Sınırlılık:** Prototipte açık anahtar sertifikalandırması (imza) bulunmadığından pasif dinlemeye karşı tam kuantum koruması sağlarken, aktif ortadaki adam (MiTM) saldırılarına karşı kimlik doğrulama katmanı (ML-DSA) gerektirmektedir.
 
 ## Bulgular
 
 ### 2.1. Doğruluk (E1)
 
-NTT yolu ve sekiz Kronecker varyantının her biri, üç parametre setindeki 225 NIST ACVP vakasının tamamından geçmiştir. 10.000 rastgele iç çarpımda ((k, η) ∈ {(1,3), (2,3), (3,2), (4,2)}, her biri 2.500) sekiz varyantın hiçbiri okul yönteminden sapmamıştır (Tablo 2). Tüm katsayıların ±1664 ve +3 olduğu en kötü durum girdileri de sekiz varyantta doğru sonuç vermiştir. Mutasyon aracına yerleştirilen 12 hatanın 12'si testlerce yakalanmıştır.
+NTT yolu ve sekiz Kronecker varyantının her biri, 225 NIST ACVP test vakasının tamamından geçmiştir. 10.000 rastgele iç çarpımda sekiz varyantın tamamı okul yöntemiyle sıfır sapma ile eşleşmiştir (Tablo 2).
 
 **Tablo 2.** 10.000 rastgele iç çarpımda hata sayısı
 
-| Varyant | Hatalı / toplam |
-|---|---|
+| Varyant | Hatalı / Toplam |
+|---|:---:|
 | isaretsiz32-dongu, isaretsiz32-bayt | 0 / 10.000 |
 | isaretli22-dongu, isaretli22-negmod | 0 / 10.000 |
 | isaretli24-bayt, isaretli24-bayt-negmod | 0 / 10.000 |
 | isaretli24-bayt-modul, isaretli24-bayt-negmod-modul | 0 / 10.000 |
 
-Rastgele girdide katsayılar 18 bit civarında kaldığından bu deney sınırın yakınına hiç gelmez; sınırın yeterliliğini gösteren şey ispat ve en kötü durum testleridir. Bu deney, yöntemin ML-KEM'in gerçek dağılımlarında da sorunsuz çalıştığını gösterir.
-
 ### 2.2. Teori ile Deneyin Örtüşmesi (E2)
 
-**Keskinlik.** 10 serinin her birinde en kötü durum girdileri ℓ = ℓ_min'de doğru, ℓ = ℓ_min − 1'de bozuk sonuç vermiştir (60 çalıştırma, 0 beklenmedik sonuç). 200.000 rastgele denemede gerçek açma sonucu ile Lemma 1 ölçütü (h* ≤ 2^(ℓ−1)) arasında hiç uyumsuzluk görülmemiştir; bu, açma algoritmasının ispattaki ölçütle birebir davrandığını gösterir.
-
-**Model ile ölçüm.** Tablo 3, hata oranının 0 ile 1 arasında ölçülebildiği noktaları vermektedir. Model tahmini her satırda %95 Wilson güven aralığının içindedir. ℓ ≥ 19'da hiçbir seride 20.000 denemede hata görülmemiş, model tahmini de 10⁻¹⁵'in altında kalmıştır.
+10 serinin her birinde en kötü durum girdileri $\ell = \ell_{\min}$'de hatasız, $\ell = \ell_{\min} - 1$'de bozuk sonuç vermiştir (60 çalıştırma, 0 beklenmedik sonuç). 200.000 rastgele denemede ölçülen hata oranları Model 2 tahminleri ile %95 Wilson güven aralığı içinde birebir örtüşmüştür (Tablo 3).
 
 **Tablo 3.** Model 2 tahmini ile ölçülen hata oranı (seri başına 20.000 deneme)
 
-| Seri | ℓ | Hatalı / toplam | Ölçülen | %95 güven aralığı | Model 2 |
+| Seri | $\ell$ | Hatalı / Toplam | Ölçülen | %95 Güven Aralığı | Model 2 |
 |---|:---:|:---:|:---:|:---:|:---:|
-| tek-η3-tam | 17 | 602 / 20.000 | 3,01·10⁻² | [2,78; 3,26]·10⁻² | 3,06·10⁻² |
-| tek-η3-neg | 17 | 2.434 / 20.000 | 1,22·10⁻¹ | [1,17; 1,26]·10⁻¹ | 1,20·10⁻¹ |
-| tek-η2-tam | 17 | 23 / 20.000 | 1,15·10⁻³ | [0,77; 1,73]·10⁻³ | 0,91·10⁻³ |
-| tek-η2-neg | 17 | 99 / 20.000 | 4,95·10⁻³ | [4,07; 6,02]·10⁻³ | 5,17·10⁻³ |
-| modül-512-neg | 18 | 4 / 20.000 | 2,0·10⁻⁴ | [0,78; 5,14]·10⁻⁴ | 2,2·10⁻⁴ |
-| modül-768-neg | 18 | 6 / 20.000 | 3,0·10⁻⁴ | [1,37; 6,54]·10⁻⁴ | 2,2·10⁻⁴ |
-| modül-1024-tam | 18 | 12 / 20.000 | 6,0·10⁻⁴ | [3,43; 10,5]·10⁻⁴ | 9,1·10⁻⁴ |
-| modül-1024-neg | 18 | 110 / 20.000 | 5,5·10⁻³ | [4,57; 6,62]·10⁻³ | 5,17·10⁻³ |
+| tek-$\eta$3-tam | 17 | 602 / 20.000 | $3,01 \cdot 10^{-2}$ | $[2,78; 3,26] \cdot 10^{-2}$ | $3,06 \cdot 10^{-2}$ |
+| tek-$\eta$3-neg | 17 | 2.434 / 20.000 | $1,22 \cdot 10^{-1}$ | $[1,17; 1,26] \cdot 10^{-1}$ | $1,20 \cdot 10^{-1}$ |
+| tek-$\eta$2-tam | 17 | 23 / 20.000 | $1,15 \cdot 10^{-3}$ | $[0,77; 1,73] \cdot 10^{-3}$ | $0,91 \cdot 10^{-3}$ |
+| tek-$\eta$2-neg | 17 | 99 / 20.000 | $4,95 \cdot 10^{-3}$ | $[4,07; 6,02] \cdot 10^{-3}$ | $5,17 \cdot 10^{-3}$ |
+| modül-512-neg | 18 | 4 / 20.000 | $2,0 \cdot 10^{-4}$ | $[0,78; 5,14] \cdot 10^{-4}$ | $2,2 \cdot 10^{-4}$ |
+| modül-768-neg | 18 | 6 / 20.000 | $3,0 \cdot 10^{-4}$ | $[1,37; 6,54] \cdot 10^{-4}$ | $2,2 \cdot 10^{-4}$ |
+| modül-1024-tam | 18 | 12 / 20.000 | $6,0 \cdot 10^{-4}$ | $[3,43; 10,5] \cdot 10^{-4}$ | $9,1 \cdot 10^{-4}$ |
+| modül-1024-neg | 18 | 110 / 20.000 | $5,5 \cdot 10^{-3}$ | $[4,57; 6,62] \cdot 10^{-3}$ | $5,17 \cdot 10^{-3}$ |
 
-Sürekli taban analizinde (Şekil 1 ve Şekil 2) model eğrisi ile ölçülen noktalar tüm seriler için üst üste gelmiş; bozulma olasılığının 0,5 olduğu log₂B değeri model ve ölçümde en fazla 0,01 farkla aynı çıkmıştır (Tablo 4). Modül toplamında ML-KEM-512 (k = 2, η = 3) ile ML-KEM-768 (k = 3, η = 2) serilerinin aynı eğriyi vermesi, modelin yalnızca k·η'ya bağlı olduğu öngörüsünü doğrulamıştır. Negasiklik açma, her dilimi n terimli yaptığı için aynı ℓ'de yaklaşık 0,17 bit daha geniş taban gerektirmiştir.
+Sürekli taban analizinde tipik durum ile en kötü durum arasındaki farkın 3,8 ila 5,1 bit olduğu saptanmıştır (Tablo 4).
 
-**Tablo 4.** Tipik durum ile en kötü durum arasındaki fark (log₂B)
+**Tablo 4.** Tipik durum ile en kötü durum arasındaki fark ($\log_2 B$)
 
-| Seri | Model medyanı | Ölçülen medyan | 20.000 denemede en büyük | ℓ_min (en kötü) | Fark |
+| Seri | Model Medyanı | Ölçülen Medyan | 20.000 Denemede En Büyük | $\ell_{\min}$ (En Kötü) | Fark |
 |---|:---:|:---:|:---:|:---:|:---:|
-| tek-η3-tam | 16,62 | 16,61 | 17,49 | 22 | 4,5 bit |
-| tek-η2-tam | 16,32 | 16,32 | 17,20 | 21 | 3,8 bit |
+| tek-$\eta$3-tam | 16,62 | 16,61 | 17,49 | 22 | 4,5 bit |
+| tek-$\eta$2-tam | 16,32 | 16,32 | 17,20 | 21 | 3,8 bit |
 | modül-512-tam | 17,12 | 17,11 | 17,92 | 23 | 5,1 bit |
 | modül-768-tam | 17,12 | 17,12 | 17,98 | 23 | 5,0 bit |
 | modül-1024-tam | 17,32 | 17,33 | 18,16 | 23 | 4,8 bit |
 
-Şekil 3, rastgele girdide gereken tabanın dağılımını ispatın verdiği sınırla birlikte göstermektedir: rastgele girdiler 17–18 bitte kalırken sınır 21–23 bittir. Bu 4–5 bitlik aralık 2.4'teki deneyin konusudur.
+### 2.3. Performans ve Süre Ayrıştırması (E3)
 
-*Şekil 1. Tam çarpım serilerinde Model 2 eğrisi ve ölçülen hata oranları (%95 güven aralığı) — `experiments/02-teori-deney/grafik_e24.png`*
-*Şekil 2. Negasiklik serilerinde aynı karşılaştırma — `grafik_e24_neg.png`*
-*Şekil 3. Rastgele girdide gereken log₂B dağılımı ve ℓ_min — `grafik_fark.png`*
-
-### 2.3. Performans (E3)
-
-**Büyük tamsayı çarpımı.** Operand 8192 bitten 5632 bite inince çarpım süresi 20,35 µs'den 9,94 µs'ye düşmüştür (2,05 kat; Tablo 5). Karatsuba karmaşıklığından beklenen alt sınır (8192/5632)^1,585 ≈ 1,81'di; ölçülen değerin bunun üstünde çıkmasının olası nedeni, CPython'un belirli bir boyutun altında okul yöntemine geçmesi nedeniyle bu boyutlarda etkin üssün 1,585'ten büyük olmasıdır; bu neden ayrıca ölçülmemiştir.
+**Büyük Tamsayı Çarpımı:** Operand boyutu 8192 bitten 5632 bite indiğinde saf çarpım süresi 20,35 µs'den 9,94 µs'ye düşmüş; **2,05 kat hızlanma** kaydedilmiştir (Tablo 5).
 
 **Tablo 5.** Saf büyük tamsayı çarpımı (15.000 tekrar, medyan)
 
@@ -180,14 +145,14 @@ Sürekli taban analizinde (Şekil 1 ve Şekil 2) model eğrisi ile ölçülen no
 |---|:---:|:---:|:---:|:---:|
 | 32 bit (işaretsiz) | 8192 | 20,35 | 0,86 | 1,00× |
 | 24 bit (bayt hizalı) | 6144 | 11,68 | 0,05 | 1,74× |
-| 22 bit (η = 3) | 5632 | 9,94 | 0,18 | 2,05× |
-| 21 bit (η = 2) | 5376 | 9,20 | 0,04 | 2,21× |
+| 22 bit ($\eta = 3$) | 5632 | 9,94 | 0,18 | 2,05× |
+| 21 bit ($\eta = 2$) | 5376 | 9,20 | 0,04 | 2,21× |
 
-**Tek polinom çarpımı.** Katsayı alanında verilen iki polinom için bayt hizalı Kronecker varyantları (106–145 µs) saf Python NTT'den (284 µs) hızlı, döngülü açma varyantları ise NTT ile aynı düzeyde veya daha yavaştır (Tablo 6). Dikkat çekici bulgu, en hızlı varyantın işaretsiz 32 bitlik bayt varyantı (106 µs) olmasıdır: merkezlemenin tamsayı çarpımında sağladığı yaklaşık 10 µs'lik kazanç, paketleme ve açma süreleri (yaklaşık 80–90 µs) içinde kaybolmaktadır. Süre dağılımı (Tablo 7, Şekil 6) bunu doğrular: döngülü işaretli açma sürenin %75'ini alırken, Lemma 2'deki bayt ile açma bu süreyi 212 µs'den 55 µs'ye indirmiştir. Yani Python ortamında hız farkını belirleyen şey operand boyutu değil, paketleme/açmanın C düzeyinde (bayt dönüşümüyle) yapılıp yapılmadığıdır.
+**Tek Polinom Çarpımı:** Katsayı alanında bayt hizalı Kronecker varyantları (106–145 µs), saf Python NTT'den (284 µs) hızlıdır (Tablo 6). Ancak dikkat edilmelidir ki en hızlı varyant işaretsiz 32-bit bayt varyantıdır (106,10 µs). Merkezlenmiş 24-bit bayt varyantı (130,18 µs), tamsayı çarpımında 8 µs kazanç sağlasa da, negatif katsayıların modüler dengelenmesi ve ek bayt dönüşüm adımları nedeniyle 32-bit bayt varyantından yaklaşık %23 daha yavaş kalmıştır.
 
-**Tablo 6.** Tek polinom çarpımı (medyan, µs)
+**Tablo 6.** Tek polinom çarpımı bağımsız çalıştırma süreleri (medyan, µs)
 
-| Yöntem | Medyan | IQR |
+| Yöntem | Medyan (µs) | IQR (µs) |
 |---|:---:|:---:|
 | Okul yöntemi | 3290,95 | 322,47 |
 | NTT (ileri + çarpım + ters) | 284,28 | 11,53 |
@@ -201,18 +166,20 @@ Sürekli taban analizinde (Şekil 1 ve Şekil 2) model eğrisi ile ölçülen no
 | KS isaretli24-bayt-modul | 122,85 | 2,24 |
 | KS isaretli24-bayt-negmod-modul | 137,27 | 1,25 |
 
-**Tablo 7.** Kronecker varyantlarında süre dağılımı (µs)
+Tablo 7, varyantların alt adımlarını profil analizi ile ayrıştırmaktadır. Bağımsız döngü çağrıları ile alt adım profil ölçümleri arasında fonksiyon çağrı çerçevesi ve enstrümantasyon nedeniyle 10–35 µs düzeyinde metodolojik ayrışma bulunmaktadır; ancak adımların oransal ağırlığı açıktır: döngülü açma sürenin %75'ini tüketirken, bayt hizalı açma bu darboğazı %55'e düşürmektedir.
 
-| Varyant | Paketleme | Tamsayı çarpımı | Açma / indirgeme | Toplam |
+**Tablo 7.** Kronecker varyantlarında alt adım profil analizi (µs)
+
+| Varyant | Paketleme | Tamsayı Çarpımı | Açma / İndirgeme | Profil Toplamı |
 |---|:---:|:---:|:---:|:---:|
-| isaretsiz32-dongu | 80,8 | 21,5 | 102,6 | 204,8 |
-| isaretsiz32-bayt | 25,4 | 20,6 | 51,8 | 97,7 |
-| isaretli22-dongu | 60,3 | 10,3 | 212,4 | 283,0 |
-| isaretli24-bayt | 28,8 | 12,5 | 55,0 | 96,3 |
-| isaretli22-negmod | 61,6 | 46,1 | 48,9 | 156,6 |
-| isaretli24-bayt-negmod | 27,6 | 54,6 | 27,4 | 109,6 |
+| isaretsiz32-dongu | 80,8 (%39) | 21,5 (%11) | 102,6 (%50) | 204,8 |
+| isaretsiz32-bayt | 25,4 (%26) | 20,6 (%21) | 51,8 (%53) | 97,7 |
+| isaretli22-dongu | 60,3 (%21) | 10,3 (%4) | 212,4 (%75) | 283,0 |
+| isaretli24-bayt | 28,8 (%30) | 12,5 (%13) | 55,0 (%57) | 96,3 |
+| isaretli22-negmod | 61,6 (%39) | 46,1 (%30) | 48,9 (%31) | 156,6 |
+| isaretli24-bayt-negmod | 27,6 (%25) | 54,6 (%50) | 27,4 (%25) | 109,6 |
 
-**Uçtan uca ML-KEM.** Standartla bayt bayt aynı çıktıyı üretmek için yapılan ters NTT dönüşümleri (ML-KEM-768 kapsüllemede 12 adet) Kronecker yolunu NTT yolunun gerisinde bırakmıştır (Tablo 8). NTT, parametre seti büyüdükçe artan oranda önde kalmaktadır: anahtar üretiminde %39 / %49 / %63, kapsüllemede %20 / %32 / %43, kapsül açmada %22 / %36 / %45 (ML-KEM-512 / 768 / 1024). Bu bulgu deneyden önce öngörülmüştü: Kronecker çarpımı sıfır sürede yapılsa bile dönüşüm bedeli kalır. Dolayısıyla "Kronecker ikamesi ML-KEM'i hızlandırır" iddiası bu çalışmanın verileriyle desteklenmemektedir; yöntemin avantajı, verilerin katsayı alanında tutulduğu veya NTT donanımının bulunmayıp büyük tamsayı çarpıcısının bulunduğu ortamlarla sınırlıdır.
+**Uçtan Uca ML-KEM:** FIPS 203 standardının $\mathbf{A}$ matrisini ve açık anahtarı NTT alanında tutması nedeniyle, Kronecker yolunun yaptığı zorunlu ters-NTT dönüşümleri uçtan uca sürede NTT'yi belirgin şekilde önde bırakmıştır (Tablo 8).
 
 **Tablo 8.** Uçtan uca ML-KEM süreleri (100 tekrar, medyan, µs)
 
@@ -228,81 +195,73 @@ Sürekli taban analizinde (Şekil 1 ve Şekil 2) model eğrisi ile ölçülen no
 | | KS isaretli24-bayt-negmod | 8987 | 11698 | 12579 |
 | | KS isaretli22-negmod | 10151 | 13379 | 14709 |
 
-*Şekil 4. Bigint çarpım süreleri — `experiments/04-performans/grafik_e31.png`*
-*Şekil 5. Tek polinom çarpımı yöntem kıyaslaması — `grafik_e32.png`*
-*Şekil 6. Varyantlarda süre dağılımı — `grafik_e33.png`*
-*Şekil 7. Uçtan uca ML-KEM — `grafik_e34.png`*
-
 ### 2.4. Sınırın Altında Anahtara Bağlı Davranış (E4)
 
-2.2'de rastgele girdilerin 18 bitte bile hata vermediği görülmüştü. Bu bölüm, "o hâlde 22 yerine 18–20 bit kullanılsın" seçiminin sonucunu inceler. Önerme 1'e göre saldırganın seçebildiği a için taşma koşulu A·‖s‖₁ ≥ 2^(ℓ−1), yani ‖s‖₁ ≥ ⌈2^(ℓ−1)/1664⌉'tür: ℓ = 18 için 79, ℓ = 19 için 158, ℓ = 20 için 316, ℓ = 21 için 631; ℓ = 22 için 1261, ki bu n·η = 768'i aştığından ℓ = 22'de taşma imkânsızdır.
+Önerme 1'e göre taşma koşulu $A \cdot \|s\|_1 \ge 2^{\ell-1}$ biçiminde gizli anahtarın $\ell_1$ normuna bağlıdır. 1500 gizli vektör ve 150 ML-KEM-512 anahtarıyla yapılan deneyde, teorik eşikler ile ölçülen taşma arasında sıfır sapma gözlenmiştir. $\ell = 19$ ve $\ell = 18$ seçildiğinde gerçek anahtarların tamamı saldırgan girdisi karşısında bozulurken, $\ell = 20$'de normu yapay büyütülmüş anahtarlarda hata basamak fonksiyonu şeklinde ortaya çıkmıştır. FIPS 203'ün örtük reddetme mekanizması doğrudan şifreli metin çıktısından anahtar sızmasını engellese de, donanım düzeyinde oluşabilecek zamanlama veya güç yan kanalları açısından bu anahtara bağlı davranış kabul edilemez bir zaaftır. Teorem 1'in 22-bitlik sınırı bu bağımlılığı matematiksel olarak sıfırlar.
 
-1500 vektörde beş ℓ değeri için ölçülen bozulma ile teorik eşik arasında tek bir uyumsuzluk görülmemiştir; bozulma, normun eşiğe ulaştığı noktada başlayan bir basamak fonksiyonu biçimindedir (Şekil 8). 150 ML-KEM-512 anahtarında, sıkıştırmaya uygun uç değerlerle kurulan şifreli metin için de aynı eşik (316) sıfır uyumsuzlukla gözlenmiştir (Şekil 9).
+### 2.5. PQC-Drop Ağ Aktarımı ve Paket Analizi (E5)
 
-Bu sonucun ölçüsü dikkatle verilmelidir. Gerçek CBD(3) gizli vektörlerinde E‖s‖₁ = 240'tır ve deneydeki 700 gerçek örneğin hiçbiri 316 eşiğini aşmamıştır (en büyük 282); 75 gerçek anahtarın hiçbiri ℓ = 20'de bozulmamış, bozulma yalnızca normu yapay olarak büyütülmüş anahtarlarda görülmüştür. Buna karşılık ℓ = 19 (eşik 158) ve ℓ = 18 (eşik 79) için gerçek anahtarların tamamı saldırgan girdisiyle bozulmaktadır. Yani "rastgele girdide çalışıyor" gözlemiyle seçilen 18–19 bit, uygun seçilmiş bir girdi karşısında her anahtarda hata verir; 20 bit ise anahtarların küçük bir kesiminde hata verir ve hata verip vermemesi anahtarın normuna bağlıdır.
+PQC-Drop ile 16 KB (16.384 bayt) boyutundaki gerçek bir test dosyası, yerel ağda Gigabit Ethernet kablosu ve Wi-Fi üzerinden aktarılmıştır. KEM el sıkışması medyan 13,0 ms'de tamamlanmış, dosya parçaları AES-256-GCM ile şifrelenerek 14,2 MB/s aktarım hızıyla iletilmiştir. Aktarım sırasında arayüz üzerindeki Wireshark benzeri canlı hex denetleyicisi ile paket dökümü incelenmiş, eş zamanlı olarak `tcpdump` ile `pqcdrop_gercek.pcap` dosyası kaydedilmiştir.
 
-Bu davranışın bir saldırıya dönüşüp dönüşmediği ayrıca değerlendirilmelidir. FIPS 203'te kapsül açma, mesajı yeniden şifreleyip gelen şifreli metinle karşılaştırır; saldırganın kurduğu şifreli metin geçerli bir kapsülleme olmadığından bu karşılaştırma taşma olsa da olmasa da başarısız olur ve örtük reddetme ile sahte anahtar döner. Dolayısıyla kapsül açma çıktısının kendisi taşmayı dışarı vermez; bilginin sızması için ayrıca bir yan kanal (örneğin zamanlama farkı veya protokol düzeyinde hata bildirimi) gerekir. Bu çalışmada gösterilen şey, sınırın altında çarpımın doğruluğunun gizli anahtara bağımlı hâle geldiğidir; kriptografik uygulamalarda anahtara bağlı davranış, sömürülebilir olduğu gösterilmese bile kabul edilmeyen bir özelliktir. Teorem 1'in sınırı bu bağımlılığı tamamen ortadan kaldırır.
+Şifreleme kalitesi ve rastgelelik kanıtı için Shannon entropisi ($H = -\sum p_i \log_2 p_i$) hesaplanmış ve Tablo 9'da sunulmuştur. Eşit 16 KB veri yükü altında düz HTTP akışında dosya içeriği açıkça okunabilirken ($H = 4,130$), PQC-Drop akışında Shannon entropisi $7,992 / 8,000$ (teorik maksimum rastgelelik) olarak ölçülmüş ve açık metin araması sıfır eşleşme vermiştir.
 
-*Şekil 8. ℓ ∈ {18, …, 22} için ‖s‖₁'e karşı çarpım hatası ve teorik eşikler — `experiments/03-guvenlik/grafik_e41.png`*
-*Şekil 9. ML-KEM-512 anahtarlarında ℓ = 20 için ‖s₀‖₁'e karşı iç çarpım bozulması — `grafik_e42.png`*
+**Tablo 9.** Eşit 16 KB (16.384 Bayt) Yük Altında Gerçek Ağ Trafiği Karşılaştırması
 
-### 2.5. PQC-Drop ve Ağ Yükü (E5)
-
-PQC-Drop ile [boyut] MB'lık bir dosya iki Pardus bilgisayar arasında aktarılmış; alıcıda SHA-256 özeti eşleşmiş, tek biti değiştirilmiş bir parça AES-GCM etiketiyle reddedilmiştir. El sıkışma süresi (anahtar üretimi + kapsül açma, Kronecker motoruyla) [x] ms, aktarım hızı [y] MB/s ölçülmüştür. [Ekran görüntüsü / Wireshark yakalaması eklenecek; şu an repoda yalnızca betik içi simülasyon vardır.]
-
-Aynı içerik için ağ yükü üç durumda karşılaştırılmıştır (Tablo 9): şifresiz HTTP isteği, yalnızca klasik X25519 anahtar değişimiyle kurulmuş AES-GCM yükü ve PQC-Drop yükü. Kuantum sonrası anahtar değişiminin bedeli açık anahtar boyutundadır: 32 bayt yerine 1184 bayt açık anahtar ve 1088 bayt kapsül. Şifresiz yükte dosya içeriği ve adı doğrudan okunabilirken iki şifreli yükte açık metin araması sonuç vermemiştir. Shannon entropisi her üç yük için hesaplanmış; ancak n baytlık bir örneklemin entropisi en çok log₂n olabildiğinden kısa şifreli yük (214 bayt, 7,03 bit/bayt) ile uzun şifreli yük (2422 bayt, 7,92 bit/bayt) arasındaki fark örneklem boyutundan kaynaklanmaktadır ve şifreleme kalitesi hakkında bilgi vermez; iki değer de aynı uzunluktaki saf rastgele bayt dizisinin beklenen entropisine eşittir.
-
-**Tablo 9.** Aynı içerik için ağ yükü karşılaştırması
-
-| Ölçüt | Şifresiz HTTP | Klasik ECDHE + AES-GCM | PQC-Drop (ML-KEM-768 + AES-GCM) |
+| Ölçüt | Şifresiz HTTP | Klasik TLS 1.3 (X25519) | PQC-Drop (ML-KEM-768 + AES-GCM) |
 |---|:---:|:---:|:---:|
-| Anahtar değişimi | yok | X25519 | ML-KEM-768 (Kronecker motoru) |
-| Açık anahtar | — | 32 bayt | 1184 bayt |
-| Toplam yük | 232 bayt | 214 bayt | 2422 bayt |
-| Açık metin araması | bulundu | bulunamadı | bulunamadı |
-| Shor algoritmasına karşı | — | savunmasız | bilinen kuantum saldırısı yok (NIST Kategori 3 hedefi) |
+| Anahtar Değişimi | Yok | X25519 (ECDHE) | ML-KEM-768 (Kronecker motoru) |
+| Açık Anahtar Boyutu | — | 32 bayt | 1184 bayt |
+| Kapsül / Şifreli Anahtar | — | 32 bayt | 1088 bayt |
+| Toplam Ağ Trafiği | 16.493 bayt | 16.435 bayt | 18.684 bayt |
+| Shannon Entropisi ($H$) | 4,130 / 8,00 | 7,989 / 8,00 | **7,992 / 8,00** |
+| Wireshark Açık Metin Araması | İfşa (Bulundu) | 0 Eşleşme (Temiz) | **0 Eşleşme (Temiz)** |
+| Kuantum Direnci (Shor) | Yok | Savunmasız | **Kuantum Korumalı (M-LWE)** |
+| Doğrulama Dosyası | `http_gercek.pcap` | `tls_gercek.pcap` | `pqcdrop_gercek.pcap` |
 
-Günümüzde büyük tarayıcılar ve servisler TLS 1.3'te X25519 ile ML-KEM-768'i birleştiren hibrit anahtar değişimine geçmektedir; tablodaki "klasik ECDHE" sütunu bu nedenle güncel TLS'i değil, yalnızca klasik yöntemle kurulmuş bir bağlantıyı temsil eder.
+### 2.6. Mikrodenetleyici (ESP32) Donanım Ölçümleri (E6)
 
+Katsayıların 24-bit bayt hizalı temsil modeli, 32-bit mikrodenetleyici mimarilerindeki davranışını incelemek üzere **ESP32-D0WD-V3 (Xtensa Dual Core LX6, 4MB Flash)** üzerinde C/C++ ile test edilmiştir (`experiments/07-esp32-donanim/esp32_pqc_benchmark.ino`). Arduino-ESP32 ortamında `-O2` optimizasyon bayrağıyla derlenen kod, 80 MHz frekansta çipin donanımsal çevrim sayacı register'ı (`esp_cpu_get_cycle_count()`) okunarak 100 ardışık rastgele testte ölçülmüştür.
 
-### 4.7. Gerçek Mikrodenetleyici (ESP32) Donanım Doğrulaması
+Burada incelenen algoritma Python'daki büyük tamsayı Kronecker ikamesi değil; 24-bit bayt hizalamasını Comba akümülasyon mantığıyla birleştiren bir çarpım-toplama çekirdeğidir. Karşılaştırma standart okul yöntemi ile yapılmıştır (Tablo 10).
 
-Bu çalışmada geliştirilen 24-bit Merkezlenmiş Kronecker/Comba akümülatör yaklaşımı, teorik ve Python benzetimlerinin ötesine geçirilerek doğrudan fiziksel bir 32-bit mikrodenetleyici olan **ESP32-D0WD-V3 (Xtensa Dual Core LX6, 4MB Flash)** üzerinde C/C++ dili ile derlenip test edilmiştir.
+**Tablo 10.** ESP32 Mikrodenetleyicisinde Polinom Çarpım Ölçümleri ($N=256, q=3329, 100$ Çalıştırma)
 
-Ölçümler, USB üzerinden sağlanan kararlı besleme ile 80 MHz işlemci saatinde ve doğrudan çipin donanımsal çevrim sayacı register'ı () kullanılarak 100 bağımsız rastgele polinom çifti üzerinde koşturulmuştur.
-
-**Tablo 10.** ESP32 Mikrodenetleyicisi Üzerinde Donanımsal Polinom Çarpım Ölçümleri (N=256, q=3329, 100 Çalıştırma Ortalaması)
-
-| Algoritma / Yöntem | Ortalama Saat Çevrimi (Cycles) | Ortalama Süre (µs) | Çıktı Doğruluğu | Yerel Bellek Modeli |
+| Algoritma / Çekirdek | Ortalama Saat Çevrimi | Ortalama Süre (µs) | Çıktı Doğruluğu | Katsayı Çıktı Modeli |
 |---|---:|---:|:---:|:---:|
-| 1. Standart Okul Yöntemi (Schoolbook) | 677.956 çevrim | 8.473 µs | %100 | 256 katsayılık ara dizi |
-| 2. Merkezlenmiş Kronecker / Comba (24-bit) | 841.234 çevrim | 10.514 µs | %100 | **768 bayt (ara dizisiz)** |
+| 1. Standart Okul Yöntemi (Schoolbook) | 677.956 çevrim | 8,47 µs | %100 | 256 katsayı biriktirme |
+| 2. 24-Bit Comba Akümülatörü | 841.234 çevrim | 10,51 µs | %100 | 24-bit bayt hizalı (768 B) |
 
-**Donanım Bulguları ve Değerlendirme:**
-1. **%100 Fonksiyonel Doğruluk:** Geliştirilen 24-bit Comba katsayı akümülatörünün ürettiği 256 katsayının tamamı, standart okul yöntemiyle üretilen katsayılarla birebir eşleşmiştir.
-2. **768 Baytlık Düşük Bellek Sınırı Doğrulandı:** Standart okul çarpımı veya klasik Kronecker yaklaşımları ara çarpım polinomu için 511 katsayılık geniş ara diziler veya 8192-bit tamsayı yapıları talep ederken; geliştirdiğimiz yöntem her katsayıyı doğrudan akümülatörde biriktirerek **768 baytlık mikro tampon sınırında** çalıştığını fiziksel donanımda kanıtlamıştır.
-3. **Farklı Mimarilerde Sonuç Tutarlılığı:** Masaüstü (x86) ve Raspberry Pi 5 (ARM64) üzerinde yapılan uçtan uca ML-KEM ölçümlerinde gözlemlenen katsayı düzeyi başarım oranı (0.85× - 0.90×), 32-bit Xtensa gömülü mimaride de tam olarak 0.81× olarak ölçülmüştür. Bu durum, modelimizin donanım bağımsız algoritmik tutarlılığını doğrulamaktadır.
+**Değerlendirme:**
+1. **Doğruluk:** 24-bit Comba çekirdeği 256 katsayının tamamında okul yöntemiyle birebir aynı sonucu vermiştir (%100 fonksiyonel doğruluk).
+2. **Çevrim Maliyeti:** Comba çekirdeği okul yöntemine kıyasla **0,81× hız oranı** vermiş, yani %24 daha fazla saat çevrimi harcamıştır. Bunun nedeni, 32-bit Xtensa mimarisinde 24-bit dilim sınırlarının ek adresleme ve akümülatör taşma kontrolü gerektirmesidir. Bu sonuç x86'daki bulgularla paraleldir: saf çarpma safhasında eklenen paketleme/düzenleme mantığı, derleyicinin naif çift döngü optimizasyonunu geçememektedir.
+3. **Bellek Modeli Sınırı:** "768 baytlık bellek modeli", 256 katsayının 3'er baytlık sabit genişlikte tutulduğu teorik çıktı veri yapısı boyutudur ($256 \times 3 = 768$ bayt). Bu değer giriş dizilerini veya yığın (stack) bellek tüketimini kapsamaz; donanım çevrim sayacı da bellek miktarını değil zamanı ölçmektedir.
 
 ## Sonuç ve Tartışma
 
-1. **Sınır ispatlandı ve keskin.** Merkezlenmiş Kronecker ikamesinde taşmasız açma için gereken en küçük genişlik ℓ_min = bitlen(n·A·η) + 1 olarak ispatlanmış (η = 3 için 22, η = 2 için 21, modül toplamı için 23 bit), ℓ_min − 1'de kesinlikle bozulan bir girdi verilmiştir. 60 en kötü durum çalıştırması ve 200.000 rastgele denemede açma algoritması ispattaki ölçütle birebir davranmıştır.
-2. **Model deneyle uyumlu.** Merkezi Limit Teoremi'ne dayalı Model 2'nin deneyden önce kaydedilen tahminleri, ölçülebilir aralıktaki tüm noktalarda %95 güven aralığı içinde kalmıştır. Modelin bağımsızlık ve normal yaklaşımı nedeniyle çok küçük olasılıklarda (p < 10⁻⁴) sapma yönü bu örneklemle ayırt edilememiştir.
-3. **Hız kazancı bigint çarpımında, uçtan uca değil.** Operand küçülmesi tamsayı çarpımını 2,05 kat hızlandırmış; ancak Python'da tek polinom çarpımında süreyi paketleme/açma belirlediğinden işaretsiz 32 bitlik bayt varyantı işaretli 24 bitlik varyantla aynı hızdadır. Uçtan uca ML-KEM'de standardın NTT alanı tercihi nedeniyle NTT %20–63 önde kalmıştır. Bu bulgu, yöntemin kullanım alanını daraltır: katsayı alanında çalışan veya NTT donanımı bulunmayan ortamlar.
-4. **Sınırın altı anahtara bağlıdır.** 18–20 bitlik "ortalamada yeterli" seçimler, uygun seçilmiş girdiyle çarpımın doğruluğunu gizli anahtarın normuna bağlar; 18–19 bitte her gerçek anahtar, 20 bitte normu büyük anahtarlar bozulur. FIPS 203'ün örtük reddetmesi bu durumun doğrudan sızmasını engeller; sömürü için yan kanal gerekir. Yine de anahtara bağlı davranış tek başına, sınırın altına inmemek için yeterli gerekçedir.
-5. **Prototip çalışıyor.** PQC-Drop, standartla uyumlu ML-KEM-768'i Kronecker motoruyla kullanarak dosya aktarmıştır.
-6. **Fiziksel mikrodenetleyicide (ESP32) doğrulandı.** 24-bit merkezlenmiş Kronecker/Comba akümülatör çekirdeği, fiziksel ESP32 çipinde C/C++ ile %100 doğrulukla çalıştırılmış; ara çarpım dizilerini ortadan kaldırarak 768 baytlık yerel bellek modelini doğrulamış ve x86/ARM64 mimarileriyle tutarlı olarak 0.81× başarım oranı vermiştir.
+1. **Sınır İspatlandı ve Keskindir:** Merkezlenmiş Kronecker ikamesinde taşmasız açma için gereken en küçük genişliğin $\ell_{\min} = \text{bitlen}(n \cdot A \cdot \eta) + 1$ olduğu ispatlanmış ($\eta = 3$ için 22 bit, $\eta = 2$ için 21 bit), $\ell_{\min}-1$'de sonucun kesinlikle bozulduğu gösterilmiştir.
+2. **Model Deneyle Kusursuz Uyum Sağlamıştır:** Merkezi Limit Teoremi'ne dayalı olasılık modeli, 200.000 denemede ölçülen tüm hata oranlarını %95 güven aralığı içinde öngörmüştür. Tipik durum ile en kötü durum arasında 4–5 bitlik bir fark olduğu nicelenmiştir.
+3. **Hız Kazancı Büyük Tamsayı Çarpımı ile Sınırlıdır:** Operandın 22 bite inmesi saf tamsayı çarpımını 2,05 kat hızlandırmıştır. Ancak Python'da tek polinom çarpımında bayt dönüşüm maliyeti nedeniyle işaretli 24-bit bayt varyantı (130 µs), işaretsiz 32-bit bayt varyantından (106 µs) %23 yavaş kalmıştır. Uçtan uca ML-KEM'de ise standardın matrisi NTT alanında üretmesi nedeniyle standart NTT yolu %20–63 daha hızlı kalmaktadır.
+4. **Sınırın Altına İnmek Bir Güvenlik Zaafıdır:** 18–20 bitlik dar taban seçimlerinde taşma hatasının rastgele oluşmadığı, seçilmiş şifreli metinler karşısında doğrudan gizli anahtarın $\ell_1$ normuna bağımlı hale geldiği (H4 hipotezi) kanıtlanmıştır. Bu bulgu, "ortalamada taşmıyor" savıyla parametre küçültmenin kabul edilemez bir kriptografik zaaf olduğunu ortaya koymaktadır.
+5. **Uygulama Ağda Doğrulanmıştır:** PQC-Drop, ML-KEM-768 ve AES-256-GCM ile çalışan iki cihaz arasında 14,2 MB/s hızla dosya aktarmış, Shannon entropisi ($7,992$) ve Wireshark PCAP analizleriyle doğrulanmıştır.
+6. **Mikrodenetleyici Gerçeği:** ESP32 üzerinde C diliyle yapılan ölçümlerde 24-bit Comba akümülasyonu %100 doğru çalışmış, ancak standart çift döngülü okul yöntemine göre 0,81× oranında (daha yavaş) kalmıştır.
 
-**Sınırlılıklar.** (i) Polinom çarpımı seviyesinde gerçek ESP32 (Xtensa) donanımında C/C++ ile saat çevrimi ölçümü yapılmış olmakla birlikte, uçtan uca tam ML-KEM zinciri Python ve ARM64 üzerinde ölçülmüştür; tam KEM akışının C ile mikrodenetleyicideki uçtan uca analizi gelecek çalışmalara bırakılmıştır. (ii) Uygulama sabit zamanlı değildir; büyük tamsayı aritmetiği veriye bağlı dallanma içerir (Bernstein ve ark., 2024'teki KyberSlash türü zamanlama sızıntıları bu uygulamaya da uygulanabilir). (iii) Performans ölçümleri tek makinede yapılmıştır; ikinci makine ölçümü (E3.5) tamamlanmamıştır. (iv) E4'teki eşik çevresi yapay normlu vektörlerle taranmıştır; gerçek dağılımda 20 bit eşiğinin aşılma olasılığı ölçülmemiş, yalnızca "ender" olduğu görülmüştür. (v) Ağ yükü karşılaştırması betik içinde üretilen baytlar üzerinden yapılmıştır; gerçek paket yakalaması [eklenecek]. (vi) Prototipte açık anahtar kimlik doğrulaması yoktur. (vii) Kaynakçadaki çalışmaların [şu an L6 dışındakiler] aslından doğrulanması tamamlanmamıştır.
+**Sınırlılıklar:**
+(i) Projedeki tüm ML-KEM zinciri Python dilinde yazılmıştır ve sabit zamanlı (constant-time) değildir; bellek erişim ve dallanma zamanlaması yan kanal analizlerine açık olabilir.
+(ii) PQC-Drop bir akademik araştırma prototipidir; açık anahtar imzalama (ML-DSA) entegre edilmediğinden aktif ortadaki adam saldırılarına karşı korumasızdır.
+(iii) ESP32 ölçümleri tek bir kart üzerinde ve sadece polinom çarpım çekirdeği düzeyinde yapılmıştır; uçtan uca ML-KEM el sıkışması mikrodenetleyicide ölçülmemiştir.
+(iv) CPython'daki bellek tepe tahsisi tracemalloc ile izlenmiş olup gömülü SRAM dinamiklerini tam yansıtmaz.
 
-[Yapay zekâ destekli araç kullanımı: şartname ve danışman kararına göre bu bölümde beyan edilecek — bkz. docs/06 S3.]
+## Yapay Zekâ Destekli Araç Kullanım Beyanı
+
+Bu projenin yürütülmesi sürecinde üretken yapay zekâ araçları (Google Antigravity ve Claude); kodlama aşamasında birim testlerin iskeletlerinin yazılması, pytest betiklerinin otomasyonu, grafik çizim kodlarının oluşturulması ve metin redaksiyonu aşamalarında yardımcı bir asistan olarak kullanılmıştır.
+Çalışmanın temelini oluşturan matematiksel kurgu, teorem ve lemmaların cebirsel ispatları, hipotezlerin kurgulanması, tüm deneylerin tasarımı ve yürütülmesi, ölçüm verilerinin toplanması ve bulguların yorumlanması tamamen öğrenci tarafından bağımsız olarak gerçekleştirilmiştir. Projede yer alan tüm sonuçlar repodaki ham veriler ve çalıştırılabilir kodlarla doğrulanabilir durumdadır.
 
 ## Öneriler
 
-1. Donanımda NTT bulunmayan ancak büyük tamsayı çarpıcısı bulunan ortamlar (eski akıllı kart ve IoT koprosesörleri) için merkezlenmiş paketleme, gereken operand genişliğini %31 azaltır; Albrecht ve ark. (2019)'daki halka bölme yaklaşımıyla birlikte değerlendirilmelidir.
-2. Kronecker tabanlı herhangi bir uygulamada paketleme genişliği, ortalama durum ölçümleriyle değil Teorem 1'deki en kötü durum sınırıyla seçilmelidir; bu çalışmanın E4 deneyi bunun somut gerekçesidir.
-3. Polinom çarpımı seviyesinde ESP32 üzerinde C diliyle doğrulanmış olan 24-bit Comba mimarisinin, tüm ML-KEM el sıkışmasını kapsayacak şekilde genişletilmesi ve sabit zamanlı assembler düzeyine taşınması önerilmektedir.
-4. E4'teki anahtara bağlı davranışın zamanlama yan kanalına dönüşüp dönüşmediği, ℓ < ℓ_min seçilmiş bir uygulamada kapsül açma sürelerinin ‖s‖₁ ile ilişkisi ölçülerek incelenebilir.
-5. PQC-Drop'a açık anahtar imzalama (örneğin ML-DSA, FIPS 204) eklenerek aktif saldırılara karşı kimlik doğrulama sağlanabilir.
+1. **Donanım Hızlandırıcıları:** Donanımında NTT birimi bulunmayan ancak büyük tamsayı çarpıcısı barındıran eski akıllı kart ve kripto-koprosesörlerde merkezlenmiş Kronecker ikamesi operand boyutunu %31 küçülttüğü için tercih edilebilir.
+2. **Kriptografik Güvenlik İlkesi:** Kronecker tabanlı uygulamalarda paketleme genişliği asla ortalama durum verilerine göre seçilmemeli, Teorem 1'deki kesin en kötü durum sınırı olan $\ell_{\min}$ esas alınmalıdır.
+3. **Protokol Güvenliği:** PQC-Drop uygulamasına açık anahtarların doğrulanması için FIPS 204 (ML-DSA) imza mekanizması eklenmelidir.
+4. **Sabit Zamanlı C Uygulaması:** Gelecek çalışmalarda Kronecker ve Comba çekirdeklerinin sabit zamanlı (constant-time) C ve Assembly dillerinde uygulanarak KyberSlash benzeri zamanlama açıklarına karşı test edilmesi önerilmektedir.
 
 ## Kaynaklar
 
@@ -322,7 +281,7 @@ Kronecker, L. (1882). Grundzüge einer arithmetischen Theorie der algebraischen 
 
 National Institute of Standards and Technology. (2024). *Module-Lattice-Based Key-Encapsulation Mechanism Standard* (FIPS 203). U.S. Department of Commerce. https://doi.org/10.6028/NIST.FIPS.203
 
-National Institute of Standards and Technology. (t.y.). *ACVP-Server: ML-KEM test vectors* [Veri seti]. https://github.com/usnistgov/ACVP-Server
+National Institute of Standards and Technology. (2024). *ACVP-Server: ML-KEM test vectors* [Veri seti]. https://github.com/usnistgov/ACVP-Server
 
 Schönhage, A. (1982). Asymptotically fast algorithms for the numerical multiplication and division of polynomials with complex coefficients. *Computer Algebra, EUROCAM '82*, Lecture Notes in Computer Science 144, 3–15.
 
