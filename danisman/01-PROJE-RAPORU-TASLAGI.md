@@ -83,12 +83,17 @@ Doğruluk: (i) NIST ACVP resmî test vektörleri (ML-KEM-512/768/1024; toplam 22
 | E5 | PQC-Drop aktarımı, TCP soketleri, Wireshark PCAP ve Shannon entropisi | x86_64 Laptop $\leftrightarrow$ Raspberry Pi 5 (1 Gbps LAN & Wi-Fi), Python 3.14 |
 | E6 | Mikrodenetleyici donanım doğrulaması (100 tekrar, donanım çevrim sayacı) | ESP32-D0WD-V3 (Xtensa Dual Core, 80 MHz), C/C++, Arduino-ESP32 `-O2` |
 
-### 1.6. PQC-Drop Prototip Mimarisi
+### 1.6. PQC-Drop Prototip Mimarisi ve Taşınabilir Kullanıcı Arayüzü
 
-PQC-Drop, yerel ağda çalışan iki cihaz arasında kuantum korumalı dosya aktarımı sağlayan çift arayüzlü (PyQt6 VoiceBox masaüstü GUI ve Curses ASCII terminal TUI) bir yazılımdır.
-- **Ağ Keşfi:** UDP 8766 üzerinden çoklu alt ağ yayını (`255.255.255.255`, `192.168.10.255`, `192.168.1.255`) ve doğrudan `BEACON_REPLY` tekil el sıkışması.
-- **Kuantum El Sıkışması:** ML-KEM-768 ile açık anahtar (1184 B) ve kapsül (1088 B) değişimi; ortak sırdan HKDF ile 256-bit AES anahtarı türetimi.
-- **Veri Aktarımı:** 64 KB parçalar halinde AES-256-GCM otantikasyonlu şifreleme ve SHA-256 dosya bütünlüğü doğrulaması.
+PQC-Drop, yerel ağda çalışan iki cihaz arasında kuantum korumalı dosya aktarımı sağlayan, çift form faktörlü (Masaüstü PyQt6 GUI ve Başsız Curses ASCII TUI) ve kurulumsuz taşınabilir (standalone) bir sistem olarak geliştirilmiştir.
+
+- **Ağ Keşfi ve Radar (UDP 8766):** Yerel ağdaki PQC cihazlarını otomatik olarak keşfetmek için çoklu alt ağ yayını (`255.255.255.255`, `192.168.10.255`, `192.168.1.255`) ve router kısıtlamalarına takılmayan anında tekil el sıkışma (`BEACON_REPLY`) mimarisi kurulmuştur. Cihazlar kullanıcı dostu isimlerle listelenir ve tek tıkla ağdan gizlenebilen **Gizli Mod (Stealth Mode)** desteği sunulur.
+- **Kuantum El Sıkışması ve Şifreleme:** Alıcı ve gönderici arasında ML-KEM-768 ile açık anahtar (1184 B) ve şifreli kapsül (1088 B) aktarılır; türetilen 32 baytlık ortak sırdan HKDF-SHA256 ile 256-bit AES anahtarı oluşturulur. Dosya verisi 64 KB'lık parçalar hâlinde AES-256-GCM ile şifrelenir ve SHA-256 özetiyle bütünlük doğrulaması yapılır.
+- **Çift Kullanıcı Arayüzü (Dual-UI) ve VoiceBox Tasarım Sistemi:** 
+  1. *Masaüstü Grafik Arayüzü (PyQt6 VoiceBox GUI):* 0px keskin kenarlıklar, yüksek kontrastlı monokrom editoryal dergi estetiği (`#0A0A0A` zemin, `#FAFAFA` kartlar ve `#EF4444` kırmızı vurgu) ile tasarlanmıştır. Üç editoryal sekme barındırır: Aktarım & Ağ Denetimi, Literatür & Rakip Kıyaslama ve "Nasıl Çalışır?" 9. Sınıf İnteraktif Simülatörleri (23² binom elde aktarımı, 256 vagon tren/saat modulo ve H4 güvenlik açığı simülatörü).
+  2. *Terminal ASCII Arayüzü (Curses TUI):* Raspberry Pi 5 ve sunucu SSH oturumları gibi grafik ekranı (X11/Wayland) bulunmayan başsız ortamlarda çalışan, klavye kısayollu (`[S]` gönder, `[V]` görünürlük, `[R]` yenile) hafif kontrol paneli.
+- **Wireshark Benzeri Canlı Paket & Entropi Denetçisi:** Aktarım sırasında ağdan geçen tüm paketlerin (`PQC_PUBKEY`, `PQC_CIPHERTEXT`, `AES_GCM_CHUNK`, `SHA256_VERIFY`) 16-bayt Hex ve ASCII dökümü canlı olarak listelenir. Hesaplanan anlık **Shannon Entropisi ($H \ge 7,95 / 8,00$)** ile taşınan baytların düz metin olmadığı ve tam rastgelelik taşıdığı kullanıcıya ve jüriye görsel olarak ispatlanır.
+- **Tek Tıkla Taşınabilir Dağıtım (Standalone Portable Release - v1.0.0):** Sistemin jüri veya son kullanıcı tarafından Python, PyQt6 veya harici bağımlılık kurulumu gerektirmeden tek tıkla denenebilmesi için PyInstaller ile derlenmiş bağımsız Linux x86_64 ikili paketi (`pqc-drop-v1.0.0-linux-x86_64.tar.gz`) hazırlanmış ve GitHub Releases üzerinde resmi v1.0.0 sürümü olarak yayınlanmıştır (`./run-gui.sh` veya `./pqcdrop-gui`).
 - **Sınırlılık:** Prototipte açık anahtar sertifikalandırması (imza) bulunmadığından pasif dinlemeye karşı tam kuantum koruması sağlarken, aktif ortadaki adam (MiTM) saldırılarına karşı kimlik doğrulama katmanı (ML-DSA) gerektirmektedir.
 
 ## Bulgular
@@ -199,11 +204,15 @@ Tablo 7, varyantların alt adımlarını profil analizi ile ayrıştırmaktadır
 
 Önerme 1'e göre taşma koşulu $A \cdot \|s\|_1 \ge 2^{\ell-1}$ biçiminde gizli anahtarın $\ell_1$ normuna bağlıdır. 1500 gizli vektör ve 150 ML-KEM-512 anahtarıyla yapılan deneyde, teorik eşikler ile ölçülen taşma arasında sıfır sapma gözlenmiştir. $\ell = 19$ ve $\ell = 18$ seçildiğinde gerçek anahtarların tamamı saldırgan girdisi karşısında bozulurken, $\ell = 20$'de normu yapay büyütülmüş anahtarlarda hata basamak fonksiyonu şeklinde ortaya çıkmıştır. FIPS 203'ün örtük reddetme mekanizması doğrudan şifreli metin çıktısından anahtar sızmasını engellese de, donanım düzeyinde oluşabilecek zamanlama veya güç yan kanalları açısından bu anahtara bağlı davranış kabul edilemez bir zaaftır. Teorem 1'in 22-bitlik sınırı bu bağımlılığı matematiksel olarak sıfırlar.
 
-### 2.5. PQC-Drop Ağ Aktarımı ve Paket Analizi (E5)
+### 2.5. PQC-Drop Ağ Aktarımı, Paket Analizi ve Taşınabilir Kullanılabilirlik (E5)
 
-PQC-Drop ile 16 KB (16.384 bayt) boyutundaki gerçek bir test dosyası, yerel ağda Gigabit Ethernet kablosu ve Wi-Fi üzerinden aktarılmıştır. KEM el sıkışması medyan 13,0 ms'de tamamlanmış, dosya parçaları AES-256-GCM ile şifrelenerek 14,2 MB/s aktarım hızıyla iletilmiştir. Aktarım sırasında arayüz üzerindeki Wireshark benzeri canlı hex denetleyicisi ile paket dökümü incelenmiş, eş zamanlı olarak `tcpdump` ile `pqcdrop_gercek.pcap` dosyası kaydedilmiştir.
+PQC-Drop ile 16 KB (16.384 bayt) boyutundaki gerçek bir test dosyası, yerel ağda Gigabit Ethernet kablosu ve Wi-Fi üzerinden aktarılmıştır. UDP 8766 radarı her iki cihazı milisaniyeler içinde karşılıklı keşfetmiş; KEM el sıkışması medyan 13,0 ms'de tamamlanmış, dosya parçaları AES-256-GCM ile şifrelenerek 14,2 MB/s aktarım hızıyla alıcıya ulaştırılmıştır. 
+
+Aktarım sırasında Masaüstü VoiceBox GUI ve Curses TUI arayüzlerindeki Wireshark benzeri canlı hex denetleyicisi ile paketlerin 16-bayt Hex/ASCII dökümü incelenmiş, eş zamanlı olarak `tcpdump` ile `pqcdrop_gercek.pcap` dosyası kaydedilmiştir.
 
 Şifreleme kalitesi ve rastgelelik kanıtı için Shannon entropisi ($H = -\sum p_i \log_2 p_i$) hesaplanmış ve Tablo 9'da sunulmuştur. Eşit 16 KB veri yükü altında düz HTTP akışında dosya içeriği açıkça okunabilirken ($H = 4,130$), PQC-Drop akışında Shannon entropisi $7,992 / 8,000$ (teorik maksimum rastgelelik) olarak ölçülmüş ve açık metin araması sıfır eşleşme vermiştir.
+
+Ayrıca sistemin pratik kullanılabilirliği doğrulanmış; PyInstaller ile üretilen taşınabilir bağımsız paket (`pqc-drop-v1.0.0-linux-x86_64.tar.gz`) sayesinde hem CachyOS/Ubuntu x86_64 masaüstünde (GUI) hem de başsız Raspberry Pi 5 üzerinde (TUI) Python veya kütüphane kurulumu yapılmaksızın tek komutla (`./run-gui.sh` / `./run-tui.sh`) başarıyla çalıştığı ve dosya aktardığı sergilenmiştir.
 
 **Tablo 9.** Eşit 16 KB (16.384 Bayt) Yük Altında Gerçek Ağ Trafiği Karşılaştırması
 
