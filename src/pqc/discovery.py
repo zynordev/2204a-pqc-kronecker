@@ -12,7 +12,7 @@ import logging
 import socket
 import threading
 import time
-from typing import Callable, Dict, Optional
+from collections.abc import Callable
 
 DISCOVERY_PORT = 8766
 BROADCAST_IP = "255.255.255.255"
@@ -46,7 +46,7 @@ class DiscoveryService:
         device_name: str,
         transfer_port: int = 8787,
         discovery_port: int = DISCOVERY_PORT,
-        on_peers_updated: Optional[Callable[[Dict[str, PeerInfo]], None]] = None,
+        on_peers_updated: Callable[[dict[str, PeerInfo]], None] | None = None,
     ):
         self.device_name = device_name
         self.transfer_port = transfer_port
@@ -55,12 +55,12 @@ class DiscoveryService:
 
         self.visible = True
         self.running = False
-        self.peers: Dict[str, PeerInfo] = {}  # key: "ip:port"
+        self.peers: dict[str, PeerInfo] = {}  # key: "ip:port"
         self._lock = threading.Lock()
 
-        self._sock: Optional[socket.socket] = None
-        self._listen_thread: Optional[threading.Thread] = None
-        self._beacon_thread: Optional[threading.Thread] = None
+        self._sock: socket.socket | None = None
+        self._listen_thread: threading.Thread | None = None
+        self._beacon_thread: threading.Thread | None = None
 
     def start(self) -> None:
         if self.running:
@@ -80,7 +80,7 @@ class DiscoveryService:
             self._sock.bind(("", self.discovery_port))
             self._sock.settimeout(1.0)
         except Exception as e:
-            logging.error(f"UDP Keşif soketi açılamadı: {e}")
+            logging.getLogger(__name__).error(f"UDP Keşif soketi açılamadı: {e}")
             self.running = False
             return
 
@@ -153,7 +153,7 @@ class DiscoveryService:
                 data, addr = self._sock.recvfrom(2048)
                 sender_ip = addr[0]
                 self._handle_message(data, sender_ip)
-            except socket.timeout:
+            except TimeoutError:
                 self._cleanup_stale_peers()
             except Exception:
                 if not self.running:

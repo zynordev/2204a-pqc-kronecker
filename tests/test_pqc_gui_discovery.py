@@ -1,10 +1,12 @@
 """PQC-Drop GUI & Keşif Servisi Testleri."""
 
 import os
-import socket
 import time
-from pqc.discovery import DiscoveryService, PeerInfo
-from pqc.pqcdrop_engine import hesapla_shannon_entropisi, formatla_hex_dokum
+
+import pytest
+
+from pqc.discovery import DiscoveryService
+from pqc.pqcdrop_engine import formatla_hex_dokum, hesapla_shannon_entropisi
 
 
 def test_shannon_entropisi():
@@ -53,7 +55,10 @@ def test_discovery_service():
 
 
 def test_gui_window_headless():
+    # PyQt6 isteğe bağlı (pyproject'te dev bağımlılığı değil); yoksa test atlanır, düşmez.
+    pytest.importorskip("PyQt6")
     from PyQt6.QtWidgets import QApplication
+
     from pqc.gui import VoiceBoxPQCDropWindow
 
     # Headless / offscreen test
@@ -79,10 +84,10 @@ def test_gui_window_headless():
 
 def test_pqcdrop_engine_e2e(tmp_path):
     """SendTask ve ReceiveListener ile uçtan uca dosya aktarımı ve paket yakalama testi."""
-    from pqc.pqcdrop_engine import SendTask, ReceiveListener
+    from pqc.pqcdrop_engine import ReceiveListener, SendTask
 
     gonderilen_dosya = tmp_path / "gizli_metin.txt"
-    test_veri = "TUBITAK 2204-A Projesi Kuantum Korumali Dosya Aktarim Testi.".encode("utf-8") * 2000  # ~120 KB
+    test_veri = b"TUBITAK 2204-A Projesi Kuantum Korumali Dosya Aktarim Testi." * 2000  # ~120 KB
     gonderilen_dosya.write_bytes(test_veri)
 
     alici_dizin = tmp_path / "alici_klasor"
