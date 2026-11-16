@@ -13,11 +13,9 @@ import math
 import os
 import pathlib
 import socket
-import struct
-import sys
 import threading
 import time
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
@@ -27,8 +25,6 @@ from pqc.pqcdrop import (
     VARSAYILAN_MOTOR,
     VARSAYILAN_PARAM,
     VARSAYILAN_PORT,
-    el_sikis_alici,
-    el_sikis_gonderici,
     nonce_uret,
     recv_bytes,
     send_bytes,
@@ -104,10 +100,10 @@ class SendTask(threading.Thread):
         target_port: int = VARSAYILAN_PORT,
         param_name: str = VARSAYILAN_PARAM,
         engine_name: str = VARSAYILAN_MOTOR,
-        on_packet: Optional[Callable[[PacketEvent], None]] = None,
-        on_progress: Optional[Callable[[int, int, float], None]] = None,
-        on_status: Optional[Callable[[str, str], None]] = None,
-        on_finished: Optional[Callable[[bool, str, str], None]] = None,
+        on_packet: Callable[[PacketEvent], None] | None = None,
+        on_progress: Callable[[int, int, float], None] | None = None,
+        on_status: Callable[[str, str], None] | None = None,
+        on_finished: Callable[[bool, str, str], None] | None = None,
     ):
         super().__init__(daemon=True, name="PQC-SendTask")
         self.file_path = file_path
@@ -135,7 +131,7 @@ class SendTask(threading.Thread):
         p = PARAMETRELER[self.param_name]
 
         if self.on_status:
-            self.on_status(f"SHA-256 bütünlük özeti hesaplanıyor...", "INFO")
+            self.on_status("SHA-256 bütünlük özeti hesaplanıyor...", "INFO")
 
         hasher = hashlib.sha256()
         with open(yol, "rb") as f:
@@ -286,11 +282,11 @@ class ReceiveListener(threading.Thread):
         save_dir: str = "/home/halil/Downloads",
         param_name: str = VARSAYILAN_PARAM,
         engine_name: str = VARSAYILAN_MOTOR,
-        on_packet: Optional[Callable[[PacketEvent], None]] = None,
-        on_progress: Optional[Callable[[int, int, float], None]] = None,
-        on_status: Optional[Callable[[str, str], None]] = None,
-        on_file_received: Optional[Callable[[str, int, str], None]] = None,
-        on_port_bound: Optional[Callable[[int], None]] = None,
+        on_packet: Callable[[PacketEvent], None] | None = None,
+        on_progress: Callable[[int, int, float], None] | None = None,
+        on_status: Callable[[str, str], None] | None = None,
+        on_file_received: Callable[[str, int, str], None] | None = None,
+        on_port_bound: Callable[[int], None] | None = None,
     ):
         super().__init__(daemon=True, name="PQC-ReceiveListener")
         self.port = port
@@ -303,7 +299,7 @@ class ReceiveListener(threading.Thread):
         self.on_file_received = on_file_received
         self.on_port_bound = on_port_bound
         self.running = False
-        self._server_sock: Optional[socket.socket] = None
+        self._server_sock: socket.socket | None = None
 
     def stop(self):
         self.running = False
@@ -356,7 +352,7 @@ class ReceiveListener(threading.Thread):
         while self.running:
             try:
                 conn, addr = self._server_sock.accept()
-            except socket.timeout:
+            except TimeoutError:
                 continue
             except Exception:
                 break
@@ -378,9 +374,7 @@ class ReceiveListener(threading.Thread):
             from pqc.pqcdrop import anahtar_turet
 
             pke = KroneckerPKE(VARYANT[self.engine_name])
-            t0 = time.perf_counter()
             ek, dk = mlkem.keygen(p, pke=pke)
-            t_keygen = (time.perf_counter() - t0) * 1000
 
             # 2. ek gönder
             send_bytes(conn, ek)
@@ -397,9 +391,7 @@ class ReceiveListener(threading.Thread):
                 )
 
             # 4. K decaps
-            t0 = time.perf_counter()
             K = mlkem.decaps(dk, c, p, pke=pke)
-            t_decaps = (time.perf_counter() - t0) * 1000
 
             aes_anahtar = anahtar_turet(K)
             aes = AESGCM(aes_anahtar)

@@ -1,22 +1,17 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 TÜBİTAK 2204-A Lise Öğrencileri Araştırma Projeleri Yarışması
 Kuantum Sonrası Kriptografide Merkezlenmiş Kronecker İkamesi (ML-KEM)
 9. Sınıf Seviyesinde Sıfırdan Mantık, Formüller, Deneyler ve Jüri Savunma Master Kitabı
 """
 
-import os
-import sys
-from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, HRFlowable
-)
-from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from reportlab.platypus import HRFlowable, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 # Fontları kaydet (Türkçe karakter destekli Roboto)
 pdfmetrics.registerFont(TTFont('Roboto', '/usr/share/fonts/TTF/Roboto-Regular.ttf'))
@@ -82,7 +77,6 @@ def create_master_guide_pdf(output_path):
     C_BLUE = colors.HexColor("#1D4ED8")
     C_CYAN = colors.HexColor("#0284C7")
     C_DARK = colors.HexColor("#1E293B")
-    C_MUTED = colors.HexColor("#475569")
     C_LIGHT_BG = colors.HexColor("#F8FAFC")
     C_ICE_BG = colors.HexColor("#F0F9FF")
     C_BORDER = colors.HexColor("#CBD5E1")

@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 TÜBİTAK 2204-A Lise Araştırma Projeleri
 PQC-Kronecker — 9. Sınıf Seviyesinde Sıfırdan Proje ve Formül Öğrenim Kitabı
 """
 
-import os
-import sys
-from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, HRFlowable
-)
-from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 pdfmetrics.registerFont(TTFont('Roboto', '/usr/share/fonts/TTF/Roboto-Regular.ttf'))
 pdfmetrics.registerFont(TTFont('Roboto-Bold', '/usr/share/fonts/TTF/Roboto-Bold.ttf'))
@@ -74,7 +69,6 @@ def create_guide_pdf(output_path):
     c_blue = colors.HexColor("#1D4ED8")       # Canlı ana başlık mavisi
     c_teal = colors.HexColor("#0D9488")       # Matematik kutusu rengi
     c_amber = colors.HexColor("#D97706")      # Formül kutusu rengi
-    c_red = colors.HexColor("#DC2626")        # Güvenlik açığı rengi
     c_dark = colors.HexColor("#1E293B")       # Okuma metni
     c_bg_light = colors.HexColor("#F8FAFC")
     c_border = colors.HexColor("#E2E8F0")
@@ -110,16 +104,6 @@ def create_guide_pdf(output_path):
         keepWithNext=True
     )
 
-    h2_style = ParagraphStyle(
-        'H2',
-        fontName='Roboto-Bold',
-        fontSize=10.5,
-        leading=14,
-        textColor=colors.HexColor("#0369A1"),
-        spaceBefore=8,
-        spaceAfter=4,
-        keepWithNext=True
-    )
 
     body_style = ParagraphStyle(
         'Body',
@@ -138,13 +122,6 @@ def create_guide_pdf(output_path):
         textColor=colors.HexColor("#0F172A")
     )
 
-    analogy_style = ParagraphStyle(
-        'Analogy',
-        fontName='Roboto-Italic',
-        fontSize=8.8,
-        leading=12.5,
-        textColor=colors.HexColor("#1E1B4B")
-    )
 
     table_header = ParagraphStyle(
         'TH',

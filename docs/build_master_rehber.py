@@ -1,22 +1,17 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 TÜBİTAK 2204-A Lise Araştırma Projeleri
 PQC-Kronecker: Sıfırdan Mantık, Formül Öğrenim ve Jüri Savunma Kılavuzu (Master Birleşik Rehber)
 Öğrenci: Halil Erdem Yanık (9. Sınıf Seviyesinde Tam Anlatım)
 """
 
-import os
-import sys
-from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, HRFlowable
-)
-from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 # Fontları kaydet (Türkçe karakter destekli Roboto)
 pdfmetrics.registerFont(TTFont('Roboto', '/usr/share/fonts/TTF/Roboto-Regular.ttf'))
@@ -78,7 +73,6 @@ def create_master_guide(output_path):
     c_accent = colors.HexColor("#0369A1")     # Gökyüzü mavisi
     c_teal = colors.HexColor("#0D9488")       # Matematik kutusu rengi
     c_amber = colors.HexColor("#D97706")      # Formül kutusu rengi
-    c_red = colors.HexColor("#DC2626")        # Güvenlik açığı rengi
     c_dark = colors.HexColor("#1E293B")       # Okuma metni
     c_bg_light = colors.HexColor("#F8FAFC")
     c_bg_blue = colors.HexColor("#EFF6FF")
