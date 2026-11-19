@@ -7,7 +7,7 @@
 ## Özet
 
 İnternet üzerinden güvenli iletişim kurabilmek için tarafların ortak bir gizli anahtar oluşturması gerekir. Gelecekte yeterince güçlü kuantum bilgisayarların bazı yaygın anahtar oluşturma yöntemlerini tehdit edebilmesi, yeni yöntemlerin araştırılmasını önemli hâle getirmiştir. Bu çalışmada, kuantum sonrası güvenli iletişim için geliştirilen ML-KEM yöntemindeki bir çarpma işlemi incelenmiştir.
- Çalışma kapsamında geliştirilen yöntem, yalnızca simülasyon ortamında değil, fiziksel ESP32 (Xtensa mimarili) mikrodenetleyicisi üzerinde de donanımsal register sayaçlarıyla doğrulanmış ve 1000 bayt altı (768 B) yerel tampon modelinin kararlılığı kanıtlanmıştır.
+ Çalışma kapsamında geliştirilen yaklaşım, yalnızca simülasyon ortamında değil, fiziksel ESP32 (Xtensa mimarili) mikrodenetleyicisi üzerinde de donanımsal çevrim sayacıyla test edilmiştir. Bu deney tam ML-KEM akışını değil, merkezlenmiş katsayılarla çalışan Comba tipi polinom çarpım çekirdeğini doğrulamaktadır; 768 B değeri tüm ESP32 belleği değil, tek bir 24-bit katsayı tamponu için kuramsal boyuttur.
 
 Araştırmada Kronecker ikamesi adı verilen yöntem kullanılmıştır. Bu yöntem, birden fazla katsayıyı tek bir büyük sayıda birleştirerek çarpma yapar. Ancak katsayılara yeterli yer ayrılmazsa sonuçlar birbirine karışabilir. Çalışmanın temel sorusu, doğru sonucu koruyarak bu alanın ne kadar küçültülebileceğidir.
 
@@ -78,7 +78,7 @@ PQC-Drop, önce ML-KEM-768 ile ortak anahtar oluşturur, ardından dosyayı AES-
 
 Ağ deneyinde aynı büyüklükteki 16.384 baytlık veri, farklı aktarım biçimleriyle karşılaştırılmıştır. Kod gerçek TCP soketlerini kullanmaktadır. Bununla birlikte PCAP dosyalarındaki ağ başlıkları deney betiği tarafından oluşturulmaktadır; bu dosyalar bağımsız bir ağ dinleme aracıyla yakalanmış paketlerin kanıtı olarak değerlendirilmemiştir. İki ayrı fiziksel bilgisayardaki ölçüm ortamı ve bağımsız paket yakalama doğrulaması ayrıca belgelenmelidir.
 
-Ayrıca geliştirilen 24-bit Comba katsayı akümülatörü, C/C++ dili ile derlenerek fiziksel bir ESP32-D0WD-V3 mikrodenetleyicisine yüklenmiş; mikrodenetleyicinin donanımsal saat sayacı () ile 100 bağımsız çalıştırmada gerçek donanım çevrimleri ölçülmüştür.
+Ayrıca geliştirilen 24-bit Comba katsayı akümülatörü, C/C++ dili ile derlenerek fiziksel bir ESP32-D0WD-V3 mikrodenetleyicisine yüklenmiş; `esp_cpu_get_cycle_count()` ve `micros()` ile 100 ardışık ölçüm alınmıştır. Kodda rastgele polinom çifti başlangıçta bir kez üretildiği için bu sonuçlar 100 farklı girişin değil, aynı giriş çifti üzerindeki tekrarların ortalamasıdır. Fonksiyonel doğruluk karşılaştırması bu çalıştırma için 256 katsayının tamamında yapılmıştır.
 
 ## Proje İş-Zaman Çizelgesi
 
@@ -140,9 +140,9 @@ PQC-Drop ile incelenen çarpma yöntemi bir dosya aktarım akışına eklenmişt
 
 ### 4.7. Gerçek Mikrodenetleyici (ESP32) Donanım Doğrulaması
 
-Geliştirilen 24-bit Merkezlenmiş Kronecker ve Comba akümülatör mimarisi, simülasyonların ötesine geçilerek gerçek bir 32-bit mikrodenetleyici olan **ESP32-D0WD-V3 (Xtensa Dual Core LX6)** üzerinde C/C++ diliyle derlenip çalıştırılmıştır.
+Geliştirilen 24-bit merkezlenmiş katsayı akümülatörü ve Comba tipi negasiklik çarpım çekirdeği, simülasyonların ötesine geçilerek gerçek bir 32-bit mikrodenetleyici olan **ESP32-D0WD-V3 (Xtensa Dual Core LX6)** üzerinde C/C++ diliyle derlenip çalıştırılmıştır. Bu deney, Python'daki büyük tamsayı tabanlı Kronecker uygulamasının birebir ESP32 portu değil, aynı merkezlenmiş katsayı fikrinin donanıma uyarlanmış Comba çekirdeğidir.
 
-Ölçümlerde mikrodenetleyicinin doğrudan donanım saat register'ı () ve mikrosaniye sayacı kullanılmış, 100 ardışık çalıştırmanın ortalaması alınmıştır.
+Ölçümlerde `esp_cpu_get_cycle_count()` çevrim sayacı ve `micros()` sayacı kullanılmış, aynı polinom çifti üzerinde 100 ardışık çalıştırmanın ortalaması alınmıştır.
 
 | Yöntem | Ortalama Saat Çevrimi | Ortalama Süre (µs) | Doğruluk Oranı |
 |---|---:|---:|---:|
@@ -150,9 +150,9 @@ Geliştirilen 24-bit Merkezlenmiş Kronecker ve Comba akümülatör mimarisi, si
 | 2. Merkezlenmiş Kronecker / Comba | 841.234 çevrim | 10.514 µs | %100 |
 
 **Donanım Bulgularının Önemi:**
-1. **İki Yöntemin Çıktısı %100 Birebir Eşleşmiştir:** 256 katsayının tamamı hatasız doğrulanmıştır.
-2. **Bellek Alanı Sınırı İspatlanmıştır:** Standart çarpım ara tampon dizileri gerektirirken, geliştirdiğimiz Comba yaklaşımı katsayıları tek geçişte akümülatörde topladığı için ara çarpım tamponunu sıfırlayarak **768 baytlık yerel bellek modelini** fiziksel donanımda doğrulamıştır.
-3. **Ölçüm Tutarlılığı:** Raspberry Pi 5 ve masaüstü bilgisayarlarda ölçülen algoritmik katsayı başarım oranları (0.85× - 0.90×), ESP32 üzerinde de tam olarak 0.81× olarak ölçülmüş; teorik modelin her platformda tutarlı çalıştığı kanıtlanmıştır.
+1. **İki Yöntemin Çıktısı Birebir Eşleşmiştir:** Seçilen test girdisinde 256 katsayının tamamı hatasız eşleşmiştir.
+2. **Kuramsal Tampon Modeli Donanımda Uygulanmıştır:** Comba yaklaşımı ara çarpım polinomunu ayrı bir 511 katsayılı dizi olarak tutmadan çalışır. 768 B değeri, 256 adet 24-bit katsayı için kuramsal tek tampon boyutudur; tüm uygulamanın SRAM kullanımı olarak yorumlanmamalıdır.
+3. **ESP32 Performans Sonucu:** Standart yöntem 677.956 çevrim ve 8.473 µs, Comba uyarlaması 841.234 çevrim ve 10.514 µs ölçülmüştür. Bu nedenle ESP32 testinde yöntem hızlanmamış, yaklaşık 0,81× hız oranında kalmıştır. Bu sonuç uçtan uca ML-KEM'in ESP32 üzerinde test edildiğini göstermez.
 
 
 ## Sonuç ve Tartışma
@@ -163,7 +163,7 @@ Süre ölçümlerinin temel sonucu, tek bir aşamadaki hızlanmanın bütün uyg
 
 Ek ölçümde daha hızlı polinom çarpımına daha yüksek Python bellek tahsisi eşlik etmiştir. Dolayısıyla süre, sayıların paketleme alanı ve programın bellek kullanımı ayrı ölçütler olarak değerlendirilmelidir.
 
-Çalışmanın sonuçları genel olarak Python ortamı ve ölçüm koşullarıyla değerlendirilmiştir. Bununla birlikte, polinom çarpımı seviyesinde gerçek ESP32 mikrodenetleyicisinde C/C++ ile donanım saat çevrimi ölçümü yapılmış; %100 doğruluk ve 768 baytlık yerel bellek modeli fiziksel donanımda kanıtlanmıştır. Uçtan uca tüm ML-KEM sürecinin mikrodenetleyicideki tam enerji tüketimi ve çevre birim etkileri ise gelecek çalışmalara bırakılmıştır. Ayrıca uygulamanın işlem süresi girdilere göre değişebilir; bu durumun bilgi sızıntısına yol açıp açmadığı araştırılmamıştır. PQC-Drop'ta karşı tarafın kimliğini doğrulayacak açık anahtar doğrulama katmanı da eksiktir. Prototip bu nedenlerle araştırma amaçlı değerlendirilmelidir.
+Çalışmanın sonuçları genel olarak Python ortamı ve ölçüm koşullarıyla değerlendirilmiştir. Bununla birlikte, polinom çarpımı seviyesinde gerçek ESP32 mikrodenetleyicisinde C/C++ ile donanım çevrimi ölçümü yapılmış; seçilen test girdisinde %100 katsayı eşleşmesi ve 768 baytlık kuramsal tek tampon modeli fiziksel donanımda uygulanmıştır. Bu deney tam ML-KEM zincirinin ESP32 üzerinde çalıştırıldığını veya tüm SRAM kullanımının 768 B olduğunu göstermez. Uçtan uca tüm ML-KEM sürecinin mikrodenetleyicideki tam enerji tüketimi ve çevre birim etkileri ise gelecek çalışmalara bırakılmıştır. Ayrıca uygulamanın işlem süresi girdilere göre değişebilir; bu durumun bilgi sızıntısına yol açıp açmadığı araştırılmamıştır. PQC-Drop'ta karşı tarafın kimliğini doğrulayacak açık anahtar doğrulama katmanı da eksiktir. Prototip bu nedenlerle araştırma amaçlı değerlendirilmelidir.
 
 ## Öneriler
 
