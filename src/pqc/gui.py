@@ -9,19 +9,15 @@ Tasarım Sistemi: VoiceBox Design System (/home/halil/Downloads/voicebox-DESIGN.
 """
 
 import os
-import pathlib
 import socket
 import sys
-import time
 
-from PyQt6.QtCore import QObject, Qt, QThread, QTimer, pyqtSignal
-from PyQt6.QtGui import QFont, QIcon
+from PyQt6.QtCore import QObject, Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QApplication,
-    QCheckBox,
     QFileDialog,
     QFrame,
-    QGridLayout,
     QHBoxLayout,
     QHeaderView,
     QLabel,
@@ -32,15 +28,15 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QScrollArea,
     QSplitter,
-    QTabWidget,
     QTableWidget,
     QTableWidgetItem,
+    QTabWidget,
     QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
-from pqc.discovery import DiscoveryService, PeerInfo
+from pqc.discovery import DiscoveryService
 from pqc.gui_theme import (
     COLOR_BG,
     COLOR_BORDER_STRONG,
@@ -48,13 +44,11 @@ from pqc.gui_theme import (
     COLOR_ERROR,
     COLOR_PRIMARY,
     COLOR_SECONDARY,
-    COLOR_TERTIARY,
     COLOR_SUCCESS,
     COLOR_SURFACE,
-    COLOR_SURFACE_RAISED,
+    COLOR_TERTIARY,
     COLOR_TEXT_PRIMARY,
     COLOR_TEXT_SECONDARY,
-    COLOR_TEXT_TERTIARY,
     COLOR_WARNING,
     VOICEBOX_QSS,
 )
@@ -62,8 +56,6 @@ from pqc.pqcdrop_engine import (
     PacketEvent,
     ReceiveListener,
     SendTask,
-    formatla_hex_dokum,
-    hesapla_shannon_entropisi,
 )
 
 
@@ -859,7 +851,7 @@ class VoiceBoxPQCDropWindow(QMainWindow):
 
     def _refresh_peers_table(self, peers_dict: dict):
         self.table_peers.setRowCount(0)
-        for key, peer in peers_dict.items():
+        for peer in peers_dict.values():
             r = self.table_peers.rowCount()
             self.table_peers.insertRow(r)
 

@@ -1,22 +1,17 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 TÜBİTAK 2204-A Lise Öğrencileri Araştırma Projeleri Yarışması
 Kuantum Sonrası Kriptografide Merkezlenmiş Kronecker İkamesi (ML-KEM)
 9. Sınıf Seviyesinde Jüri Savunma, Metodoloji ve Öğrenim Rehberi PDF Oluşturucu
 """
 
-import os
-import sys
-from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageBreak, KeepTogether, HRFlowable
-)
-from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 # Fontları kaydet (Türkçe karakter destekli Roboto)
 pdfmetrics.registerFont(TTFont('Roboto', '/usr/share/fonts/TTF/Roboto-Regular.ttf'))
@@ -77,7 +72,6 @@ def create_pqc_jury_pdf(output_path):
         bottomMargin=46
     )
 
-    styles = getSampleStyleSheet()
 
     # Özel Tipografi Stilleri
     c_primary = colors.HexColor("#0F172A")    # Çok Koyu Lacivert / Siyah
@@ -86,8 +80,6 @@ def create_pqc_jury_pdf(output_path):
     c_dark = colors.HexColor("#1E293B")       # Gövde Metni
     c_bg_box = colors.HexColor("#F8FAFC")     # Açık Kutu Arka Planı
     c_border = colors.HexColor("#E2E8F0")     # Çerçeve Rengi
-    c_success = colors.HexColor("#047857")    # Yeşil Vurgu
-    c_warn = colors.HexColor("#B45309")       # Turuncu Vurgu
 
     title_style = ParagraphStyle(
         'DocTitle',
@@ -140,14 +132,6 @@ def create_pqc_jury_pdf(output_path):
         spaceAfter=5
     )
 
-    bold_body_style = ParagraphStyle(
-        'BoldBody_Custom',
-        fontName='Roboto-Bold',
-        fontSize=9,
-        leading=12.5,
-        textColor=c_dark,
-        spaceAfter=5
-    )
 
     quote_style = ParagraphStyle(
         'Quote_Custom',
@@ -157,13 +141,6 @@ def create_pqc_jury_pdf(output_path):
         textColor=colors.HexColor("#0F172A")
     )
 
-    callout_style = ParagraphStyle(
-        'Callout_Text',
-        fontName='Roboto',
-        fontSize=8.5,
-        leading=12,
-        textColor=colors.HexColor("#1E293B")
-    )
 
     table_cell = ParagraphStyle(
         'TableCell',

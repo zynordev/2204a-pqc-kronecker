@@ -17,20 +17,13 @@
 
 import curses
 import os
-import pathlib
 import socket
-import sys
-import threading
-import time
-from typing import Dict, List, Optional
 
 from pqc.discovery import DiscoveryService, PeerInfo
 from pqc.pqcdrop_engine import (
     PacketEvent,
     ReceiveListener,
     SendTask,
-    formatla_hex_dokum,
-    hesapla_shannon_entropisi,
 )
 
 
@@ -64,9 +57,9 @@ class AsciiTuiApp:
         self.discovery_port = 8766
         self.save_dir = os.path.expanduser("~/Downloads")
 
-        self.peers: Dict[str, PeerInfo] = {}
-        self.peers_list: List[PeerInfo] = []
-        self.packets: List[PacketEvent] = []
+        self.peers: dict[str, PeerInfo] = {}
+        self.peers_list: list[PeerInfo] = []
+        self.packets: list[PacketEvent] = []
         self.selected_packet_idx = -1
 
         self.status_msg = "HAZIR — Kuantum Korumalı Şifreleme Hattı Devrede."
@@ -74,8 +67,8 @@ class AsciiTuiApp:
         self.transfer_info = "Boşta — Aktarım bekleniyor."
         self.transfer_pct = 0
 
-        self.current_sender: Optional[SendTask] = None
-        self.recv_listener: Optional[ReceiveListener] = None
+        self.current_sender: SendTask | None = None
+        self.recv_listener: ReceiveListener | None = None
 
         # UDP Keşif Servisi
         self.discovery = DiscoveryService(
@@ -207,7 +200,7 @@ class AsciiTuiApp:
 
         self.stdscr.addstr(y_peer, 2, ">>> 2. DOSYA AKTARIM DURUMU", curses.A_BOLD)
         y_peer += 1
-        self.stdscr.addstr(y_peer, 4, f"Hedef: [S] tuşuna basarak gönderin")
+        self.stdscr.addstr(y_peer, 4, "Hedef: [S] tuşuna basarak gönderin")
         y_peer += 1
         self.stdscr.addstr(y_peer, 4, f"Kayıt: {self.save_dir[:split_x - 12]}")
         y_peer += 1
@@ -318,7 +311,7 @@ class AsciiTuiApp:
             # Kutuyu Çiz
             self.stdscr.addstr(dlg_y, dlg_x, "+--" + " KUANTUM KORUMALI DOSYA GONDER " + "-" * max(0, dlg_w - 34) + "+", curses.A_BOLD)
             self.stdscr.addstr(dlg_y + 1, dlg_x, f"| Hedef IP veya No [{default_target}]:".ljust(dlg_w - 1) + "|")
-            self.stdscr.addstr(dlg_y + 2, dlg_x, f"| Dosya Yolu (Orn: test.txt veya ~/dosya.bin):".ljust(dlg_w - 1) + "|")
+            self.stdscr.addstr(dlg_y + 2, dlg_x, "| Dosya Yolu (Orn: test.txt veya ~/dosya.bin):".ljust(dlg_w - 1) + "|")
             self.stdscr.addstr(dlg_y + 3, dlg_x, "| [ENTER] Onayla | [Bos/ESC] Iptal".ljust(dlg_w - 1) + "|")
             self.stdscr.addstr(dlg_y + 4, dlg_x, "+" + "-" * (dlg_w - 2) + "+")
             self.stdscr.refresh()
