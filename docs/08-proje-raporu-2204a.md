@@ -34,11 +34,57 @@ Her hipotezin beklenen sayısal sonucu deneyden önce yazılmış, sonradan değ
 
 ## 2. Giriş
 
-İki tarafın daha önce hiç buluşmadan ortak bir gizli anahtar kurması, internetteki güvenli bağlantıların temelidir. Bugün bu iş için kullanılan RSA ve eliptik eğri yöntemlerinin güvenliği, büyük sayıları çarpanlarına ayırmanın ve ayrık logaritma hesaplamanın zorluğuna dayanır. Shor (1994), bu iki problemi kuantum bilgisayarda verimli biçimde çözen bir algoritma vermiştir. Yeterli büyüklükte bir kuantum bilgisayar henüz yoktur; ancak bugün kaydedilen şifreli trafik ileride çözülebileceği için geçişin şimdiden yapılması gerekmektedir. Bu amaçla ABD Ulusal Standartlar ve Teknoloji Enstitüsü (NIST), Ağustos 2024'te ML-KEM anahtar kapsülleme standardını yayımlamıştır (NIST, 2024). ML-KEM, Kyber algoritmasından türetilmiştir (Bos ve ark., 2018) ve güvenliği modül üzerinde hatalarla öğrenme problemine dayanır.
+### 2.1. Neden Yeni Bir Şifreleme Yöntemine İhtiyaç Var?
 
-ML-KEM'in bütün hesapları, katsayıları 3329'a göre kalan olarak tutulan ve X²⁵⁶ = −1 kuralıyla indirgenen 256 katsayılı polinomlar üzerinde yapılır. Bu polinomların çarpımı, yöntemin en sık tekrarlanan işlemidir. Standart bu çarpımı Sayı Teorik Dönüşüm (NTT) ile yapar ve açık anahtarı doğrudan dönüşmüş biçimde saklar.
+İki tarafın daha önce hiç buluşmadan ortak bir gizli anahtar kurması, internetteki güvenli bağlantıların temelidir. Bir web sitesine bağlanırken, bir mesajlaşma uygulamasında yazışırken ya da e-Devlet'e girerken önce bu anahtar kurulur, sonra bütün veri bu anahtarla şifrelenir. Bugün bu iş için kullanılan RSA ve eliptik eğri yöntemlerinin güvenliği, büyük sayıları çarpanlarına ayırmanın ve ayrık logaritma hesaplamanın zorluğuna dayanır. Shor (1994), bu iki problemi kuantum bilgisayarda verimli biçimde çözen bir algoritma vermiştir. Yeterli büyüklükte bir kuantum bilgisayar henüz yoktur. Ancak bugün kaydedilen şifreli trafik ileride çözülebilir ("şimdi topla, sonra çöz"). Bu yüzden geçişin şimdiden yapılması gerekmektedir. Bu amaçla ABD Ulusal Standartlar ve Teknoloji Enstitüsü (NIST), Ağustos 2024'te ML-KEM anahtar kapsülleme standardını yayımlamıştır (NIST, 2024). ML-KEM, Kyber algoritmasından türetilmiştir (Bos ve ark., 2018). Güvenliği RSA'daki gibi çarpanlara ayırmaya değil, "gürültü eklenmiş" denklemlerden gizli sayıları bulmanın zorluğuna (modül üzerinde hatalarla öğrenme problemi) dayanır. Bu problemi kuantum bilgisayarda hızlı çözen bilinen bir yöntem yoktur.
 
-Bu projenin çıkış noktası ise ilkokuldan bilinen bir gözlemdir. 23 sayısı 2·10 + 3 olarak yazılırsa karesi (2x + 3)² = 4x² + 12x + 9 polinomunun x = 10'daki değeridir; katsayılara sağdan sola elde uygulanınca 529 bulunur. Buradan şu soru doğmuştur: *Taban ne kadar büyük seçilirse hiç elde gerekmez ve katsayılar sayının içinden doğrudan okunur?* İki basamaklı sayıların karesinde en büyük katsayı 2·9·9 = 162 olduğundan cevap 163'tür. Bu sorunun genel hâli, polinom çarpımını tek bir büyük tamsayı çarpımına indirgeyen ve Kronecker'e (1882) dayanan **Kronecker ikamesidir**: x yerine yeterince büyük bir sayı (bilgisayarda 2^ℓ) konur, iki tamsayı çarpılır ve sonuç ℓ bitlik dilimlere ayrılarak katsayılar geri okunur. Gözlemimizin bu yöntemin özel bir hâli olduğu, literatür taraması sırasında öğrenilmiştir.
+### 2.2. Polinom Nedir, Şifrelemede Ne İşe Yarar?
+
+Polinom, bir sayı listesini tek bir nesne olarak yazmanın yoludur. Örneğin 3, 2 ve 5 sayılarından oluşan liste
+
+  f(x) = 3 + 2x + 5x²
+
+biçiminde yazılır. Buradaki 3, 2 ve 5 sayılarına **katsayı** denir; x ise yalnızca katsayıların sırasını tutan bir yer imidir. Bu projede polinomlar bir fonksiyon çizmek için değil, **sayı paketleri** olarak kullanılır. ML-KEM'de her polinom 256 katsayılıdır, yani her biri 256 sayılık bir kutudur. Anahtarlar, şifreli metin ve şifrelenecek mesaj bu kutular hâlinde tutulur.
+
+ML-KEM'de üç tür polinom vardır ve katsayıları farklı yerlerden gelir:
+
+- **Herkese açık büyük polinomlar (A matrisi):** 32 baytlık rastgele bir "tohum" sayısından, standartta tanımlı bir karıştırma fonksiyonuyla (SHAKE128) üretilir. Katsayıları 0 ile 3328 arasındadır ve hepsi eşit olasılıkla çıkar. Tohum açık anahtarın içinde gönderilir; karşı taraf aynı tohumdan aynı polinomları üretir.
+- **Gizli küçük polinomlar (s, e, r):** Katsayıları yalnızca −3 ile +3 (ML-KEM-768 ve ML-KEM-1024'te −2 ile +2) arasındadır. Bir katsayı, η kez atılan iki ayrı yazı-tura dizisindeki tura sayılarının farkıdır. Örneğin η = 2 için birinci dizide 2, ikincisinde 1 tura gelirse katsayı 2 − 1 = +1 olur. Bu yüzden 0 en sık, ±2 en seyrek çıkan değerdir (olasılıklar sırasıyla 6/16, 4/16 ve 1/16).
+- **Mesaj polinomu:** Gönderilecek 32 baytlık (256 bitlik) sırrın her biti bir katsayıya yerleştirilir. Bit 0 ise katsayı 0, bit 1 ise 1665 (3329'un yaklaşık yarısı) olur.
+
+Bütün hesaplar **3329'a göre kalan** ile yapılır. Bu, saat aritmetiğine benzer: 12 saatlik saatte 10 + 5 = 3 olduğu gibi, burada da 3328 + 2 = 1 olur. Aynı mantıkla 3328 sayısı "0'dan bir eksik" yani **−1** olarak da yazılabilir. Projenin temel fikri buna dayanır: katsayılar 0 ile 3328 arasında değil, **sıfırın çevresinde** −1664 ile +1664 arasında yazıldığında (**merkezlenmiş gösterim**) sayıların büyüklüğü yarıya iner.
+
+İkinci kural, polinomun 256 katsayıyla sınırlı kalmasını sağlar: x²⁵⁶ yerine **−1** yazılır. Yani kutunun sonundan taşan bir terim, işareti değişerek başa döner. Küçük bir örnekle, 4 katsayılı polinomlarda x⁴ = −1 alınsın:
+
+  (1 + 2x + 3x³) · (2 + x) = 2 + 5x + 2x² + 6x³ + **3x⁴**
+
+Son terimdeki x⁴ yerine −1 yazılınca 3x⁴ = −3 olur ve başa eklenir: sonuç **−1 + 5x + 2x² + 6x³** bulunur. ML-KEM'de aynı işlem 256 katsayıyla yapılır.
+
+### 2.3. Polinom Çarpımı Nasıl Yapılır ve Neden Önemlidir?
+
+İki polinomu çarpmak için birinin her katsayısı diğerinin her katsayısıyla çarpılır ve aynı kuvvete düşenler toplanır (okul yöntemi):
+
+  (2x + 3) · (4x + 1) = 8x² + 2x + 12x + 3 = **8x² + 14x + 3**
+
+Burada 2·2 = 4 çarpma yapılmıştır. 256 katsayılı iki polinom için bu sayı 256 · 256 = **65.536** çarpmadır. Bir ML-KEM-768 anahtar kurulumunda bu çarpımlardan onlarcası yapılır. Örneğin herkese açık 3×3'lük polinom tablosu, 3 polinomluk gizli vektörle çarpılırken tek başına 9 polinom çarpımı gerekir. Bu nedenle polinom çarpımı yöntemin en sık tekrarlanan işlemidir. Standart bu çarpımı Sayı Teorik Dönüşüm (NTT) adı verilen bir dönüşümle hızlandırır ve açık anahtarı doğrudan bu dönüşmüş biçimde saklar.
+
+### 2.4. Çıkış Noktası: Sayılar Aslında Polinomdur
+
+Bu projenin çıkış noktası ilkokuldan bilinen bir gözlemdir: onluk sistemde yazılan her sayı, x = 10 konmuş bir polinomdur. 23 = 2·10 + 3 ve 41 = 4·10 + 1 olduğundan, 2.3'teki çarpım x = 10'da bir sayı çarpımına dönüşür:
+
+  23 · 41 = (2x + 3)(4x + 1), x = 10 için = 8·100 + 14·10 + 3 = **943**
+
+Ancak 943 sayısına bakarak 8, 14 ve 3 katsayıları geri okunamaz. Ortadaki katsayı (14) 10'dan büyük olduğu için onlar basamağından yüzler basamağına **elde** taşınmış, katsayılar birbirine karışmıştır. Aynı çarpım x = 100 için yapılırsa durum değişir:
+
+  203 · 401 = **8|14|03** = 81.403
+
+Bu kez her katsayı iki basamaklık kendi "kutusuna" sığar ve sayı ikişer basamaklık gruplara ayrılınca 8, 14, 3 katsayıları doğrudan okunur. Buradan projenin sorusu doğmuştur: *Taban en az ne kadar büyük seçilmelidir ki hiç elde oluşmasın ve katsayılar sayının içinden doğrudan okunabilsin?* İki basamaklı sayıların karesinde en büyük katsayı 2·9·9 = 162 olduğundan cevap 163'tür.
+
+Negatif katsayılar da aynı yolla çalışır ve tabanı küçültür. 19 sayısı 1·10 + 9 yerine 2·10 − 1 olarak yazılabilir. O zaman 19² = (2x − 1)² = 4x² − 4x + 1 olur ve x = 10 için 400 − 40 + 1 = 361 bulunur. Katsayılar 0…9 yerine −5…+4 aralığında tutulduğunda, aynı işi yapmak için daha küçük kutular yeter. Bu, 2.2'deki merkezlenmiş gösterimin küçük ölçekli hâlidir.
+
+Bu sorunun genel hâli, polinom çarpımını tek bir büyük tamsayı çarpımına indirgeyen ve Kronecker'e (1882) dayanan **Kronecker ikamesidir**. x yerine yeterince büyük bir sayı (bilgisayarda 2^ℓ) konur, iki tamsayı çarpılır ve sonuç ℓ bitlik dilimlere ayrılarak katsayılar geri okunur. Bilgisayar büyük tamsayıları çok hızlı çarpabildiği için 65.536 küçük çarpma yerine tek bir büyük çarpma yapılmış olur. Gözlemimizin bu yöntemin özel bir hâli olduğu, literatür taraması sırasında öğrenilmiştir.
+
+### 2.5. Literatürdeki Yeri
 
 Kronecker ikamesi hızlı polinom çarpımı alanında uzun süredir incelenmektedir (Harvey, 2009). Kuantum sonrası kriptografide Albrecht ve ark. (2019), Kyber'ı akıllı kartlardaki RSA büyük tamsayı çarpıcısı üzerinde çalıştırmak için bu yöntemi kullanmış ve katsayıların karışmaması için gereken genişliği belirlemiştir; Bos ve ark. (2022) aynı donanım hedefi için daha gelişmiş varyantlar önermiştir. Dolayısıyla işaretli (merkezlenmiş) Kronecker ikamesi ve en kötü durum sınırı literatürde bilinmektedir; bu proje yeni bir şifreleme algoritması ya da yeni bir çarpma yöntemi önermemektedir.
 
@@ -46,7 +92,27 @@ Projenin literatüre göre konumu şudur: (i) FIPS 203'ün kesinleşmiş paramet
 
 ## 3. Yöntem
 
-### 3.1. Matematiksel Çerçeve
+### 3.1. Kullanılan Sayılar ve Nereden Geldikleri
+
+Yöntemin temel sayıları proje ekibi tarafından keyfî olarak seçilmemiştir; hepsi ya standarttan alınmış ya da standarttaki değerlerden hesaplanmıştır (Tablo 1).
+
+**Tablo 1.** Temel sayılar, kaynakları ve anlamları
+
+| Sembol | Değer | Kaynağı | Ne anlama gelir? |
+|---|---|---|---|
+| n | 256 | FIPS 203 | Her polinomdaki katsayı sayısı (kutunun boyu) |
+| q | 3329 | FIPS 203 | Hesapların yapıldığı modül. Asal bir sayıdır ve 3329 − 1 = 13 · 256 olduğu için standardın NTT dönüşümüne uygundur |
+| A | 1664 | Hesaplanır: (q − 1)/2 | Büyük katsayının merkezlenmiş gösterimde alabileceği en büyük mutlak değer |
+| η | 3 veya 2 | FIPS 203 | Gizli katsayıların sınırı: ML-KEM-512'de −3…+3, ML-KEM-768/1024'te −2…+2 |
+| k | 2, 3, 4 | FIPS 203 | Polinom tablosunun boyu (ML-KEM-512, -768, -1024). Büyüdükçe güvenlik artar |
+| ℓ | 21–32 | Bu çalışmada hesaplanır | Kronecker ikamesinde her katsayıya ayrılan bit sayısı (kutunun genişliği) |
+| 1.277.952 | 256 · 1664 · 3 | Hesaplanır (Teorem 1) | Bir çarpım katsayısının ML-KEM-512'de ulaşabileceği en büyük mutlak değer |
+
+Bir çarpım katsayısının en fazla ne kadar büyüyebileceği sade bir akıl yürütmeyle bulunur. Her sonuç katsayısı en fazla 256 küçük çarpımın toplamıdır. Bu çarpımların her biri en fazla 1664 · 3 = 4992 olabilir. Öyleyse toplam en fazla 256 · 4992 = 1.277.952 olur. Bu en kötü durum ancak bütün büyük katsayılar 1664, bütün gizli katsayılar 3 olduğunda (ya da işaretleri birbirine uyduğunda) ortaya çıkar.
+
+### 3.2. Matematiksel Çerçeve
+
+Bu bölüm, 2.4'teki "taban ne kadar büyük olmalı?" sorusunun ve 3.1'deki akıl yürütmenin matematiksel yazımıdır. Sonuçları 3.3'te sade bir dille özetlenmiştir.
 
 n = 256, q = 3329 alınmıştır. Katsayılar merkezlenmiş biçimde, yani {−1664, …, 1664} aralığında tutulur; A = (q − 1)/2 = 1664'tür. Küçük polinomun katsayıları s_j ∈ [−η, η] aralığındadır (ML-KEM-512'de η = 3, ML-KEM-768 ve ML-KEM-1024'te η = 2). İki polinomun indirgenmemiş çarpımının katsayıları c_k = Σ_{i+j=k} a_i·s_j, X²⁵⁶ = −1 kuralıyla indirgenmiş katsayılar ise d_k = c_k − c_{k+n} biçimindedir.
 
@@ -66,7 +132,7 @@ olur. η = 3 için n·A·η = 256·1664·3 = 1.277.952 ve ℓ_min = 22; η = 2 i
 
 **Sonuç 1 (toplamın açılmadan yapılması).** ML-KEM'de çarpımlar k terimli toplamlar hâlinde gelir (k = 2, 3, 4). Terimler tamsayı olarak toplanıp bir kez açılırsa sınır k·n·A·η olur ve üç parametre setinde de ℓ_min = 23 çıkar; bayt sınırına denk gelen 24 bit üçüne de yeter.
 
-**Tablo 1.** Gereken en küçük genişlikler
+**Tablo 2.** Gereken en küçük genişlikler
 
 | Durum | En büyük katsayı | ℓ_min | 256 katsayının toplam boyutu |
 |---|---:|:---:|---:|
@@ -75,23 +141,91 @@ olur. η = 3 için n·A·η = 256·1664·3 = 1.277.952 ve ℓ_min = 22; η = 2 i
 | Merkezlenmiş, η = 2 (ML-KEM-768/1024) | 851.968 | 21 | 5376 bit |
 | Merkezlenmiş, toplam açılmadan (üç set) | 2.555.904 – 3.407.872 | 23 | 5888 bit |
 
-Karşılaştırmanın adil olması için bir not gerekir: 32 bitlik satır, küçük çarpanı da 0…3328 aralığında tutan en yalın uygulamadır. Yalnızca küçük çarpan η kadar kaydırılıp negatif olmayan hâle getirilirse en büyük katsayı 256·3328·6 = 5.111.808 olur ve 23 bit yeter. Yani 32 → 22 bitlik kazancın büyük kısmı küçük çarpanın küçük tutulmasından, son bir biti ise büyük çarpanın merkezlenmesinden gelir.
+### 3.3. Neden 32 Bitten 22 Bite İniyoruz?
 
-### 3.2. Rastgele Girdiler İçin Olasılık Modeli
+Kronecker ikamesinde her katsayıya bir "kutu" ayrılır. Kutu, içine girebilecek en büyük sayıyı alacak kadar geniş olmalıdır; dar olursa 2.4'teki 943 örneğindeki gibi elde taşınır ve katsayılar karışır. Bir bit eklemek kutunun alabileceği sayıyı iki katına çıkarır: ℓ bitlik bir kutu yaklaşık 2^ℓ büyüklüğünde sayı alır (örneğin 2²¹ = 2.097.152, 2³² = 4.294.967.296). İşaretli sayılar için bir bit de artı/eksi işaretine ayrılır.
+
+**Yalın yöntem neden 32 bit ister?** Bilgisayarda hazır sayı türleri genellikle 0'dan başlar. Bu yüzden en yalın uygulama hem büyük hem gizli katsayıları 0…3328 arasında tutar. Bu durumda en büyük çarpım katsayısı 256 · 3328 · 3328 = 2.835.349.504 olur. Bu sayı 2³¹'den büyük, 2³²'den küçüktür; yani 32 bitlik kutu gerekir.
+
+**22 bite iniş iki gözleme dayanır:**
+
+1. *Gizli sayılar aslında çok küçüktür.* Gizli katsayılar 0…3328 değil, −3…+3 arasındadır. Yalın yöntem bunları gereksiz yere 3328'e kadar çıkabilecekmiş gibi hesaplar. Gerçek boyutları kullanılınca en büyük değer yaklaşık 1100 kat küçülür.
+2. *Büyük sayılar sıfırın çevresinde yazılabilir.* 0…3328 yerine −1664…+1664 kullanılınca (2.2'deki saat örneği) büyük katsayıların en büyük değeri yarıya iner.
+
+İkisi birlikte uygulanınca en büyük çarpım katsayısı 256 · 1664 · 3 = 1.277.952 olur. Bu sayı 2²⁰ = 1.048.576'dan büyük, 2²¹ = 2.097.152'den küçüktür, yani büyüklüğü için 21 bit yeter. İşaret için bir bit eklenince **22 bit** bulunur. Böylece 256 katsayılık sayı 8192 bitten 5632 bite, yani yaklaşık üçte bir oranında kısalır. Bilgisayar daha kısa sayıları daha hızlı çarptığı için çarpım adımı hızlanır (4.3'te ölçülmüştür: 2,05 kat).
+
+Karşılaştırmanın adil olması için bir not gerekir: yalnızca gizli katsayılar 3 kadar kaydırılıp 0…6 aralığına alınırsa en büyük katsayı 256·3328·6 = 5.111.808 olur ve 23 bit yeter. Yani 32 → 22 bitlik kazancın büyük kısmı küçük çarpanın küçük tutulmasından, son bir biti ise büyük çarpanın merkezlenmesinden gelir.
+
+**Neden 21 ya da 20 bit değil?** 22 bit, *her* olası girdi için yeterli olan en küçük genişliktir. 21 bit seçilirse, bütün katsayıları en büyük değerde olan bir girdide sonuç kesinlikle bozulur (Önerme 1). Rastgele denemelerde bu girdiyle neredeyse hiç karşılaşılmaz ve 18 bit bile yetiyormuş gibi görünür. Ancak 4.4'te gösterildiği gibi, bu durumda sonucun doğru çıkıp çıkmaması gizli anahtara bağlı hâle gelir. Bu yüzden genişlik denemeyle değil, ispatla seçilmiştir. PQC-Drop'ta 22 yerine **24 bit** kullanılmasının nedeni ise bilgisayarın veriyi 8 bitlik baytlar hâlinde daha hızlı işlemesidir (24 = 3 bayt). Ayrıca 24 bit, terimler toplanıp tek seferde açıldığında gereken 23 biti de karşılar.
+
+### 3.4. Basit Bir Şifreleme Örneği: Bir Okul Metnini Şifrelemek ve Çözmek
+
+Yöntemin nasıl çalıştığını somutlaştırmak için iki örnek hazırlanmıştır. İkisi de depodaki `docs/ornekler/okul_metni_sifreleme.py` dosyasıyla yeniden üretilebilir.
+
+**Örnek 1: Tek bir harfin elle izlenebilir şifrelenmesi.** ML-KEM'in fikri, gerçek değerler yerine küçük sayılarla gösterilmiştir: 256 yerine 8 katsayı, 3329 yerine 97 modülü. Şifrelenecek şey "O" harfidir. Bilgisayarda "O" harfi 79 sayısıyla, ikilik sistemde 01001111 olarak tutulur. Bu 8 bit, en sağdaki bitten başlayarak mesaj polinomunun katsayıları olur: m = [1, 1, 1, 1, 0, 0, 1, 0].
+
+**Tablo 3.** "O" harfinin oyuncak ML-KEM ile şifrelenmesi (n = 8, q = 97)
+
+| Adım | Kim yapar? | İşlem | Örnek değerler |
+|---|---|---|---|
+| 1. Anahtar üretimi | Alıcı | Rastgele bir **a** polinomu ve gizli küçük **s**, **e** seçer; **b = a·s + e** hesaplar. (a, b) herkese açıktır, s gizli kalır | a = [6, 8, −1, 34, 24, 42, 11, 16], s = [1, 0, 1, −1, 0, 0, 0, 0] → b = [36, 2, 21, 36, 15, −20, 1, 35] |
+| 2. Şifreleme | Gönderici | Yeni küçük **r**, **e₁**, **e₂** seçer; **u = a·r + e₁** ve **v = b·r + e₂ + 49·m** hesaplar ve (u, v)'yi gönderir | m = [1, 1, 1, 1, 0, 0, 1, 0] → u = [23, 8, −31, −9, 17, 48, 33, −23], v = [−13, 17, 16, 27, −24, −27, 11, 8] |
+| 3. Çözme | Alıcı | Gizli s ile **w = v − s·u** hesaplar; 0'a yakın değerler 0, ±49'a yakın değerler 1 bitidir | w = [46, −47, 47, −46, −2, 0, −48, 0] → bitler 01001111 → **"O"** |
+
+Çözmenin neden çalıştığı şöyle açıklanabilir. v − s·u hesaplanınca a·s·r terimleri birbirini götürür ve geriye yalnızca 49·m ile küçük gürültü terimleri (e·r + e₂ − s·e₁) kalır. Bu örnekte gürültü en fazla 3'tür. 0 ile 49 arasındaki farka göre çok küçük olduğu için her bit doğru okunur. Gerçek boyutlarda (256 katsayı, 3329 modülü, k adet polinom), gizli s'yi bilmeyen biri u ve v'deki sayıların rastgele görünen karışımından mesajı ayıramaz. Bu oyuncak örnek ise yalnızca fikri göstermek içindir; sayılar o kadar küçüktür ki tüm olasılıklar denenerek kolayca kırılabilir.
+
+Tablodaki bütün polinom çarpımları (a·s, a·r, b·r, s·u) Kronecker ikamesiyle yapılmış ve okul yöntemiyle karşılaştırılmıştır. Kolay okunsun diye x yerine 2^ℓ değil 1000 konmuştur. Örneğin a polinomu tek bir sayıya dönüştürülünce
+
+  P_a = 16.011.042.024.033.999.008.006
+
+olur. Bu sayı sağdan üçer basamaklı gruplara ayrılınca 006, 008, 999 (yani −1), 033 (yani 34; bir önceki −1 için bir ödünç alındığı için) … biçiminde a'nın katsayıları geri okunur. 1000 tabanının yetip yetmediği de Teorem 1 ile aynı akıl yürütmeyle denetlenmiştir: 8 terim × en fazla 48 × en fazla 1 = 384, ve 384 < 500 olduğundan katsayılar karışmaz.
+
+**Örnek 2: Gerçek bir okul duyurusunun PQC-Drop akışıyla şifrelenmesi.** Aynı fikir gerçek boyutlarda, projenin kendi ML-KEM-768 kodu ve PQC-Drop'un 24 bitlik Kronecker motoruyla çalıştırılmıştır. Şifrelenen metin şudur: *"Okulumuzun bilim şenliği 20 Aralık'ta konferans salonunda yapılacaktır."* Bu metin Türkçe karakterleriyle birlikte 76 bayttır.
+
+1. **Alıcı** anahtar çifti üretir. 1184 baytlık açık anahtarı göndericiye yollar; 2400 baytlık gizli anahtar hiçbir zaman gönderilmez.
+2. **Gönderici**, açık anahtarla 1088 baytlık bir kapsül üretip alıcıya yollar. Bu sırada kendi tarafında 32 baytlık bir ortak sır elde eder.
+3. **Alıcı**, gizli anahtarıyla kapsülü açar ve aynı 32 baytlık ortak sırrı bulur. Ağı dinleyen biri açık anahtarı, kapsülü ve şifreli metni görür; ortak sırrı ve metni göremez.
+4. Ortak sırdan HKDF-SHA256 ile 256 bitlik bir AES anahtarı türetilir. Metin AES-256-GCM ile şifrelenir. 76 baytlık metin 92 baytlık şifreli metne dönüşür; aradaki 16 bayt, metnin değiştirilmediğini denetleyen doğrulama etiketidir.
+5. Alıcı aynı anahtarla şifreli metni çözer ve metnin aslıyla bayt bayt aynı olduğu doğrulanır. Şifreli metinde tek bir bit değiştirildiğinde ise çözme reddedilir; yani yolda yapılan bir değişiklik fark edilir.
+
+Örnek çalıştırmada şifreli metnin ilk baytları `636d1bb42c31589d…` olmuştur. Anahtarlar her çalıştırmada rastgele üretildiği için bu baytlar her seferinde farklı çıkar. Metnin çözülüp aslıyla aynı çıkması ise her seferinde değişmez.
+
+### 3.5. Rastgele Girdiler İçin Olasılık Modeli
 
 Teorem 1, bütün katsayıların aynı anda en büyük değerde ve aynı işaretli olduğu en kötü durumu ele alır. ML-KEM'de ise büyük polinomun katsayıları düzgün dağılır (varyansı (q² − 1)/12 = 923.520), küçük polinomunkiler merkezli binom dağılımından gelir (varyansı η/2). Bir çarpım katsayısı, T adet bağımsız terimin toplamı olduğundan Merkezi Limit Teoremi ile yaklaşık normal dağılır: σ² = T·923.520·η/2. Tek bir dilimin D_ℓ dışına çıkma olasılığı p_k ≈ 2Φ(−2^(ℓ−1)/σ_k), çarpımın bozulma olasılığı ise 1 − Π(1 − p_k) olarak modellenmiştir. Modelin iki yaklaşıklığı baştan bilinmektedir: dilimler aynı katsayıları paylaştığı için tam bağımsız değildir ve terimler sınırlı olduğu için gerçek dağılımın kuyruğu normalden incedir.
 
-### 3.3. Yazılım
+### 3.6. Yazılım
 
-ML-KEM'in üç parametre seti, standarttaki algoritma numaraları izlenerek Python ile sıfırdan yazılmıştır; özet fonksiyonları için yalnızca Python'un standart kütüphanesi kullanılmıştır. Kronecker ikamesi beş seçimle tanımlanan bir yapı olarak kodlanmıştır: dilim genişliği, katsayıların işaretli olup olmadığı, paketleme ve açmanın döngüyle mi bayt dönüşümüyle mi yapıldığı, indirgemenin tamsayıda yapılıp yapılmadığı (Önerme 2) ve toplamın açılmadan yapılıp yapılmadığı (Sonuç 1). Bu seçimlerden sekiz varyant oluşturulmuştur (Tablo 3'te adlarıyla verilmiştir).
+ML-KEM'in üç parametre seti, standarttaki algoritma numaraları izlenerek Python ile sıfırdan yazılmıştır; özet fonksiyonları için yalnızca Python'un standart kütüphanesi kullanılmıştır. Kronecker ikamesi beş seçimle tanımlanan bir yapı olarak kodlanmıştır: dilim genişliği, katsayıların işaretli olup olmadığı, paketleme ve açmanın döngüyle mi bayt dönüşümüyle mi yapıldığı, indirgemenin tamsayıda yapılıp yapılmadığı (Önerme 2) ve toplamın açılmadan yapılıp yapılmadığı (Sonuç 1). Bu seçimlerden sekiz varyant oluşturulmuştur (Tablo 5'te adlarıyla verilmiştir).
 
 Standart, açık anahtarı ve A matrisini NTT biçiminde ürettiği için Kronecker yolu bunları önce ters dönüşümle katsayı biçimine çevirir, çarpar ve sonucu geri çevirir. Böylece çıktı standartla bayt bayt aynı kalır. Bu ek dönüşümler ayrıca ölçülmüştür.
 
 Doğruluk üç bağımsız kaynağa karşı sınanmıştır: NIST'in resmî test vektörleri, katsayıları tek tek çarpıp toplayan okul yöntemi ve Teorem 1'in sayısal değerleri. Testlerin hata yakalama gücünü görmek için koda bilerek 12 ayrı hata yerleştiren bir araç yazılmıştır. Depoda toplam 1884 otomatik test bulunmaktadır.
 
-### 3.4. Deney Düzeni
+### 3.7. Deneyler Nerede, Neyle ve Nasıl Yapıldı?
 
-**Tablo 2.** Deneyler ve ölçüm ortamları
+**Kullanılan cihazlar.** Deneyler üç gerçek cihazda yapılmıştır; hiçbiri sanal makine ya da bulut sunucusu değildir:
+
+- **Raspberry Pi 5:** Kredi kartı boyutunda, 64 bit ARM işlemcili küçük bir bilgisayardır. Doğruluk deneyleri (E1) bunda, Python 3.13.5 ile yapılmıştır. 10.000 rastgele örneğin sekiz varyantla denetlenmesi 405 saniye sürmüştür.
+- **Masaüstü bilgisayar (Intel Core i3-14100 işlemci, Linux):** Teori, performans ve güvenlik deneyleri (E2, E3, E4) bunda, Python 3.11.2 ile yapılmıştır. Ek performans ölçümü (E3-ek) ise Python 3.14 kurulu ikinci bir x86-64 bilgisayarda yapılmıştır.
+- **ESP32 geliştirme kartı (ESP32-D0WD-V3):** Akıllı ev cihazlarında kullanılan türden, 80 MHz'de çalışan küçük bir mikrodenetleyicidir. Çarpım kodu C++ ile yazılıp karta yüklenmiştir (E6).
+
+ESP32 kodu dışındaki bütün yazılım Python ile yazılmıştır. Kod, ölçüm betikleri ve ham sonuç dosyaları (CSV) proje deposunda bulunmaktadır.
+
+**"Bir deneme" ne demektir?** Raporda "200.000 deneme" gibi ifadeler geçtiğinde, tek bir deneme şu adımlardan oluşur:
+
+1. Bilgisayar 256 katsayılı rastgele bir büyük polinom üretir (her katsayı 0…3328 arasında, eşit olasılıkla).
+2. 256 katsayılı rastgele bir gizli polinom üretir (her katsayı 2.2'deki yazı-tura yöntemiyle, −3…+3 arasında).
+3. Önce "doğru cevap" hesaplanır. Doğruluk deneyinde (E1) bu, en güvenilir yöntem olan okul yöntemiyle (65.536 çarpma) yapılır. Teori deneyinde (E2) ise Kronecker ikamesi hiçbir zaman taşmayacak kadar geniş, 40 bitlik kutularla çalıştırılır.
+4. Aynı çarpım incelenen genişlikteki Kronecker ikamesiyle yapılır ve 256 sonuç katsayısının hepsi doğru cevapla tek tek karşılaştırılır. Tek bir katsayı bile farklıysa deneme "hatalı" sayılır. E2'de aynı deneme 14 bitten ℓ_min'e kadar her genişlik için tekrarlanır.
+
+Örneğin `docs/ornekler/okul_metni_sifreleme.py` betiğinde sabit tohumla yapılan bir denemede gizli polinomdaki 256 katsayının 78'i 0, 121'i ±1, 52'si ±2, 5'i ±3 çıkmıştır. Çarpım sonucundaki en büyük katsayı 48.221 olmuş, yani bu deneme için 17 bit yetmiştir. En kötü durum sınırı ise 1.277.952'dir ve 22 bit gerektirir. Rastgele denemelerin sınıra neden hiç yaklaşmadığı (4.2) bu örnekte de görülmektedir.
+
+**Rastgelelik ve tekrarlanabilirlik.** Rastgele sayılar bilgisayarın sözde rastgele sayı üretecinden sabit bir başlangıç değeriyle (tohum: 20261027 ve 20261030) üretilmiştir. Aynı tohumla betik yeniden çalıştırıldığında aynı rastgele girdiler ve aynı hata sayıları elde edilir; isteyen herkes deneyleri tekrarlayabilir. Süre ölçümleri ise bilgisayarın o anki durumuna bağlı olduğu için küçük farklarla değişir. ML-KEM'in kendi anahtar üretimi ise standarttaki SHAKE fonksiyonlarını kullanır ve NIST'in resmî test vektörleriyle ayrıca denetlenmiştir.
+
+**Süre ölçümü.** Süreler, Python'un nanosaniye çözünürlüklü saati (`perf_counter_ns`) ile ölçülmüştür. Ölçümden önce birkaç ısınma turu atılmış, ölçüm sırasında Python'un bellek temizleyicisi kapatılmıştır. Tek bir ölçüm yerine yüzlerce ya da binlerce tekrarın **ortanca (medyan)** değeri raporlanmıştır. Böylece bilgisayarın arka planda başka bir iş yaptığı anlardaki sapmalar sonucu bozmaz.
+
+**Tablo 4.** Deneyler ve ölçüm ortamları
 
 | Deney | İçerik | Ortam |
 |---|---|---|
@@ -111,11 +245,11 @@ Doğruluk üç bağımsız kaynağa karşı sınanmıştır: NIST'in resmî test
 
 **E6.** ESP32 üzerinde büyük tamsayı paketlemesi uygulanmamıştır. Ölçülen, aynı çarpımın iki C++ biçimidir: sonuçları 511 elemanlı bir ara dizide biriktiren okul yöntemi ve her sonuç katsayısını tek bir 32 bitlik toplayıcıda hesaplayan, ara dizi kullanmayan biçim. Teorem 1'e göre toplayıcının değeri 1.277.952'yi aşamayacağından 32 bit taşmaz. Bir rastgele girdi çifti üretilmiş, iki biçimin çıktıları karşılaştırılmış ve her biri 100 kez çalıştırılarak işlemcinin çevrim sayacı okunmuştur.
 
-### 3.5. PQC-Drop Prototipi
+### 3.8. PQC-Drop Prototipi
 
 PQC-Drop, aynı ağdaki iki cihaz arasında dosya aktaran bir araçtır. Alıcı ML-KEM-768 anahtar çifti üretip açık anahtarı (1184 bayt) gönderir; gönderici kapsülü (1088 bayt) yollar; iki taraf 32 baytlık ortak sırdan HKDF-SHA256 ile bir AES anahtarı türetir. Dosya 64 KB'lık parçalar hâlinde AES-256-GCM ile şifrelenir; her parça kendi doğrulama etiketiyle, aktarımın sonunda bütün dosya SHA-256 özetiyle denetlenir. Polinom çarpımları 24 bitlik, bayt hizalı ve tamsayıda indirgeme yapan Kronecker varyantıyla yapılır. ML-KEM ve Kronecker katmanı projenin kendi kodudur; AES-GCM ve HKDF için hazır `cryptography` kütüphanesi kullanılmıştır. Aracın komut satırı, masaüstü ve terminal arayüzleri ile aynı ağdaki cihazları bulan bir keşif servisi vardır.
 
-### 3.6. Proje İş-Zaman Çizelgesi
+### 3.9. Proje İş-Zaman Çizelgesi
 
 | İşin tanımı | Ekim | Kasım | Aralık | Ocak |
 |---|:---:|:---:|:---:|:---:|
@@ -130,9 +264,9 @@ PQC-Drop, aynı ağdaki iki cihaz arasında dosya aktaran bir araçtır. Alıcı
 
 ### 4.1. Doğruluk (H1)
 
-Standardın yolu (NTT) ve sekiz Kronecker varyantının her biri, üç parametre setindeki 180 anahtar üretimi, kapsülleme ve kapsül açma vakasının tamamında resmî beklenen çıktıyı bayt bayt üretmiştir; 60 anahtar denetimi vakası da geçmiştir. 10.000 rastgele çarpımda sekiz varyantın hiçbiri okul yönteminden sapmamıştır (Tablo 3). Bütün katsayıların uç değerde olduğu en kötü durum girdileri de sekiz varyantta doğru sonuç vermiştir. Koda bilerek yerleştirilen 12 hatanın 12'si testlerce yakalanmıştır.
+Standardın yolu (NTT) ve sekiz Kronecker varyantının her biri, üç parametre setindeki 180 anahtar üretimi, kapsülleme ve kapsül açma vakasının tamamında resmî beklenen çıktıyı bayt bayt üretmiştir; 60 anahtar denetimi vakası da geçmiştir. 10.000 rastgele çarpımda sekiz varyantın hiçbiri okul yönteminden sapmamıştır (Tablo 5). Bütün katsayıların uç değerde olduğu en kötü durum girdileri de sekiz varyantta doğru sonuç vermiştir. Koda bilerek yerleştirilen 12 hatanın 12'si testlerce yakalanmıştır.
 
-**Tablo 3.** 10.000 rastgele çarpımda hata sayısı
+**Tablo 5.** 10.000 rastgele çarpımda hata sayısı
 
 | Varyant | Genişlik | Hatalı / toplam |
 |---|:---:|:---:|
@@ -151,9 +285,9 @@ Sıfır hata, %95 güvenle hata oranının 10.000'de 3'ün altında olduğunu s�
 
 **Sınırın en küçük olması.** On serinin her birinde en kötü durum girdileri ℓ_min genişliğinde doğru, bir bit dar genişlikte bozuk sonuç vermiştir (60 çalıştırmanın 60'ı beklendiği gibi). 200.000 rastgele denemenin hiçbirinde, gerçek açma sonucu ile Lemma 1'in ölçütü birbirinden ayrılmamıştır.
 
-**Model ile ölçüm.** Tablo 4, hata oranının 0 ile 1 arasında ölçülebildiği noktaları göstermektedir. Sonuç iki bölgede farklıdır. Hatanın seyrek olduğu bölgede (oran 0,15'in altında) model sekiz noktanın sekizinde güven aralığının içindedir. Hatanın sık olduğu bölgede (oran 0,7'nin üstünde) ise model altı noktanın altısında aralığın dışında kalmış ve oranı 0,3 ile 1,6 puan arasında **fazla** tahmin etmiştir.
+**Model ile ölçüm.** Tablo 6, hata oranının 0 ile 1 arasında ölçülebildiği noktaları göstermektedir. Sonuç iki bölgede farklıdır. Hatanın seyrek olduğu bölgede (oran 0,15'in altında) model sekiz noktanın sekizinde güven aralığının içindedir. Hatanın sık olduğu bölgede (oran 0,7'nin üstünde) ise model altı noktanın altısında aralığın dışında kalmış ve oranı 0,3 ile 1,6 puan arasında **fazla** tahmin etmiştir.
 
-**Tablo 4.** Olasılık modelinin tahmini ile ölçülen hata oranı (seri başına 20.000 deneme)
+**Tablo 6.** Olasılık modelinin tahmini ile ölçülen hata oranı (seri başına 20.000 deneme)
 
 | Seri | ℓ | Hatalı | Ölçülen oran | %95 güven aralığı | Model | Model aralıkta mı? |
 |---|:---:|---:|:---:|:---:|:---:|:---:|
@@ -176,9 +310,9 @@ Sapmanın yönü her seferinde aynıdır ve modelin baştan bilinen yaklaşıkl�
 
 Genişlik 19 bit ve üzerindeyken hiçbir seride 20.000 denemede hata görülmemiştir. Bu sonuç, modelin bu bölgedeki çok küçük tahminlerini (10⁻¹⁵'in altı) **doğrulamaz**; yalnızca hata oranının 1,9·10⁻⁴'ün altında olduğunu gösterir.
 
-Sürekli eksende ölçülen eğriler modelle üst üste gelmiştir (Şekil 1, Şekil 2): hata olasılığının yarıya düştüğü taban, model ve ölçümde en fazla 0,01 bit farkla aynıdır (Tablo 5). k = 2, η = 3 ile k = 3, η = 2 serilerinin aynı eğriyi vermesi, modelin yalnızca k·η çarpımına bağlı olduğu öngörüsünü doğrulamıştır.
+Sürekli eksende ölçülen eğriler modelle üst üste gelmiştir (Şekil 1, Şekil 2): hata olasılığının yarıya düştüğü taban, model ve ölçümde en fazla 0,01 bit farkla aynıdır (Tablo 7). k = 2, η = 3 ile k = 3, η = 2 serilerinin aynı eğriyi vermesi, modelin yalnızca k·η çarpımına bağlı olduğu öngörüsünü doğrulamıştır.
 
-**Tablo 5.** Rastgele girdide gereken genişlik ile ispatın verdiği sınır
+**Tablo 7.** Rastgele girdide gereken genişlik ile ispatın verdiği sınır
 
 | Seri | Model medyanı (bit) | Ölçülen medyan | 20.000 denemede en büyük | ℓ_min | Fark |
 |---|:---:|:---:|:---:|:---:|:---:|
@@ -201,9 +335,9 @@ Rastgele girdiler 17–18 bitte kalırken ispatın istediği genişlik 21–23 b
 
 ### 4.3. Performans (H3)
 
-**Büyük tamsayı çarpımı.** Çarpılan sayı 8192 bitten 5632 bite indiğinde süre 20,35 µs'den 9,94 µs'ye düşmüştür (Tablo 6). Beklenen değer yaklaşık 1,8 kattı; ölçülen 2,05 kattır. Farkın nedeni ayrıca ölçülmemiştir; olası açıklama, Python'un bu boyutlarda iki farklı çarpma algoritması arasında geçiş yapmasıdır.
+**Büyük tamsayı çarpımı.** Çarpılan sayı 8192 bitten 5632 bite indiğinde süre 20,35 µs'den 9,94 µs'ye düşmüştür (Tablo 8). Beklenen değer yaklaşık 1,8 kattı; ölçülen 2,05 kattır. Farkın nedeni ayrıca ölçülmemiştir; olası açıklama, Python'un bu boyutlarda iki farklı çarpma algoritması arasında geçiş yapmasıdır.
 
-**Tablo 6.** Yalnızca büyük tamsayı çarpımı (15.000 tekrar)
+**Tablo 8.** Yalnızca büyük tamsayı çarpımı (15.000 tekrar)
 
 | Paketleme | Sayının boyutu (bit) | Medyan (µs) | ÇAA (µs) | Hızlanma |
 |---|:---:|:---:|:---:|:---:|
@@ -212,11 +346,11 @@ Rastgele girdiler 17–18 bitte kalırken ispatın istediği genişlik 21–23 b
 | 22 bit | 5632 | 9,94 | 0,18 | 2,05× |
 | 21 bit | 5376 | 9,20 | 0,04 | 2,21× |
 
-**Tek polinom çarpımı.** Paketleme ve açma da hesaba katıldığında tablo değişmektedir (Tablo 7). Bayt dönüşümü kullanan Kronecker varyantları (106–145 µs) Python ile yazılmış NTT'den (284 µs) hızlıdır; döngüyle açan varyantlar değildir. Bu deneyin beklenmedik bulgusu, **en hızlı varyantın 32 bitlik işaretsiz varyant olmasıdır** (106 µs; 24 bitlik işaretli varyant 130 µs). Adım adım ölçüm bunun nedenini göstermektedir (Tablo 8): dar paketlemenin çarpımda kazandırdığı yaklaşık 10 µs, toplam 80–90 µs tutan paketleme ve açma içinde kaybolmaktadır. Döngüyle işaretli açma sürenin %75'ini alırken bayt dönüşümüyle açma bu adımı 212 µs'den 55 µs'ye indirmiştir. Farklı bir bilgisayarda 500 tekrarla yapılan ek ölçüm aynı sıralamayı vermiştir (32 bit işaretsiz 2,46 kat, 24 bit işaretli 2,22 kat NTT'den hızlı).
+**Tek polinom çarpımı.** Paketleme ve açma da hesaba katıldığında tablo değişmektedir (Tablo 9). Bayt dönüşümü kullanan Kronecker varyantları (106–145 µs) Python ile yazılmış NTT'den (284 µs) hızlıdır; döngüyle açan varyantlar değildir. Bu deneyin beklenmedik bulgusu, **en hızlı varyantın 32 bitlik işaretsiz varyant olmasıdır** (106 µs; 24 bitlik işaretli varyant 130 µs). Adım adım ölçüm bunun nedenini göstermektedir (Tablo 10): dar paketlemenin çarpımda kazandırdığı yaklaşık 10 µs, toplam 80–90 µs tutan paketleme ve açma içinde kaybolmaktadır. Döngüyle işaretli açma sürenin %75'ini alırken bayt dönüşümüyle açma bu adımı 212 µs'den 55 µs'ye indirmiştir. Farklı bir bilgisayarda 500 tekrarla yapılan ek ölçüm aynı sıralamayı vermiştir (32 bit işaretsiz 2,46 kat, 24 bit işaretli 2,22 kat NTT'den hızlı).
 
 Bu karşılaştırma dikkatle okunmalıdır: NTT burada satır satır Python ile çalışırken büyük tamsayı çarpımı Python'un C ile yazılmış çekirdeğinde yapılmaktadır. "Kronecker NTT'den 2,2 kat hızlıdır" cümlesi yalnızca bu ortam için geçerlidir; iki yöntemin C ile yazıldığı bir karşılaştırma yapılmamıştır.
 
-**Tablo 7.** Tek polinom çarpımı (1000 tekrar, medyan)
+**Tablo 9.** Tek polinom çarpımı (1000 tekrar, medyan)
 
 | Yöntem | Medyan (µs) | ÇAA (µs) |
 |---|---:|---:|
@@ -231,7 +365,7 @@ Bu karşılaştırma dikkatle okunmalıdır: NTT burada satır satır Python ile
 | Kronecker, 24 bit, bayt, tamsayıda indirgeme | 145,17 | 1,53 |
 | Kronecker, 24 bit, bayt, toplam açılmadan | 122,85 | 2,24 |
 
-**Tablo 8.** Kronecker çarpımında sürenin adımlara dağılımı (µs)
+**Tablo 10.** Kronecker çarpımında sürenin adımlara dağılımı (µs)
 
 | Varyant | Paketleme | Tamsayı çarpımı | Açma ve indirgeme | Toplam |
 |---|---:|---:|---:|---:|
@@ -242,11 +376,11 @@ Bu karşılaştırma dikkatle okunmalıdır: NTT burada satır satır Python ile
 | 22 bit işaretli, tamsayıda indirgeme | 61,6 | 46,1 | 48,9 | 156,6 |
 | 24 bit, bayt, tamsayıda indirgeme | 27,6 | 54,6 | 27,4 | 109,6 |
 
-Tablo 8'in son iki satırı ikinci bir darboğazı göstermektedir: tamsayıda indirgeme açılacak dilim sayısını yarıya indirmekte, fakat kalan alma işlemi çarpım adımını 12 µs'den 55 µs'ye çıkarmaktadır.
+Tablo 10'in son iki satırı ikinci bir darboğazı göstermektedir: tamsayıda indirgeme açılacak dilim sayısını yarıya indirmekte, fakat kalan alma işlemi çarpım adımını 12 µs'den 55 µs'ye çıkarmaktadır.
 
-**ML-KEM'in tamamı.** Standartla aynı çıktıyı üretmek için gereken ters dönüşümler (ML-KEM-768 kapsüllemesinde 12 adet) Kronecker yolunu standardın gerisinde bırakmıştır (Tablo 9). Standart yol anahtar üretiminde %39–63, kapsüllemede %20–43, kapsül açmada %22–45 daha hızlıdır ve fark parametre seti büyüdükçe artmaktadır. A matrisinin katsayı biçimi bellekte hazır tutulduğunda fark küçülmekte ama kapanmamaktadır: üç işlemin toplamında Kronecker yolu standardın 0,90 / 0,85 / 0,82 katı hızdadır (Tablo 10). Aynı ek ölçümde 24 bitlik Kronecker çarpımı, Python'un izlediği en yüksek bellek tahsisini NTT'ye göre %56,9 artırmıştır; yani paketlenen sayının %31 küçülmesi programın bellek kullanımının azalması anlamına gelmemektedir.
+**ML-KEM'in tamamı.** Standartla aynı çıktıyı üretmek için gereken ters dönüşümler (ML-KEM-768 kapsüllemesinde 12 adet) Kronecker yolunu standardın gerisinde bırakmıştır (Tablo 11). Standart yol anahtar üretiminde %39–63, kapsüllemede %20–43, kapsül açmada %22–45 daha hızlıdır ve fark parametre seti büyüdükçe artmaktadır. A matrisinin katsayı biçimi bellekte hazır tutulduğunda fark küçülmekte ama kapanmamaktadır: üç işlemin toplamında Kronecker yolu standardın 0,90 / 0,85 / 0,82 katı hızdadır (Tablo 12). Aynı ek ölçümde 24 bitlik Kronecker çarpımı, Python'un izlediği en yüksek bellek tahsisini NTT'ye göre %56,9 artırmıştır; yani paketlenen sayının %31 küçülmesi programın bellek kullanımının azalması anlamına gelmemektedir.
 
-**Tablo 9.** ML-KEM işlemleri (100 tekrar, medyan, µs)
+**Tablo 11.** ML-KEM işlemleri (100 tekrar, medyan, µs)
 
 | Parametre seti | Çarpım yolu | Anahtar üretimi | Kapsülleme | Kapsül açma |
 |---|---|---:|---:|---:|
@@ -257,7 +391,7 @@ Tablo 8'in son iki satırı ikinci bir darboğazı göstermektedir: tamsayıda i
 | ML-KEM-1024 | NTT (standart) | 5516 | 8156 | 8688 |
 | | Kronecker, 24 bit | 8987 | 11698 | 12579 |
 
-**Tablo 10.** Üç işlemin toplamı, A matrisi hazır tutulduğunda (500 tekrar, medyan)
+**Tablo 12.** Üç işlemin toplamı, A matrisi hazır tutulduğunda (500 tekrar, medyan)
 
 | Parametre seti | Standart (ms) | Kronecker (ms) | Kronecker / standart hızı |
 |---|---:|---:|:---:|
@@ -275,9 +409,9 @@ Tablo 8'in son iki satırı ikinci bir darboğazı göstermektedir: tamsayıda i
 
 ### 4.4. Sınırın Altında Anahtara Bağlı Davranış (H4)
 
-4.2'de rastgele girdilerin 18 bitte bile hata vermediği görülmüştü. Bu bölüm "öyleyse 22 yerine 18–20 bit kullanılsın" seçiminin sonucunu inceler. Önerme 1'e göre özel seçilmiş girdide hata koşulu 1664·‖s‖₁ ≥ 2^(ℓ−1) olur (Tablo 11).
+4.2'de rastgele girdilerin 18 bitte bile hata vermediği görülmüştü. Bu bölüm "öyleyse 22 yerine 18–20 bit kullanılsın" seçiminin sonucunu inceler. Önerme 1'e göre özel seçilmiş girdide hata koşulu 1664·‖s‖₁ ≥ 2^(ℓ−1) olur (Tablo 13).
 
-**Tablo 11.** Hata için gereken en küçük ‖s‖₁ ve ölçülen sonuç
+**Tablo 13.** Hata için gereken en küçük ‖s‖₁ ve ölçülen sonuç
 
 | ℓ | Eşik | Gerçek dağılımdan 700 vektör (en büyük norm 282) | Yapay normlu 800 vektör |
 |:---:|:---:|---|---|
@@ -298,9 +432,9 @@ Bu sonucun ölçüsü dikkatle verilmelidir. Gösterilen şudur: rastgele deneme
 
 PQC-Drop ile dosya aktarımı, otomatik testlerde aynı bilgisayardaki iki uç arasında gönderilen ve alınan dosyanın bayt bayt eşleşmesiyle doğrulanmış; masaüstü ve terminal arayüzleri bir dizüstü bilgisayar ile Raspberry Pi 5 arasında kablolu ve kablosuz ağda denenmiştir.
 
-Ağ deneyinde 16.384 baytlık aynı metin iki biçimde gönderilmiş ve soketten geçen baytlar kaydedilmiştir (Tablo 12). Şifresiz gönderimde aranan sözcük doğrudan bulunmuş, PQC-Drop akışında bulunmamıştır. Kuantum sonrası anahtar değişiminin bedeli boyuttadır: içerik dışındaki 2300 baytın 2272'si açık anahtar ve kapsüldür.
+Ağ deneyinde 16.384 baytlık aynı metin iki biçimde gönderilmiş ve soketten geçen baytlar kaydedilmiştir (Tablo 14). Şifresiz gönderimde aranan sözcük doğrudan bulunmuş, PQC-Drop akışında bulunmamıştır. Kuantum sonrası anahtar değişiminin bedeli boyuttadır: içerik dışındaki 2300 baytın 2272'si açık anahtar ve kapsüldür.
 
-**Tablo 12.** Aynı 16.384 baytlık içerik için soketten geçen veri
+**Tablo 14.** Aynı 16.384 baytlık içerik için soketten geçen veri
 
 | Ölçüt | Şifresiz HTTP | PQC-Drop akışı |
 |---|:---:|:---:|
@@ -313,7 +447,7 @@ Entropi değeri bir güvenlik kanıtı olarak sunulmamaktadır. 18.684 rastgele 
 
 ### 4.6. ESP32 Üzerinde Çarpımın İki Biçimi (E6)
 
-**Tablo 13.** ESP32-D0WD-V3, 80 MHz, n = 256, aynı girdiyle 100 çalıştırmanın ortalaması
+**Tablo 15.** ESP32-D0WD-V3, 80 MHz, n = 256, aynı girdiyle 100 çalıştırmanın ortalaması
 
 | Biçim | Ortalama çevrim | Süre (ms) | Ara dizi |
 |---|---:|---:|---|
@@ -334,7 +468,7 @@ Entropi değeri bir güvenlik kanıtı olarak sunulmamaktadır. 18.684 rastgele 
 
 **Sınırlılıklar.**
 1. Bütün süre ölçümleri Python'a aittir; C ile yazılmış uygulamalara genellenemez. Performans deneyleri iki ayrı bilgisayarda yapılmış, aynı deney iki makinede tekrarlanmamıştır.
-2. 32 bitlik karşılaştırma tabanı en yalın uygulamadır; küçük çarpanı kaydıran işaretsiz bir uygulama 23 bitle çalışır (3.1). Merkezlemenin buna göre kazancı bir bittir.
+2. 32 bitlik karşılaştırma tabanı en yalın uygulamadır; küçük çarpanı kaydıran işaretsiz bir uygulama 23 bitle çalışır (3.3). Merkezlemenin buna göre kazancı bir bittir.
 3. Uygulama sabit zamanlı değildir; işlem süresi verilere bağlı olabilir (bkz. Bernstein ve ark., 2024). Bunun bilgi sızdırıp sızdırmadığı incelenmemiştir.
 4. H4 deneyinde eşik çevresi yapay vektörlerle taranmış, girdi gizli vektör bilinerek kurulmuş ve kapsül açmanın tamamı çalıştırılmamıştır.
 5. Ağ deneyi tek bilgisayarda, yerel döngü arayüzünde yapılmıştır; gerçek bir TLS oturumuyla karşılaştırma ve bağımsız paket yakalama yoktur.
@@ -349,7 +483,7 @@ Entropi değeri bir güvenlik kanıtı olarak sunulmamaktadır. 18.684 rastgele 
 2. Kronecker tabanlı uygulamalarda genişlik, rastgele testlerde yeterli görünen değere göre değil Teorem 1'deki sınıra göre seçilmelidir.
 3. Olasılık modelinin küçük olasılıklardaki doğruluğu, normal yaklaşım yerine kesin bir üst sınır (örneğin Chernoff sınırı) hesaplanarak ve daha büyük örneklemle sınanmalıdır.
 4. Sınırın altındaki genişliklerde kapsül açma işleminin tamamı çalıştırılarak hatanın dışarıdan gözlenip gözlenemediği (anahtar uyuşmazlığı, süre farkı) ölçülmelidir.
-5. Tamsayıda indirgeme adımındaki kalan alma işlemi, 2^(nℓ) ≡ −1 özelliğinden yararlanan kaydırma ve çıkarma işlemleriyle değiştirilerek Tablo 8'deki ikinci darboğaz giderilebilir.
+5. Tamsayıda indirgeme adımındaki kalan alma işlemi, 2^(nℓ) ≡ −1 özelliğinden yararlanan kaydırma ve çıkarma işlemleriyle değiştirilerek Tablo 10'deki ikinci darboğaz giderilebilir.
 6. PQC-Drop'a karşı tarafın doğrulanması (iki ekranda karşılaştırılan kısa bir doğrulama kodu ya da ML-DSA imzası), alıcı onayı ve gelen dosya adı denetimi eklenmeli; ağ deneyi iki ayrı bilgisayar arasında, gerçek bir TLS oturumuyla ve bağımsız paket yakalama aracıyla yinelenmelidir.
 
 ## Kaynaklar
